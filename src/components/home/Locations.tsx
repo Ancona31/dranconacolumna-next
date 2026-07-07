@@ -38,7 +38,7 @@ export default function Locations() {
                     href={link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-5 w-full rounded-full bg-whatsapp py-3 text-center font-body text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                    className="mt-5 w-full rounded-full bg-whatsapp py-3 text-center font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
                   >
                     Agendar en {loc.ciudad}
                   </a>

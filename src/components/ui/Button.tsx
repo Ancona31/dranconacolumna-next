@@ -33,7 +33,7 @@ export default function ButtonLink({
   external = false,
   className = "",
 }: ButtonLinkProps) {
-  const classes = `inline-flex items-center justify-center gap-2 rounded-full font-body font-semibold transition-colors ${variants[variant]} ${sizes[size]} ${className}`;
+  const classes = `inline-flex items-center justify-center gap-2 rounded-full font-body font-semibold transition duration-150 active:scale-[0.985] ${variants[variant]} ${sizes[size]} ${className}`;
 
   if (external) {
     return (

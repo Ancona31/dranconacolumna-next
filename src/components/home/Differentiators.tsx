@@ -47,7 +47,7 @@ export default function Differentiators() {
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {CARDS.map(({ Icon, title, text, photo, link }, i) => (
             <Reveal key={title} delay={i * 80} className="flex">
-              <div className="group flex flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 bg-background transition-all duration-200 md:hover:-translate-y-[3px] md:hover:shadow-lg">
+              <div className="group flex flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 bg-background transition duration-200 ease-out md:hover:-translate-y-[3px] md:hover:shadow-lg">
                 <PhotoPlaceholder
                   label={photo}
                   flush

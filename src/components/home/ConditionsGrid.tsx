@@ -27,7 +27,7 @@ export default function ConditionsGrid() {
                     <Reveal key={c.slug} delay={i * 80} className="flex">
                       <Link
                         href={`/padecimientos/${c.slug}`}
-                        className="group flex flex-1 items-start justify-between gap-2 rounded-2xl border border-ink/10 bg-background p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
+                        className="group flex flex-1 items-start justify-between gap-2 rounded-2xl border border-ink/10 bg-background p-5 transition duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
                       >
                         <span className="flex flex-col">
                           <span className="font-heading text-base font-semibold text-ink">
