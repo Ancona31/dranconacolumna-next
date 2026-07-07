@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  /* Paleta de marca */
+  --color-primary: #0b3c5d; /* azul tinta profundo */
+  --color-primary-soft: #e8f1f8; /* fondos de sección alternados */
+  --color-accent: #1b6ca8; /* enlaces e interactivos */
+  --color-background: #fbfbf9; /* blanco cálido */
+  --color-ink: #16232e; /* texto principal */
+  --color-success: #2e7d5b; /* severidad leve */
+  --color-warning: #c77d1f; /* severidad moderada */
+  --color-danger: #c0453a; /* severidad severa */
+  --color-whatsapp: #25d366; /* SOLO botones de WhatsApp */
+
+  /* Tipografías conectadas a next/font */
+  --font-heading: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+/* Compensa la barra de acción fija en móvil para no tapar contenido.
+   Se anula en pantallas md+ donde la barra no existe. */
+body {
+  padding-bottom: 4.5rem;
+}
+
+@media (min-width: 768px) {
+  body {
+    padding-bottom: 0;
+  }
+}
