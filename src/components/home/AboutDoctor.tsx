@@ -1,5 +1,5 @@
+import Image from "next/image";
 import ButtonLink from "@/components/ui/Button";
-import PhotoPlaceholder from "@/components/ui/PhotoPlaceholder";
 import Reveal from "@/components/ui/Reveal";
 import { DOCTOR_FULL_NAME } from "@/lib/config";
 
@@ -8,10 +8,15 @@ export default function AboutDoctor() {
     <section className="bg-primary-soft">
       <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 md:grid-cols-2 md:py-20">
         <Reveal>
-          <PhotoPlaceholder
-            label="FOTO REAL: retrato profesional del Dr. Ancona, bata, fondo neutro"
-            className="aspect-[4/5] w-full"
-          />
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl">
+            <Image
+              src="/images/dr-ancona-perfil.jpg"
+              alt="Retrato profesional del Dr. Angel Ancona"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
         </Reveal>
 
         <Reveal delay={120}>

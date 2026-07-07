@@ -1,13 +1,13 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ShieldCheck, Bone, HeartHandshake } from "lucide-react";
-import PhotoPlaceholder from "@/components/ui/PhotoPlaceholder";
 import Reveal from "@/components/ui/Reveal";
 
 type Card = {
   Icon: typeof ShieldCheck;
   title: string;
   text: string;
-  photo: string;
+  image: { src: string; alt: string; objectPosition?: string };
   link?: { label: string; href: string };
 };
 
@@ -16,21 +16,32 @@ const CARDS: Card[] = [
     Icon: ShieldCheck,
     title: "Alta especialidad en cirugía de columna",
     text: "No todos los ortopedistas operan columna. Cursé una alta especialidad dedicada exclusivamente a ella, y cuando el caso lo permite uso técnicas de mínima invasión: incisiones más pequeñas, menos dolor y una recuperación más rápida.",
-    photo: "FOTO REAL: el Dr. Ancona en quirófano durante cirugía de columna",
+    image: {
+      src: "/images/quirofano-1.jpg",
+      alt: "Equipo quirúrgico durante una cirugía de columna de mínima invasión",
+    },
     link: { label: "Conocer más", href: "/cirugia-de-columna" },
   },
   {
     Icon: Bone,
     title: "Ortopedia y traumatología integral",
     text: "Fracturas, esguinces, lesiones deportivas y desgaste articular: hombro, cadera, rodilla, mano y tobillo. La misma rigurosidad para un esguince que para una cirugía compleja.",
-    photo: "FOTO REAL: el Dr. Ancona explorando a un paciente en consulta",
+    image: {
+      src: "/images/quirofano-fractura.jpg",
+      alt: "El Dr. Ancona durante la cirugía de una fractura",
+      objectPosition: "center 42%",
+    },
     link: { label: "Ver padecimientos", href: "/padecimientos" },
   },
   {
     Icon: HeartHandshake,
     title: "Atención personal, de inicio a fin",
     text: "Te atiendo yo en la valoración, en el quirófano y en cada revisión — no un equipo rotativo. Mi WhatsApp responde, porque las urgencias no esperan.",
-    photo: "FOTO REAL: retrato cercano del Dr. Ancona, bata, expresión cálida",
+    image: {
+      src: "/images/dr-ancona-hospital.jpg",
+      alt: "El Dr. Angel Ancona en el hospital",
+      objectPosition: "center 25%",
+    },
   },
 ];
 
@@ -45,14 +56,23 @@ export default function Differentiators() {
         </Reveal>
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {CARDS.map(({ Icon, title, text, photo, link }, i) => (
+          {CARDS.map(({ Icon, title, text, image, link }, i) => (
             <Reveal key={title} delay={i * 80} className="flex">
               <div className="group flex flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 bg-background transition duration-200 ease-out md:hover:-translate-y-[3px] md:hover:shadow-lg">
-                <PhotoPlaceholder
-                  label={photo}
-                  flush
-                  className="aspect-[4/3] w-full"
-                />
+                <div className="relative aspect-[4/3] w-full">
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    className="object-cover"
+                    style={
+                      image.objectPosition
+                        ? { objectPosition: image.objectPosition }
+                        : undefined
+                    }
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
                 <div className="flex flex-1 flex-col p-6">
                   <div className="flex items-center gap-2">
                     <Icon

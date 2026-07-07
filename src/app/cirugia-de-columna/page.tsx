@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Microscope, Wrench, Syringe, Monitor } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import ButtonLink from "@/components/ui/Button";
-import PhotoPlaceholder from "@/components/ui/PhotoPlaceholder";
+import Image from "next/image";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
@@ -60,10 +60,15 @@ export default function CirugiaDeColumnaPage() {
             </p>
           </Reveal>
           <Reveal delay={120}>
-            <PhotoPlaceholder
-              label="FOTO REAL: el Dr. Ancona en quirófano durante cirugía de columna"
-              className="mt-10 aspect-[16/9] w-full"
-            />
+            <div className="relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-2xl">
+              <Image
+                src="/images/quirofano-2.jpg"
+                alt="Cirugía endoscópica de columna: el monitor muestra la visión del endoscopio en tiempo real"
+                fill
+                className="object-cover"
+                sizes="100vw"
+              />
+            </div>
           </Reveal>
         </div>
       </section>

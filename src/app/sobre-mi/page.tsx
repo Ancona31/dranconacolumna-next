@@ -3,7 +3,7 @@ import Link from "next/link";
 import { GraduationCap, BadgeCheck } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import ButtonLink from "@/components/ui/Button";
-import PhotoPlaceholder from "@/components/ui/PhotoPlaceholder";
+import Image from "next/image";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import {
   DOCTOR_FULL_NAME,
@@ -40,10 +40,16 @@ export default function SobreMiPage() {
       <section className="bg-primary-soft">
         <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 md:grid-cols-2 md:py-20">
           <Reveal>
-            <PhotoPlaceholder
-              label="FOTO REAL: retrato profesional del Dr. Ancona, bata, expresión cálida"
-              className="aspect-[3/4] w-full"
-            />
+            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl">
+              <Image
+                src="/images/dr-ancona-perfil.jpg"
+                alt="Dr. Angel M. Ancona Pérez, ortopedista y traumatólogo"
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
           </Reveal>
 
           <Reveal delay={120}>
