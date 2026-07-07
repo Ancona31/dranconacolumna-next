@@ -6,6 +6,7 @@ import {
   CEDULA_PROFESIONAL,
   CEDULA_ESPECIALIDAD,
   CERTIFICACION,
+  CONTACT_EMAIL,
 } from "@/lib/config";
 
 export default function Footer() {
@@ -41,9 +42,18 @@ export default function Footer() {
             />
           </span>
           <p className="font-semibold text-white">{DOCTOR_FULL_NAME}</p>
-          <p>Cédula profesional: {CEDULA_PROFESIONAL}</p>
-          <p>Cédula de especialidad: {CEDULA_ESPECIALIDAD}</p>
+          <p>
+            Céd. Prof. {CEDULA_PROFESIONAL} · Céd. Esp. {CEDULA_ESPECIALIDAD}
+          </p>
           <p>{CERTIFICACION}</p>
+          <p>
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="underline underline-offset-4 transition-colors hover:text-white"
+            >
+              {CONTACT_EMAIL}
+            </a>
+          </p>
         </div>
 
         <div className="mt-6 flex flex-col gap-2 text-sm">

@@ -1,12 +1,16 @@
 import { Star } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
-import { CEDULA_PROFESIONAL, CERTIFICACION } from "@/lib/config";
+import {
+  CEDULA_PROFESIONAL,
+  CEDULA_ESPECIALIDAD,
+  CERTIFICACION,
+} from "@/lib/config";
 
 export default function TrustBar() {
   const items = [
     { key: "rating", node: <RatingItem /> },
     { key: "cirugias", node: <span>+200 cirugías de columna</span> },
-    { key: "cedula", node: <span>Céd. Prof. {CEDULA_PROFESIONAL}</span> },
+    { key: "cedula", node: <CedulaItem /> },
     { key: "cert", node: <span>{CERTIFICACION}</span> },
   ];
 
@@ -49,6 +53,19 @@ function RatingItem() {
         fill="currentColor"
       />
       <span>4.9 en Google</span>
+    </span>
+  );
+}
+
+function CedulaItem() {
+  return (
+    <span>
+      {/* Móvil (grid 2x2): solo la cédula de especialista para no saturar. */}
+      <span className="md:hidden">Céd. Esp. {CEDULA_ESPECIALIDAD}</span>
+      {/* Desktop: ambas cédulas. */}
+      <span className="hidden md:inline">
+        Céd. Prof. {CEDULA_PROFESIONAL} · Céd. Esp. {CEDULA_ESPECIALIDAD}
+      </span>
     </span>
   );
 }
