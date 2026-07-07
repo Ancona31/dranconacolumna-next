@@ -1,7 +1,9 @@
+import Reveal from "@/components/ui/Reveal";
+
 export default function InsuranceBar() {
   return (
     <section className="border-t border-ink/10 bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-12">
+      <Reveal className="mx-auto max-w-6xl px-4 py-12">
         <p className="text-center font-heading text-lg font-bold text-ink md:text-xl">
           ¿Tienes seguro de gastos médicos? Te ayudo con el trámite.
         </p>
@@ -16,7 +18,7 @@ export default function InsuranceBar() {
             </span>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

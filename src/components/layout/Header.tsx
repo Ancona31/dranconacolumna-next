@@ -1,18 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { MAIN_NAV, WHATSAPP_DEFAULT_MESSAGE } from "@/lib/nav";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { TAGLINE } from "@/lib/config";
 
 function Logo() {
   return (
-    <Link href="/" className="flex flex-col leading-none">
-      <span className="font-heading text-lg font-bold text-primary">
-        Dr. Angel Ancona
-      </span>
-      <span className="font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70">
-        Cirugía de columna
+    <Link href="/" className="flex items-center gap-2.5">
+      <Image
+        src="/logo.png"
+        alt="Logotipo Dr. Angel Ancona — columna vertebral"
+        width={527}
+        height={512}
+        priority
+        className="h-10 w-auto md:h-11"
+      />
+      <span className="flex flex-col leading-none">
+        <span className="font-heading text-lg font-bold text-primary">
+          Dr. Angel Ancona
+        </span>
+        <span className="font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70">
+          {TAGLINE}
+        </span>
       </span>
     </Link>
   );
@@ -20,10 +32,22 @@ function Logo() {
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const whatsappLink = buildWhatsAppLink(WHATSAPP_DEFAULT_MESSAGE);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 border-b border-ink/10 bg-background">
+    <header
+      className={`sticky top-0 z-40 border-b border-ink/10 bg-background transition-shadow duration-200 ${
+        scrolled ? "shadow-sm" : "shadow-none"
+      }`}
+    >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <Logo />
 

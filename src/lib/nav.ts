@@ -8,8 +8,7 @@ export type NavItem = {
 export const MAIN_NAV: NavItem[] = [
   { label: "Evaluación gratuita", href: "/evaluacion" },
   { label: "Padecimientos", href: "/padecimientos" },
-  { label: "Mínima invasión", href: "/minima-invasion" },
-  { label: "Tecnología 3D", href: "/tecnologia-3d" },
+  { label: "Cirugía de columna", href: "/cirugia-de-columna" },
   { label: "Sobre mí", href: "/sobre-mi" },
 ];
 

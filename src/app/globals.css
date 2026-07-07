@@ -46,3 +46,28 @@ body {
     padding-bottom: 0;
   }
 }
+
+/* Sistema de animación de entrada (Reveal).
+   Sin la clase .js (no-JS / SEO) todo se muestra: no se aplica ningún estado
+   oculto. Con .js los elementos .reveal entran de forma sutil. */
+html.js .reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 500ms ease-out,
+    transform 500ms ease-out;
+  will-change: opacity, transform;
+}
+
+html.js .reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

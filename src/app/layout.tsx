@@ -41,6 +41,13 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${inter.variable} h-full`}
     >
       <body className="flex min-h-full flex-col">
+        {/* Marca el documento como con-JS antes del paint para habilitar las
+            animaciones de entrada sin provocar parpadeo (FOUC). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js');",
+          }}
+        />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

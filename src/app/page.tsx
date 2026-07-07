@@ -11,9 +11,12 @@ import Locations from "@/components/home/Locations";
 import { PLACEHOLDER_REVIEWS } from "@/lib/reviews-placeholder";
 
 export const metadata: Metadata = {
-  title: { absolute: "Cirujano de columna en Mérida | Dr. Angel Ancona" },
+  title: {
+    absolute:
+      "Ortopedista y Traumatólogo en Mérida | Dr. Angel Ancona · Cirugía de Columna",
+  },
   description:
-    "Evaluación gratuita de columna en minutos. Cirugía de mínima invasión y planeación 3D. Agenda tu valoración con el Dr. Angel Ancona en Mérida y Umán.",
+    "Ortopedista y traumatólogo en Mérida y Umán. Alta especialidad en cirugía de columna y técnicas de mínima invasión. Haz una evaluación gratuita de tu dolor y agenda tu valoración.",
 };
 
 export default function HomePage() {

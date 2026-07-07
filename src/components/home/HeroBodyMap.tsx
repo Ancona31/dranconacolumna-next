@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BodyFigureSVG from "@/components/home/BodyFigureSVG";
 import ButtonLink from "@/components/ui/Button";
+import Reveal from "@/components/ui/Reveal";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { WHATSAPP_DEFAULT_MESSAGE } from "@/lib/nav";
 
@@ -11,7 +12,7 @@ export default function HeroBodyMap() {
     <section className="bg-primary-soft">
       <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-12 md:grid-cols-2 md:py-20">
         {/* Texto */}
-        <div className="order-1 text-center md:text-left">
+        <Reveal className="order-1 text-center md:text-left">
           <h1 className="font-heading text-4xl font-extrabold leading-tight text-primary sm:text-5xl">
             ¿Dónde te duele?
           </h1>
@@ -28,8 +29,8 @@ export default function HeroBodyMap() {
           </div>
 
           <p className="mx-auto mt-5 max-w-md font-body text-sm text-ink/60 md:mx-0">
-            Evaluación diseñada por el Dr. Angel Ancona, cirujano de columna
-            certificado.
+            Evaluación diseñada por el Dr. Angel Ancona — ortopedista y
+            traumatólogo, especialista en cirugía de columna.
           </p>
           <a
             href={whatsappLink}
@@ -39,10 +40,10 @@ export default function HeroBodyMap() {
           >
             Prefiero agendar directamente
           </a>
-        </div>
+        </Reveal>
 
         {/* Figura (autocontenida: puntos, halo y chip los dibuja el SVG) */}
-        <div className="order-2 flex justify-center">
+        <Reveal delay={120} className="order-2 flex justify-center">
           <Link
             href="/evaluacion"
             aria-label="Comenzar mi evaluación"
@@ -50,7 +51,7 @@ export default function HeroBodyMap() {
           >
             <BodyFigureSVG className="h-auto w-full text-primary" />
           </Link>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MAIN_NAV } from "@/lib/nav";
 import {
   DOCTOR_FULL_NAME,
@@ -30,6 +31,15 @@ export default function Footer() {
         </nav>
 
         <div className="mt-8 space-y-1 border-t border-white/15 pt-8 font-body text-sm text-white/80">
+          <span className="mb-3 inline-flex rounded-full bg-[var(--color-background)] p-1.5">
+            <Image
+              src="/logo.png"
+              alt="Logotipo Dr. Angel Ancona — columna vertebral"
+              width={527}
+              height={512}
+              className="h-12 w-auto"
+            />
+          </span>
           <p className="font-semibold text-white">{DOCTOR_FULL_NAME}</p>
           <p>Cédula profesional: {CEDULA_PROFESIONAL}</p>
           <p>Cédula de especialidad: {CEDULA_ESPECIALIDAD}</p>

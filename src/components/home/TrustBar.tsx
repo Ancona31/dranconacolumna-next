@@ -1,4 +1,5 @@
-import { IconStar } from "@/components/ui/Icons";
+import { Star } from "lucide-react";
+import Reveal from "@/components/ui/Reveal";
 import { CEDULA_PROFESIONAL, CERTIFICACION } from "@/lib/config";
 
 export default function TrustBar() {
@@ -11,7 +12,7 @@ export default function TrustBar() {
 
   return (
     <section className="bg-primary text-white">
-      <div className="mx-auto max-w-6xl px-4 py-3">
+      <Reveal className="mx-auto max-w-6xl px-4 py-3">
         {/* Móvil: grid 2x2 */}
         <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-center font-body text-xs text-white/90 md:hidden">
           {items.map((item) => (
@@ -34,7 +35,7 @@ export default function TrustBar() {
             </li>
           ))}
         </ul>
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -42,7 +43,11 @@ export default function TrustBar() {
 function RatingItem() {
   return (
     <span className="flex items-center gap-1">
-      <IconStar className="h-4 w-4 text-[#E9B44C]" />
+      <Star
+        className="h-4 w-4 text-[#E9B44C]"
+        strokeWidth={1.5}
+        fill="currentColor"
+      />
       <span>4.9 en Google</span>
     </span>
   );

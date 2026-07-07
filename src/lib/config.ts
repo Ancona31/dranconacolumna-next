@@ -3,7 +3,10 @@
  * Fuente única de verdad para datos de contacto y credenciales legales.
  */
 
-export const SITE_NAME = "Dr. Angel Ancona · Cirugía de Columna";
+export const SITE_NAME =
+  "Dr. Angel Ancona · Ortopedia, Traumatología y Cirugía de Columna";
+
+export const TAGLINE = "ORTOPEDIA · TRAUMATOLOGÍA · COLUMNA";
 
 export const DOCTOR_FULL_NAME = "Dr. Angel M. Ancona Pérez";
 
