@@ -84,7 +84,7 @@ export default function ZonePicker({
       </div>
 
       <p className="mt-6 font-body text-sm text-ink/50">
-        Por ahora la evaluación de cadera está disponible. El resto llega muy
+        Las zonas resaltadas ya tienen evaluación disponible. El resto llega muy
         pronto.
       </p>
 

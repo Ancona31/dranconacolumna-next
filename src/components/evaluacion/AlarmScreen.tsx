@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { RED_FLAGS, RED_FLAG_NONE_ID } from "@/lib/evaluacion/red-flags";
+import type { TestDefinition } from "@/lib/evaluacion/types";
 
 type AlarmScreenProps = {
+  /** Test en curso; provee el conteo de ítems y la duración estimada. */
+  test: TestDefinition;
   /**
    * Continúa SIEMPRE al triaje/test. Recibe los ids de los datos de alarma
    * marcados (vacío si eligió "Ninguna"). Ningún flag interrumpe el test.
@@ -12,7 +15,17 @@ type AlarmScreenProps = {
   onContinue: (flagIds: string[]) => void;
 };
 
-export default function AlarmScreen({ onContinue }: AlarmScreenProps) {
+/** "24 frases · alrededor de 2 minutos" — conteo de ítems + duración. */
+function durationLabel(test: TestDefinition) {
+  const noun =
+    test.questionNoun?.plural ??
+    (test.questions.length === 1 ? "pregunta" : "preguntas");
+  const min = test.estimatedMinutes;
+  const time = `alrededor de ${min} ${min === 1 ? "minuto" : "minutos"}`;
+  return `${test.questions.length} ${noun} · ${time}`;
+}
+
+export default function AlarmScreen({ test, onContinue }: AlarmScreenProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   function toggle(id: string) {
@@ -51,6 +64,9 @@ export default function AlarmScreen({ onContinue }: AlarmScreenProps) {
       </h1>
       <p className="mt-2 font-body text-ink/70">
         Selecciona todo lo que aplique. Es importante para orientarte bien.
+      </p>
+      <p className="mt-1 font-body text-sm text-ink/50">
+        {durationLabel(test)}
       </p>
 
       <ul className="mt-6 space-y-3">

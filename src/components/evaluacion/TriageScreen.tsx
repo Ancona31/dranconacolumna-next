@@ -13,25 +13,47 @@ export default function TriageScreen({
   triage,
   onComplete,
 }: TriageScreenProps) {
-  const [currentId, setCurrentId] = useState(triage[0]?.id);
+  const [index, setIndex] = useState(0);
   const [flags, setFlags] = useState<string[]>([]);
 
-  const question = triage.find((q) => q.id === currentId);
+  const question = triage[index];
   if (!question) {
     onComplete(flags);
     return null;
   }
 
+  /** Avanza a la siguiente pregunta por orden; si no hay, termina el triaje. */
+  function advance(nextFlags: string[]) {
+    const next = index + 1;
+    if (next >= triage.length) onComplete(nextFlags);
+    else {
+      setFlags(nextFlags);
+      setIndex(next);
+    }
+  }
+
   function handleAction(action: string) {
     if (!question) return;
+    // "flag-next:X" → registra el flag y avanza a la siguiente pregunta.
+    if (action.startsWith("flag-next:")) {
+      advance([...flags, action.slice("flag-next:".length)]);
+      return;
+    }
+    // "flag:X" → registra el flag y termina el triaje (rama terminal).
     if (action.startsWith("flag:")) {
-      // Ningún flag interrumpe: se registra y sigue al test.
       onComplete([...flags, action.slice("flag:".length)]);
       return;
     }
     if (action.startsWith("goto:")) {
-      setFlags(flags);
-      setCurrentId(action.slice("goto:".length));
+      const target = action.slice("goto:".length);
+      const i = triage.findIndex((q) => q.id === target);
+      if (i < 0) onComplete(flags);
+      else setIndex(i);
+      return;
+    }
+    // "next" → avanza a la siguiente pregunta sin registrar flag.
+    if (action === "next") {
+      advance(flags);
       return;
     }
     // "continue" (o cualquier otro) → al test con los flags actuales.
@@ -40,7 +62,10 @@ export default function TriageScreen({
 
   return (
     <div className="mx-auto w-full max-w-xl">
-      <h1 className="font-heading text-2xl font-bold text-primary sm:text-3xl">
+      <span className="font-body text-sm text-ink/60">
+        Sobre tu dolor · {index + 1} de {triage.length}
+      </span>
+      <h1 className="mt-1 font-heading text-2xl font-bold text-primary sm:text-3xl">
         {question.text}
       </h1>
 

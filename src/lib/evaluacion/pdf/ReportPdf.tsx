@@ -9,15 +9,29 @@ import {
   Path,
   Line,
   Circle,
+  Ellipse,
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
-import type { EvaluationResult } from "@/lib/evaluacion/types";
+import type { DomainId, EvaluationResult } from "@/lib/evaluacion/types";
 import {
   buildAlertBanner,
+  computeDomains,
+  type DomainResult,
+  EVALUATION_SIGNATURE,
+  FUNC_ALL_GREEN_LINE,
+  FUNC_COLORS,
+  FUNC_STATE_LABELS,
+  type FuncState,
+  getEvaluationPlan,
   getRecommendationText,
   getQrWhatsAppLink,
+  getWarningSigns,
+  nivelDefinitions,
+  NIVEL_BADGE_COLORS,
+  WARNING_CLOSING,
 } from "@/lib/evaluacion/engine";
+import { BODY_PATH, BODY_ZONES } from "@/components/home/BodyFigureSVG";
 import {
   DOCTOR_FULL_NAME,
   CEDULA_PROFESIONAL,
@@ -68,17 +82,24 @@ const LEVELS = {
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 0,
+    // paddingTop = 86 del membrete fijo + 18 de aire; se aplica en todas las páginas.
+    paddingTop: 104,
     paddingHorizontal: 0,
     paddingBottom: 64,
+    backgroundColor: C.bg,
     fontFamily: "Helvetica",
     fontSize: 9,
     color: C.ink,
     lineHeight: 1.35,
   },
+  // Membrete universal: mismo header fijo con altura explícita en TODAS las páginas.
   headerBand: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 86,
     backgroundColor: C.primary,
-    paddingVertical: 14,
     paddingHorizontal: 40,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -104,7 +125,7 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
     fontSize: 14,
     color: C.primary,
-    marginTop: 18,
+    marginTop: 14,
   },
   meta: { fontSize: 8.5, color: "#5b6772", marginTop: 2 },
   sectionTitle: {
@@ -114,8 +135,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginBottom: 4,
   },
-  section: { marginTop: 11 },
-  alertBox: { borderLeftWidth: 3, padding: 8, marginTop: 11, borderRadius: 3 },
+  section: { marginTop: 8 },
+  alertBox: { borderLeftWidth: 3, padding: 8, marginTop: 8, borderRadius: 3 },
   levelPill: {
     alignSelf: "flex-start",
     color: "#fff",
@@ -130,33 +151,34 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     backgroundColor: C.primarySoft,
     padding: 8,
-    marginTop: 10,
+    marginTop: 8,
     borderRadius: 3,
   },
-  barTrack: {
-    height: 5,
-    backgroundColor: "#E2E7EC",
-    borderRadius: 3,
-    marginTop: 2,
+  nivelBadge: {
+    borderWidth: 1,
+    padding: 6,
+    marginTop: 8,
+    borderRadius: 4,
   },
-  bandRow: {
+  capCard: {
+    borderWidth: 1,
+    borderLeftWidth: 3,
+    borderRadius: 4,
+    padding: 8,
+    marginBottom: 5,
+  },
+  capTop: {
     flexDirection: "row",
     justifyContent: "space-between",
-    fontSize: 8.5,
-  },
-  tableRow: {
-    flexDirection: "row",
-    height: 14,
     alignItems: "center",
-    paddingHorizontal: 6,
   },
-  tableCellL: { flex: 1, fontSize: 8.5 },
-  tableCellR: { fontSize: 8.5, fontFamily: "Helvetica-Bold" },
+  capState: { flexDirection: "row", alignItems: "center", gap: 3 },
+  signature: { fontSize: 8.5, fontStyle: "italic", color: C.muted, marginTop: 4 },
   ctaBox: {
     backgroundColor: C.primary,
     borderRadius: 8,
     padding: 11,
-    marginTop: 12,
+    marginTop: 9,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -175,7 +197,7 @@ const styles = StyleSheet.create({
   legal: {
     fontSize: 7,
     color: "#7a828b",
-    marginTop: 12,
+    marginTop: 8,
     borderTopWidth: 1,
     borderTopColor: C.line,
     paddingTop: 6,
@@ -188,11 +210,20 @@ const styles = StyleSheet.create({
     right: 0,
     height: 26,
     backgroundColor: C.primary,
+    paddingHorizontal: 40,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
   footerText: { color: C.bg, fontSize: 8 },
+  footerPage: {
+    position: "absolute",
+    bottom: 9,
+    right: 40,
+    color: C.bg,
+    fontSize: 8,
+    textAlign: "right",
+  },
 });
 
 function polar(score: number) {
@@ -223,9 +254,11 @@ function PdfGauge({ score }: { score: number }) {
   );
 }
 
+// Membrete universal: mismo header fijo (altura explícita 86) en TODAS las
+// páginas. Sin render condicional — se imprime idéntico en p1, p2, pN.
 function HeaderBand() {
   return (
-    <View style={styles.headerBand}>
+    <View style={styles.headerBand} fixed>
       <View style={styles.headerLeft}>
         <View style={styles.logoPlate}>
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
@@ -250,17 +283,27 @@ function HeaderBand() {
 
 function FooterBand() {
   return (
-    <View style={styles.footerBand} fixed>
-      <Text style={styles.footerText}>
-        dranconacolumna.com  ·  WhatsApp {PHONE_DISPLAY}  ·  Mérida y Umán
-      </Text>
-    </View>
+    <>
+      <View style={styles.footerBand} fixed>
+        <Text style={styles.footerText}>
+          dranconacolumna.com  ·  WhatsApp {PHONE_DISPLAY}  ·  Mérida y Umán
+        </Text>
+      </View>
+      {/* Único condicional por página permitido: render en un Text fijo. */}
+      <Text
+        fixed
+        style={styles.footerPage}
+        render={({ pageNumber, totalPages }) =>
+          `Página ${pageNumber} de ${totalPages}`
+        }
+      />
+    </>
   );
 }
 
 function Legal({ citation }: { citation: string }) {
   return (
-    <View style={styles.legal}>
+    <View style={styles.legal} wrap={false}>
       <Text>{citation}</Text>
       <Text style={{ marginTop: 3 }}>
         Este reporte no constituye un diagnóstico ni sustituye una consulta
@@ -271,32 +314,43 @@ function Legal({ citation }: { citation: string }) {
   );
 }
 
-function CtaBlock({ waLink }: { waLink: string }) {
+function CtaBlock({ waLink, urgent }: { waLink: string; urgent: boolean }) {
   return (
     <View style={styles.ctaBox} wrap={false}>
       <View style={{ flex: 1, paddingRight: 12 }}>
         <Text
           style={{ color: "#fff", fontFamily: "Helvetica-Bold", fontSize: 10.5 }}
         >
-          Escríbenos por WhatsApp para agendar tu valoración
+          {urgent
+            ? "Avísanos de tu caso por WhatsApp"
+            : "Escríbenos por WhatsApp para agendar tu valoración"}
         </Text>
         <Link src={waLink} style={styles.greenPill}>
           {PHONE_DISPLAY}
         </Link>
-        <Text style={{ color: "#D5E3EF", fontSize: 8.5, marginTop: 7 }}>
-          Consulta en Mérida y Umán
-        </Text>
-        <Text
-          style={{
-            color: "#D5E3EF",
-            fontSize: 8.5,
-            marginTop: 3,
-            fontStyle: "italic",
-          }}
-        >
-          Presenta este reporte en tu cita — me permite conocer tu caso antes de
-          explorarte.
-        </Text>
+        {urgent ? (
+          <Text style={{ color: "#D5E3EF", fontSize: 8.5, marginTop: 7 }}>
+            Y lleva este reporte a tu valoración de hoy — le servirá al médico
+            que te atienda.
+          </Text>
+        ) : (
+          <>
+            <Text style={{ color: "#D5E3EF", fontSize: 8.5, marginTop: 7 }}>
+              Consulta en Mérida y Umán
+            </Text>
+            <Text
+              style={{
+                color: "#D5E3EF",
+                fontSize: 8.5,
+                marginTop: 3,
+                fontStyle: "italic",
+              }}
+            >
+              Presenta este reporte en tu cita — me permite conocer tu caso antes
+              de explorarte.
+            </Text>
+          </>
+        )}
       </View>
       <View style={{ alignItems: "center" }}>
         <Link src={waLink}>
@@ -348,10 +402,138 @@ function AlertBlock({ result }: { result: EvaluationResult }) {
   );
 }
 
-function bucketMeta(value: number) {
-  if (value <= 1) return { label: "Leve", color: C.success };
-  if (value === 2) return { label: "Moderado", color: C.warning };
-  return { label: "Alto", color: C.danger };
+// Mini-silueta de marca: silueta accent 12% con la zona evaluada marcada en el
+// color intenso del nivel. Path reflejado de BodyFigureSVG (ese archivo no se toca).
+function PdfMiniSilhouette({ result }: { result: EvaluationResult }) {
+  const pt = BODY_ZONES.find((z) => z.id === result.test.zoneId);
+  const strong = NIVEL_BADGE_COLORS[result.level].strong;
+  const scale = 56 / 540;
+  return (
+    <Svg width={220 * scale} height={56} viewBox="0 0 220 540">
+      <Path d={BODY_PATH} fill={C.accent} fillOpacity={0.12} />
+      {pt ? (
+        <>
+          <Circle cx={pt.cx} cy={pt.cy} r={18} fill={strong} fillOpacity={0.2} />
+          <Circle cx={pt.cx} cy={pt.cy} r={9} fill={strong} />
+        </>
+      ) : null}
+    </Svg>
+  );
+}
+
+// Glifo de estado con primitivos SVG (legible incluso impreso en B/N).
+function PdfStatusGlyph({ state, color }: { state: FuncState; color: string }) {
+  return (
+    <Svg width={13} height={13} viewBox="0 0 14 14">
+      <Circle cx={7} cy={7} r={7} fill={color} />
+      {state === "verde" ? (
+        <Path
+          d="M 3.5 7.2 L 6 9.6 L 10.5 4.4"
+          stroke="#fff"
+          strokeWidth={1.6}
+          fill="none"
+        />
+      ) : null}
+      {state === "amarillo" ? <Circle cx={7} cy={7} r={1.7} fill="#fff" /> : null}
+      {state === "naranja" ? (
+        <>
+          <Circle cx={4.9} cy={7} r={1.5} fill="#fff" />
+          <Circle cx={9.1} cy={7} r={1.5} fill="#fff" />
+        </>
+      ) : null}
+      {state === "rojo" ? (
+        <>
+          <Line x1={7} y1={3.2} x2={7} y2={8} stroke="#fff" strokeWidth={1.7} />
+          <Circle cx={7} cy={10.2} r={1} fill="#fff" />
+        </>
+      ) : null}
+    </Svg>
+  );
+}
+
+// Icono de dominio con primitivos SVG (equivalente a los lucide de pantalla:
+// Footprints básicas · Activity moderadas · Dumbbell demandantes).
+function PdfDomainIcon({ id, color }: { id: DomainId; color: string }) {
+  const p = { stroke: color, strokeWidth: 1.3, fill: "none" as const };
+  return (
+    <Svg width={13} height={13} viewBox="0 0 16 16">
+      {id === "moderadas" ? (
+        <Path
+          d="M1 8 H4.5 L6.5 3 L9.5 13 L11.5 8 H15"
+          {...p}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      ) : null}
+      {id === "demandantes" ? (
+        <>
+          <Line x1={3} y1={5} x2={3} y2={11} {...p} strokeLinecap="round" />
+          <Line x1={5} y1={6} x2={5} y2={10} {...p} strokeLinecap="round" />
+          <Line x1={5} y1={8} x2={11} y2={8} {...p} />
+          <Line x1={11} y1={6} x2={11} y2={10} {...p} strokeLinecap="round" />
+          <Line x1={13} y1={5} x2={13} y2={11} {...p} strokeLinecap="round" />
+        </>
+      ) : null}
+      {id === "basicas" ? (
+        <>
+          <Ellipse cx={5.5} cy={6} rx={2.3} ry={3.2} {...p} />
+          <Ellipse cx={10.5} cy={10} rx={2.3} ry={3.2} {...p} />
+        </>
+      ) : null}
+    </Svg>
+  );
+}
+
+// Tarjeta del semáforo (misma versión completa que la pantalla): fila superior
+// (icono + label + indicador y etiqueta de estado) + ejemplos gris cursiva +
+// frase completa de la matriz con sus mirrors.
+function CapacityCardPdf({ domain }: { domain: DomainResult }) {
+  const { bg, strong } = FUNC_COLORS[domain.state];
+  return (
+    <View
+      style={[styles.capCard, { backgroundColor: bg, borderColor: strong }]}
+      wrap={false}
+    >
+      <View style={styles.capTop}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+          <PdfDomainIcon id={domain.id} color={strong} />
+          <Text style={{ fontFamily: "Helvetica-Bold", fontSize: 9, color: C.ink }}>
+            {domain.label}
+          </Text>
+        </View>
+        <View style={styles.capState}>
+          <PdfStatusGlyph state={domain.state} color={strong} />
+          <Text
+            style={{ fontFamily: "Helvetica-Bold", fontSize: 8, color: strong }}
+          >
+            {FUNC_STATE_LABELS[domain.state]}
+          </Text>
+        </View>
+      </View>
+      <Text
+        style={{ fontSize: 7.5, fontStyle: "italic", color: C.muted, marginTop: 3 }}
+      >
+        {domain.examples}
+      </Text>
+      <Text style={{ fontSize: 8.5, color: C.ink, marginTop: 2 }}>
+        {domain.fullPhrase}
+      </Text>
+    </View>
+  );
+}
+
+// Sección de bullets genérica (viñeta + texto).
+function BulletList({ items, color }: { items: string[]; color: string }) {
+  return (
+    <>
+      {items.map((item) => (
+        <View key={item} style={{ flexDirection: "row", marginBottom: 2 }}>
+          <Text style={{ fontSize: 8.5, marginRight: 4, color }}>•</Text>
+          <Text style={{ fontSize: 8.5, flex: 1 }}>{item}</Text>
+        </View>
+      ))}
+    </>
+  );
 }
 
 export default function ReportPdf({
@@ -377,12 +559,11 @@ export default function ReportPdf({
     dateStyle: "long",
     timeStyle: "short",
   });
-  const rows = result.test.questions.map((q) => {
-    const value = result.answers[q.id] ?? 0;
-    const opt = q.options.find((o) => o.value === value);
-    return { shortLabel: q.shortLabel, answer: opt?.label ?? "—" };
-  });
-  const sorted = [...result.breakdown].sort((a, b) => b.value - a.value);
+  const domains = computeDomains(result.test, result.answers);
+  const allGreen =
+    domains.length > 0 && domains.every((d) => d.state === "verde");
+  const evaluationPlan = getEvaluationPlan(result);
+  const warningSigns = getWarningSigns(result);
 
   return (
     <Document>
@@ -391,19 +572,34 @@ export default function ReportPdf({
         <FooterBand />
 
         <View style={styles.body}>
-          <Text style={styles.title}>
-            REPORTE DE EVALUACIÓN — {result.zoneLabel.toUpperCase()}
-          </Text>
-          <Text style={styles.meta}>
-            {fecha} · Folio {result.folio}
-          </Text>
-          {name ? <Text style={styles.meta}>Reporte de: {name}</Text> : null}
+          {/* Header-título + mini-silueta de marca (bloque completo) */}
+          <View
+            wrap={false}
+            style={{
+              flexDirection: "row",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+            }}
+          >
+            <View style={{ flex: 1, paddingRight: 12 }}>
+              <Text style={styles.title}>
+                REPORTE DE EVALUACIÓN — {result.zoneLabel.toUpperCase()}
+              </Text>
+              <Text style={styles.meta}>
+                {fecha} · Folio {result.folio}
+              </Text>
+              {name ? <Text style={styles.meta}>Reporte de: {name}</Text> : null}
+            </View>
+            <View style={{ marginTop: 10 }}>
+              <PdfMiniSilhouette result={result} />
+            </View>
+          </View>
 
           {/* Banner de alerta condicional (entre título y resultado) */}
           <AlertBlock result={result} />
 
           {/* Bloque de resultado */}
-          <View style={{ marginTop: 12 }} wrap={false}>
+          <View style={{ marginTop: 9 }} wrap={false}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
               <View style={{ width: 150 }}>
                 <PdfGauge score={result.score} />
@@ -446,38 +642,52 @@ export default function ReportPdf({
               </View>
             </View>
 
+            {/* Definición del nivel (badge según el nivel funcional del score) */}
+            <View
+              style={[
+                styles.nivelBadge,
+                {
+                  backgroundColor: NIVEL_BADGE_COLORS[result.level].bg,
+                  borderColor: NIVEL_BADGE_COLORS[result.level].strong,
+                },
+              ]}
+              wrap={false}
+            >
+              <Text
+                style={{
+                  fontFamily: "Helvetica-Bold",
+                  fontSize: 8.5,
+                  color: NIVEL_BADGE_COLORS[result.level].strong,
+                }}
+              >
+                ¿Qué significa limitación {result.level}?
+              </Text>
+              <Text style={{ fontSize: 8.5, color: C.ink, marginTop: 2 }}>
+                {nivelDefinitions[result.level]}
+              </Text>
+            </View>
+
             <View style={[styles.recBox, { borderLeftColor: level.color }]}>
               <Text>{getRecommendationText(result.level, result.alertLevel)}</Text>
             </View>
           </View>
 
-          {/* Áreas más afectadas */}
-          <View style={styles.section} wrap={false}>
-            <Text style={styles.sectionTitle}>ÁREAS MÁS AFECTADAS</Text>
-            {sorted.map((item) => {
-              const b = bucketMeta(item.value);
-              return (
-                <View key={item.shortLabel} style={{ marginBottom: 4 }}>
-                  <View style={styles.bandRow}>
-                    <Text>{item.shortLabel}</Text>
-                    <Text style={{ color: b.color, fontFamily: "Helvetica-Bold" }}>
-                      {b.label}
-                    </Text>
-                  </View>
-                  <View style={styles.barTrack}>
-                    <View
-                      style={{
-                        height: 5,
-                        borderRadius: 3,
-                        backgroundColor: b.color,
-                        width: `${Math.max((item.value / 4) * 100, 4)}%`,
-                      }}
-                    />
-                  </View>
-                </View>
-              );
-            })}
-          </View>
+          {/* Tu capacidad hoy (variante compacta) */}
+          {domains.length > 0 ? (
+            <View style={styles.section} wrap={false}>
+              <Text style={styles.sectionTitle}>
+                TU CAPACIDAD HOY, SEGÚN TUS RESPUESTAS
+              </Text>
+              {domains.map((domain) => (
+                <CapacityCardPdf key={domain.id} domain={domain} />
+              ))}
+              {allGreen ? (
+                <Text style={{ fontSize: 8, color: C.muted, marginTop: 1 }}>
+                  {FUNC_ALL_GREEN_LINE}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
 
           {/* Qué significa */}
           <View style={styles.section} wrap={false}>
@@ -487,34 +697,43 @@ export default function ReportPdf({
                 {p}
               </Text>
             ))}
-            {result.alertLevel === "none" ? (
-              <Text style={{ marginTop: 6, fontSize: 8.5, color: C.success }}>
-                No se identificaron datos de alarma en tus respuestas.
+          </View>
+
+          {/* Qué debe evaluarse en tu caso */}
+          {evaluationPlan.length > 0 ? (
+            <View style={styles.section} wrap={false}>
+              <Text style={styles.sectionTitle}>
+                QUÉ DEBE EVALUARSE EN TU CASO
               </Text>
-            ) : null}
-          </View>
+              <BulletList items={evaluationPlan} color={C.accent} />
+              <Text style={styles.signature}>{EVALUATION_SIGNATURE}</Text>
+            </View>
+          ) : null}
 
-          {/* Tus respuestas (tabla completa, sin corte) */}
-          <View style={styles.section} wrap={false}>
-            <Text style={styles.sectionTitle}>TUS RESPUESTAS</Text>
-            {rows.map((r, i) => (
-              <View
-                key={r.shortLabel}
-                style={[
-                  styles.tableRow,
-                  { backgroundColor: i % 2 === 0 ? C.primarySoft : "transparent" },
-                ]}
+          {/* Señales para no esperar tu cita */}
+          {warningSigns.length > 0 ? (
+            <View style={styles.section} wrap={false}>
+              <Text style={[styles.sectionTitle, { color: C.danger }]}>
+                SEÑALES PARA NO ESPERAR TU CITA
+              </Text>
+              <BulletList items={warningSigns} color={C.danger} />
+              <Text
+                style={{ fontSize: 8.5, fontFamily: "Helvetica-Bold", marginTop: 4 }}
               >
-                <Text style={styles.tableCellL}>{r.shortLabel}</Text>
-                <Text style={styles.tableCellR}>{r.answer}</Text>
-              </View>
-            ))}
+                {WARNING_CLOSING}
+              </Text>
+            </View>
+          ) : null}
+
+          {/* CTA + pie legal agrupados: anti-huérfano. Viajan juntos a la
+              página siguiente si no caben; el CTA nunca queda solo. */}
+          <View wrap={false}>
+            <CtaBlock
+              waLink={qrValue}
+              urgent={result.alertLevel === "urgente"}
+            />
+            <Legal citation={result.test.instrumentCitation} />
           </View>
-
-          {/* Bloque WhatsApp */}
-          <CtaBlock waLink={qrValue} />
-
-          <Legal citation={result.test.instrumentCitation} />
         </View>
       </Page>
     </Document>

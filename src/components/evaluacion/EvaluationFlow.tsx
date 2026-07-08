@@ -8,18 +8,12 @@ import type {
   TestDefinition,
 } from "@/lib/evaluacion/types";
 import { computeResult } from "@/lib/evaluacion/engine";
-import { caderaTest } from "@/lib/evaluacion/tests/cadera";
+import { TESTS, AVAILABLE_ZONES } from "@/lib/evaluacion/tests";
 import ZonePicker from "@/components/evaluacion/ZonePicker";
 import AlarmScreen from "@/components/evaluacion/AlarmScreen";
 import TriageScreen from "@/components/evaluacion/TriageScreen";
 import QuestionScreen from "@/components/evaluacion/QuestionScreen";
 import ResultScreen from "@/components/evaluacion/ResultScreen";
-
-// Registro de tests disponibles. Los futuros son solo archivos de datos.
-const AVAILABLE_TESTS: Partial<Record<BodyZoneId, TestDefinition>> = {
-  cadera: caderaTest,
-};
-const AVAILABLE_ZONES = Object.keys(AVAILABLE_TESTS) as BodyZoneId[];
 
 type Step = "zona" | "alarma" | "triaje" | "test" | "resultado";
 
@@ -29,14 +23,20 @@ function timeLabel(test: TestDefinition) {
     : `~${test.estimatedMinutes} min`;
 }
 
+/** Sustantivo del ítem, con mayúscula inicial ("Pregunta" / "Frase"). */
+function questionNounCap(test: TestDefinition) {
+  const singular = test.questionNoun?.singular ?? "pregunta";
+  return singular.charAt(0).toUpperCase() + singular.slice(1);
+}
+
 export default function EvaluationFlow({
   initialZone,
 }: {
   initialZone?: BodyZoneId;
 }) {
   const startTest =
-    initialZone && AVAILABLE_TESTS[initialZone]
-      ? AVAILABLE_TESTS[initialZone]!
+    initialZone && TESTS[initialZone]
+      ? TESTS[initialZone]!
       : null;
 
   const [step, setStep] = useState<Step>(startTest ? "alarma" : "zona");
@@ -58,7 +58,7 @@ export default function EvaluationFlow({
   }
 
   function handleZoneSelect(zoneId: BodyZoneId) {
-    const t = AVAILABLE_TESTS[zoneId];
+    const t = TESTS[zoneId];
     if (!t) return;
     setTest(t);
     setAlarmFlags([]);
@@ -153,7 +153,9 @@ export default function EvaluationFlow({
         key={`${step}-${qIndex}`}
         className="eval-screen flex-1 px-4 py-8 sm:py-10"
       >
-        {step === "alarma" && <AlarmScreen onContinue={handleAlarmContinue} />}
+        {step === "alarma" && test && (
+          <AlarmScreen test={test} onContinue={handleAlarmContinue} />
+        )}
 
         {step === "triaje" && test && (
           <TriageScreen
@@ -167,6 +169,7 @@ export default function EvaluationFlow({
             question={test.questions[qIndex]}
             index={qIndex}
             total={total}
+            nounLabel={questionNounCap(test)}
             timeLabel={timeLabel(test)}
             onAnswer={handleAnswer}
             onBack={handleBack}

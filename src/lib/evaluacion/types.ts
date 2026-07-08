@@ -21,14 +21,40 @@ export type TestQuestion = {
   shortLabel: string;
   /** Encabezado de contexto agrupador (p. ej. "Durante la última semana…"). */
   contextHeader?: string;
+  /**
+   * Paráfrasis en lenguaje del paciente (NUNCA el texto del reactivo). Se usa
+   * como "espejo" en el semáforo funcional cuando el ítem está afectado.
+   */
+  mirrorPhrase?: string;
   options: QuestionOption[];
 };
 
-/** Acción de una opción de triaje. */
+/** Dominio funcional del semáforo. */
+export type DomainId = "basicas" | "moderadas" | "demandantes";
+
+export type Domain = {
+  id: DomainId;
+  label: string;
+  /** Ejemplos en lenguaje del paciente (línea gris de la tarjeta). */
+  examples: string;
+  /** Ítems (question ids) que puntúan este dominio. */
+  itemIds: string[];
+};
+
+/**
+ * Acción de una opción de triaje.
+ * - "continue": termina el triaje y pasa al test (rama terminal).
+ * - "next": avanza a la siguiente pregunta del triaje por orden de arreglo.
+ * - "flag:X": registra el flag X y termina el triaje (rama terminal con flag).
+ * - "flag-next:X": registra el flag X y avanza a la siguiente pregunta.
+ * - "goto:Y": salta a la pregunta con id Y.
+ */
 export type TriageAction =
   | "continue"
+  | "next"
   | "urgent"
   | `flag:${string}`
+  | `flag-next:${string}`
   | `goto:${string}`;
 
 export type TriageOption = { label: string; action: TriageAction };
@@ -48,16 +74,22 @@ export type ScoringLevels = {
   moderadaMax: number;
 };
 
-export type Scoring = {
-  /** Tabla oficial raw (suma de valores) → intervalo de salud 0-100. */
-  rawToInterval: Record<number, number>;
-  levels: ScoringLevels;
-  /**
-   * Reservado. Los flags ya NO escalan el nivel funcional (el score y la pill
-   * nunca cambian por flags). Se mantiene por compatibilidad; normalmente [].
-   */
-  escalationFlags?: string[];
-};
+/**
+ * Dos formas de convertir el raw (suma de valores) a intervalo de salud 0-100:
+ * - 'table': tabla oficial indexada por raw (raw 0..N → table[raw]).
+ * - 'linear': interval = 100 − (raw / maxRaw) * 100.
+ * En ambas: limitación = 100 − interval (redondeado). Si se omite `levels`,
+ * el motor usa los cortes por defecto 30 / 60.
+ */
+export type Scoring =
+  | { kind: "table"; table: number[]; levels?: ScoringLevels }
+  | { kind: "linear"; maxRaw: number; levels?: ScoringLevels };
+
+/** Presentación del desglose de resultado. 'checklist' para instrumentos Sí/No. */
+export type ResultDisplay = "bars" | "checklist";
+
+/** Sustantivo del ítem para encabezados de progreso (default "pregunta"). */
+export type QuestionNoun = { singular: string; plural: string };
 
 export type ReportTexts = {
   leve: string[];
@@ -72,6 +104,17 @@ export type TestDefinition = {
   instrumentName: string;
   instrumentCitation: string;
   estimatedMinutes: number;
+  /** Presentación del resultado; default 'bars'. */
+  resultDisplay?: ResultDisplay;
+  /** Sustantivo del ítem en los encabezados; default {singular:"pregunta", plural:"preguntas"}. */
+  questionNoun?: QuestionNoun;
+  /**
+   * Frase legible de cada flag informativo del test. Los flags presentes aquí
+   * aparecen en "Datos adicionales de tus respuestas" y NO afectan nivel ni alerta.
+   */
+  flagLabels?: Record<string, string>;
+  /** Dominios funcionales del semáforo (básicas / moderadas / demandantes). */
+  domains?: Domain[];
   triage: TriageQuestion[];
   questions: TestQuestion[];
   scoring: Scoring;

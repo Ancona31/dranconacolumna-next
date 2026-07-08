@@ -8,6 +8,8 @@ type QuestionScreenProps = {
   question: TestQuestion;
   index: number;
   total: number;
+  /** Sustantivo del ítem capitalizado ("Pregunta" / "Frase"). */
+  nounLabel: string;
   timeLabel: string;
   onAnswer: (value: number) => void;
   onBack: () => void;
@@ -17,6 +19,7 @@ export default function QuestionScreen({
   question,
   index,
   total,
+  nounLabel,
   timeLabel,
   onAnswer,
   onBack,
@@ -43,7 +46,7 @@ export default function QuestionScreen({
           Atrás
         </button>
         <span className="font-body text-sm text-ink/60">
-          Pregunta {index + 1} de {total} · {timeLabel}
+          {nounLabel} {index + 1} de {total} · {timeLabel}
         </span>
       </div>
 

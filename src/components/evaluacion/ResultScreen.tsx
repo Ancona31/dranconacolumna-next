@@ -1,61 +1,80 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, MessageCircle, ShieldCheck } from "lucide-react";
-import type { EvaluationResult, NonUrgentLevel } from "@/lib/evaluacion/types";
+import {
+  Activity,
+  AlertCircle,
+  AlertTriangle,
+  Check,
+  Dot,
+  Dumbbell,
+  Footprints,
+  MessageCircle,
+  MoreHorizontal,
+  Stethoscope,
+} from "lucide-react";
+import type {
+  DomainId,
+  EvaluationResult,
+  NonUrgentLevel,
+} from "@/lib/evaluacion/types";
 import {
   buildAlertBanner,
+  computeDomains,
+  EVALUATION_SIGNATURE,
+  FUNC_ALL_GREEN_LINE,
+  FUNC_COLORS,
+  FUNC_STATE_LABELS,
+  type FuncState,
+  getEvaluationPlan,
   getRecommendationText,
   getResultWhatsAppLink,
+  getWarningSigns,
+  nivelDefinitions,
+  NIVEL_BADGE_COLORS,
+  WARNING_CLOSING,
 } from "@/lib/evaluacion/engine";
+import { BODY_PATH, BODY_ZONES } from "@/components/home/BodyFigureSVG";
 import PdfDownload from "@/components/evaluacion/PdfDownload";
 
 const BANNER_STYLES = {
-  precaucion: {
-    box: "border-warning bg-warning/10",
-    title: "text-warning",
-  },
-  urgente: {
-    box: "border-danger bg-danger/10",
-    title: "text-danger",
-  },
+  precaucion: { box: "border-warning bg-warning/10", title: "text-warning" },
+  urgente: { box: "border-danger bg-danger/10", title: "text-danger" },
 };
 
 const LEVEL_STYLES: Record<
   NonUrgentLevel,
-  { pill: string; border: string; label: string; gauge: string }
+  { pill: string; border: string; label: string }
 > = {
   leve: {
     pill: "bg-success/10 text-success",
     border: "border-success",
     label: "Limitación leve",
-    gauge: "var(--color-success)",
   },
   moderada: {
     pill: "bg-warning/10 text-warning",
     border: "border-warning",
     label: "Limitación moderada",
-    gauge: "var(--color-warning)",
   },
   severa: {
     pill: "bg-danger/10 text-danger",
     border: "border-danger",
     label: "Limitación severa",
-    gauge: "var(--color-danger)",
   },
 };
 
-const BUCKETS = {
-  leve: { label: "Leve", bar: "bg-success", text: "text-success" },
-  moderado: { label: "Moderado", bar: "bg-warning", text: "text-warning" },
-  alto: { label: "Alto", bar: "bg-danger", text: "text-danger" },
+// Icono lucide por dominio y glifo de estado (SVG, nunca emoji).
+const DOMAIN_ICON: Record<DomainId, typeof Activity> = {
+  basicas: Footprints,
+  moderadas: Activity,
+  demandantes: Dumbbell,
 };
-
-function bucketFor(value: number) {
-  if (value <= 1) return BUCKETS.leve;
-  if (value === 2) return BUCKETS.moderado;
-  return BUCKETS.alto;
-}
+const STATE_GLYPH: Record<FuncState, typeof Check> = {
+  verde: Check,
+  amarillo: Dot,
+  naranja: MoreHorizontal,
+  rojo: AlertCircle,
+};
 
 // Geometría del medidor semicircular.
 function polar(score: number) {
@@ -93,6 +112,71 @@ function Gauge({ score, ready }: { score: number; ready: boolean }) {
   );
 }
 
+// Mini-silueta de marca con la zona evaluada marcada en el color del nivel.
+function MiniSilhouette({ result }: { result: EvaluationResult }) {
+  const pt = BODY_ZONES.find((z) => z.id === result.test.zoneId);
+  const strong = NIVEL_BADGE_COLORS[result.level].strong;
+  return (
+    <svg
+      viewBox="0 0 220 540"
+      className="h-16 w-auto shrink-0"
+      role="img"
+      aria-label={`Zona evaluada: ${result.zoneLabel}`}
+    >
+      <path d={BODY_PATH} fill="var(--color-accent)" fillOpacity={0.12} />
+      {pt && (
+        <>
+          <circle cx={pt.cx} cy={pt.cy} r={17} fill={strong} fillOpacity={0.2} />
+          <circle cx={pt.cx} cy={pt.cy} r={8.5} fill={strong} />
+        </>
+      )}
+    </svg>
+  );
+}
+
+function CapacityCard({
+  domain,
+}: {
+  domain: ReturnType<typeof computeDomains>[number];
+}) {
+  const { bg, strong } = FUNC_COLORS[domain.state];
+  const Icon = DOMAIN_ICON[domain.id];
+  const Glyph = STATE_GLYPH[domain.state];
+  return (
+    <div
+      className="relative overflow-hidden rounded-xl border-[1.5px] p-4 pl-5"
+      style={{ backgroundColor: bg, borderColor: strong }}
+    >
+      <span
+        className="absolute left-0 top-0 h-full w-[3px]"
+        style={{ backgroundColor: strong }}
+        aria-hidden="true"
+      />
+      <div className="flex items-center gap-2">
+        <Icon className="h-5 w-5 shrink-0" style={{ color: strong }} strokeWidth={1.75} />
+        <span className="font-heading text-sm font-bold text-ink">
+          {domain.label}
+        </span>
+        <span className="ml-auto flex items-center gap-1.5">
+          <span
+            className="flex h-5 w-5 items-center justify-center rounded-full"
+            style={{ backgroundColor: strong }}
+          >
+            <Glyph className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
+          </span>
+          <span className="font-body text-xs font-bold" style={{ color: strong }}>
+            {FUNC_STATE_LABELS[domain.state]}
+          </span>
+        </span>
+      </div>
+      <p className="mt-1 font-body text-xs italic text-ink/50">
+        {domain.examples}
+      </p>
+      <p className="mt-1.5 font-body text-sm text-ink/80">{domain.fullPhrase}</p>
+    </div>
+  );
+}
+
 export default function ResultScreen({ result }: { result: EvaluationResult }) {
   const [ready, setReady] = useState(false);
   useEffect(() => {
@@ -102,18 +186,27 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
 
   const style = LEVEL_STYLES[result.level];
   const whatsappLink = getResultWhatsAppLink(result);
-  const sorted = [...result.breakdown].sort((a, b) => b.value - a.value);
   const paragraphs = result.test.reportTexts[result.level];
   const banner = buildAlertBanner(result);
+  const domains = computeDomains(result.test, result.answers);
+  const allGreen = domains.length > 0 && domains.every((d) => d.state === "verde");
+  const evaluationPlan = getEvaluationPlan(result);
+  const warningSigns = getWarningSigns(result);
 
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <h1 className="text-center font-heading text-2xl font-bold text-primary sm:text-3xl">
-        Tu evaluación de {result.zoneLabel}
-      </h1>
-      <p className="mt-1 text-center font-body text-sm text-ink/50">
-        Folio {result.folio}
-      </p>
+      {/* Título + mini-silueta de marca */}
+      <div className="flex items-center justify-center gap-3">
+        <MiniSilhouette result={result} />
+        <div className="text-left">
+          <h1 className="font-heading text-2xl font-bold text-primary sm:text-3xl">
+            Tu evaluación de {result.zoneLabel}
+          </h1>
+          <p className="mt-1 font-body text-sm text-ink/50">
+            Folio {result.folio}
+          </p>
+        </div>
+      </div>
 
       {/* Banner de alerta condicional (arriba del medidor) */}
       {banner && (
@@ -137,9 +230,7 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
               >
                 {banner.title}
               </p>
-              <p className="mt-1 font-body text-sm text-ink/80">
-                {banner.body}
-              </p>
+              <p className="mt-1 font-body text-sm text-ink/80">{banner.body}</p>
             </div>
           </div>
         </div>
@@ -163,6 +254,25 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
         </span>
       </div>
 
+      {/* Definición del nivel (badge, según el nivel funcional del score) */}
+      <div
+        className="mt-6 rounded-xl border-[1.5px] p-4"
+        style={{
+          backgroundColor: NIVEL_BADGE_COLORS[result.level].bg,
+          borderColor: NIVEL_BADGE_COLORS[result.level].strong,
+        }}
+      >
+        <p
+          className="font-heading text-sm font-bold"
+          style={{ color: NIVEL_BADGE_COLORS[result.level].strong }}
+        >
+          ¿Qué significa limitación {result.level}?
+        </p>
+        <p className="mt-1 font-body text-sm text-ink">
+          {nivelDefinitions[result.level]}
+        </p>
+      </div>
+
       {/* Recomendación */}
       <div
         className={`mt-8 rounded-r-xl border-l-4 bg-primary-soft/60 p-4 ${style.border}`}
@@ -172,36 +282,24 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
         </p>
       </div>
 
-      {/* Áreas más afectadas */}
-      <div className="mt-8">
-        <h2 className="font-heading text-lg font-bold text-primary">
-          Áreas más afectadas
-        </h2>
-        <ul className="mt-4 space-y-3">
-          {sorted.map((item, i) => {
-            const bucket = bucketFor(item.value);
-            return (
-              <li key={item.shortLabel}>
-                <div className="flex items-center justify-between font-body text-sm">
-                  <span className="text-ink/80">{item.shortLabel}</span>
-                  <span className={`font-semibold ${bucket.text}`}>
-                    {bucket.label}
-                  </span>
-                </div>
-                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-ink/10">
-                  <div
-                    className={`h-full origin-left rounded-full transition-transform duration-500 ease-out ${bucket.bar}`}
-                    style={{
-                      transform: `scaleX(${ready ? Math.max(item.value / 4, 0.04) : 0})`,
-                      transitionDelay: `${i * 60}ms`,
-                    }}
-                  />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      {/* Tu capacidad hoy, según tus respuestas (semáforo funcional) */}
+      {domains.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-heading text-lg font-bold text-primary">
+            Tu capacidad hoy, según tus respuestas
+          </h2>
+          <div className="mt-4 space-y-3">
+            {domains.map((domain) => (
+              <CapacityCard key={domain.id} domain={domain} />
+            ))}
+          </div>
+          {allGreen && (
+            <p className="mt-3 font-body text-sm text-ink/70">
+              {FUNC_ALL_GREEN_LINE}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Qué significa tu resultado */}
       <div className="mt-8">
@@ -215,18 +313,59 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
         </div>
       </div>
 
-      {/* Línea de alarma: solo cuando no hay datos marcados */}
-      {result.alertLevel === "none" && (
-        <div className="mt-6 flex items-center gap-2 font-body text-sm text-ink/70">
-          <ShieldCheck
-            className="h-5 w-5 shrink-0 text-success"
-            strokeWidth={1.5}
-          />
-          No se identificaron datos de alarma en tus respuestas
+      {/* Qué debe evaluarse en tu caso */}
+      {evaluationPlan.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-heading text-lg font-bold text-primary">
+            Qué debe evaluarse en tu caso
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {evaluationPlan.map((item) => (
+              <li
+                key={item}
+                className="flex gap-2 font-body text-sm text-ink/80"
+              >
+                <Stethoscope
+                  className="mt-0.5 h-4 w-4 shrink-0 text-accent"
+                  strokeWidth={1.75}
+                />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 font-body text-sm italic text-ink/60">
+            {EVALUATION_SIGNATURE}
+          </p>
         </div>
       )}
 
-      {/* CTA */}
+      {/* Señales para no esperar tu cita */}
+      {warningSigns.length > 0 && (
+        <div className="mt-8 rounded-xl border-l-4 border-danger bg-danger/5 p-4">
+          <h2 className="font-heading text-lg font-bold text-danger">
+            Señales para no esperar tu cita
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {warningSigns.map((sign) => (
+              <li
+                key={sign}
+                className="flex gap-2 font-body text-sm text-ink/80"
+              >
+                <AlertTriangle
+                  className="mt-0.5 h-4 w-4 shrink-0 text-danger"
+                  strokeWidth={1.75}
+                />
+                <span>{sign}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 font-body text-sm font-semibold text-ink">
+            {WARNING_CLOSING}
+          </p>
+        </div>
+      )}
+
+      {/* CTA (con alertLevel 'urgente' cambia el mensaje) */}
       <div className="mt-8 space-y-3">
         <a
           href={whatsappLink}
@@ -235,8 +374,16 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
           className="flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
         >
           <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
-          Escríbenos para agendar tu valoración
+          {result.alertLevel === "urgente"
+            ? "Avísanos de tu caso por WhatsApp"
+            : "Escríbenos para agendar tu valoración"}
         </a>
+        {result.alertLevel === "urgente" && (
+          <p className="text-center font-body text-sm text-ink/70">
+            Y lleva este reporte a tu valoración de hoy — le servirá al médico
+            que te atienda.
+          </p>
+        )}
         <PdfDownload result={result} />
       </div>
 

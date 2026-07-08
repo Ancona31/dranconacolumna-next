@@ -16,34 +16,12 @@ const DIFFICULTY_OPTIONS = [
   { label: "Extrema", value: 4 },
 ];
 
-// Tabla de conversión OFICIAL HSS (raw → interval de salud 0-100).
-const RAW_TO_INTERVAL: Record<number, number> = {
-  0: 100.0,
-  1: 92.34,
-  2: 85.257,
-  3: 80.55,
-  4: 76.776,
-  5: 73.472,
-  6: 70.426,
-  7: 67.516,
-  8: 64.664,
-  9: 61.815,
-  10: 58.93,
-  11: 55.985,
-  12: 52.965,
-  13: 49.858,
-  14: 46.652,
-  15: 43.335,
-  16: 39.902,
-  17: 36.363,
-  18: 32.735,
-  19: 29.009,
-  20: 25.103,
-  21: 20.805,
-  22: 15.633,
-  23: 8.104,
-  24: 0.0,
-};
+// Tabla de conversión OFICIAL HSS (raw 0-24 → interval de salud 0-100).
+const RAW_TO_INTERVAL = [
+  100.0, 92.34, 85.257, 80.55, 76.776, 73.472, 70.426, 67.516, 64.664, 61.815,
+  58.93, 55.985, 52.965, 49.858, 46.652, 43.335, 39.902, 36.363, 32.735, 29.009,
+  25.103, 20.805, 15.633, 8.104, 0.0,
+];
 
 // TODO verificar contra traducción española oficial distribuida por HSS.
 export const caderaTest: TestDefinition = {
@@ -83,6 +61,7 @@ export const caderaTest: TestDefinition = {
         "Durante la última semana, ¿cuánto dolor de cadera has tenido al…",
       text: "…subir o bajar escaleras",
       shortLabel: "Dolor en escaleras",
+      mirrorPhrase: "las escaleras despiertan tu dolor",
       options: PAIN_OPTIONS,
     },
     {
@@ -91,6 +70,7 @@ export const caderaTest: TestDefinition = {
         "Durante la última semana, ¿cuánto dolor de cadera has tenido al…",
       text: "…caminar sobre una superficie irregular",
       shortLabel: "Dolor en terreno irregular",
+      mirrorPhrase: "el piso disparejo se volvió territorio incómodo",
       options: PAIN_OPTIONS,
     },
     {
@@ -99,6 +79,7 @@ export const caderaTest: TestDefinition = {
         "Durante la última semana, ¿qué tanta dificultad has tenido para…",
       text: "…levantarte desde una silla",
       shortLabel: "Levantarte de una silla",
+      mirrorPhrase: "incorporarte de un asiento se volvió un esfuerzo",
       options: DIFFICULTY_OPTIONS,
     },
     {
@@ -107,6 +88,7 @@ export const caderaTest: TestDefinition = {
         "Durante la última semana, ¿qué tanta dificultad has tenido para…",
       text: "…agacharte al piso o recoger un objeto",
       shortLabel: "Agacharte al piso",
+      mirrorPhrase: "agacharte por algo del suelo cuesta trabajo",
       options: DIFFICULTY_OPTIONS,
     },
     {
@@ -115,6 +97,7 @@ export const caderaTest: TestDefinition = {
         "Durante la última semana, ¿qué tanta dificultad has tenido para…",
       text: "…estar acostado en la cama (voltearte o mantener la postura de la cadera)",
       shortLabel: "Estar acostado",
+      mirrorPhrase: "hasta el descanso en cama se ve afectado",
       options: DIFFICULTY_OPTIONS,
     },
     {
@@ -123,16 +106,37 @@ export const caderaTest: TestDefinition = {
         "Durante la última semana, ¿qué tanta dificultad has tenido para…",
       text: "…permanecer sentado",
       shortLabel: "Permanecer sentado",
+      mirrorPhrase: "estar sentado mucho rato te incomoda",
       options: DIFFICULTY_OPTIONS,
     },
   ],
 
-  scoring: {
-    rawToInterval: RAW_TO_INTERVAL,
-    levels: { leveMax: 30, moderadaMax: 60 },
-    // Los flags ya no escalan el nivel funcional.
-    escalationFlags: [],
+  flagLabels: {
+    trauma: "La molestia inició tras un golpe o caída",
   },
+
+  domains: [
+    {
+      id: "basicas",
+      label: "Actividades básicas",
+      examples: "levantarte de una silla, estar sentado o acostado",
+      itemIds: ["q3", "q5", "q6"],
+    },
+    {
+      id: "moderadas",
+      label: "Actividad moderada",
+      examples: "subir y bajar escaleras",
+      itemIds: ["q1"],
+    },
+    {
+      id: "demandantes",
+      label: "Actividad demandante",
+      examples: "caminar en terreno disparejo, agacharte al piso",
+      itemIds: ["q2", "q4"],
+    },
+  ],
+
+  scoring: { kind: "table", table: RAW_TO_INTERVAL },
 
   reportTexts: {
     leve: [
