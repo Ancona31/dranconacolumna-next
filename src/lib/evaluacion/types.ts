@@ -15,6 +15,12 @@ export type AlertLevel = "none" | "precaucion" | "urgente";
 /** Opción de una pregunta puntuable (value 0-4). */
 export type QuestionOption = { label: string; value: number };
 
+/** Tipo de reactivo. 'options' (default): botones etiquetados. 'scale': 0-10. */
+export type QuestionKind = "options" | "scale";
+
+/** Anclas de los extremos de una escala numérica (bajo el 0 y bajo el 10). */
+export type ScaleAnchors = { min: string; max: string };
+
 export type TestQuestion = {
   id: string;
   text: string;
@@ -26,7 +32,12 @@ export type TestQuestion = {
    * como "espejo" en el semáforo funcional cuando el ítem está afectado.
    */
   mirrorPhrase?: string;
-  options: QuestionOption[];
+  /** Tipo de reactivo; default 'options'. */
+  kind?: QuestionKind;
+  /** Solo 'options': opciones puntuables. */
+  options?: QuestionOption[];
+  /** Solo 'scale': anclas de los extremos (0-10). */
+  anchors?: ScaleAnchors;
 };
 
 /** Dominio funcional del semáforo. */
@@ -75,15 +86,35 @@ export type ScoringLevels = {
 };
 
 /**
- * Dos formas de convertir el raw (suma de valores) a intervalo de salud 0-100:
- * - 'table': tabla oficial indexada por raw (raw 0..N → table[raw]).
+ * Subescala ponderada: suma de sus ítems normalizada por `maxRaw`, escalada por
+ * `weight` (fracción del score total). id/itemIds identifican los reactivos.
+ */
+export type Subscale = {
+  id: string;
+  itemIds: string[];
+  maxRaw: number;
+  weight: number;
+};
+
+/**
+ * Tres formas de derivar el score (índice de limitación 0-100):
+ * - 'table': tabla oficial indexada por raw (raw 0..N → table[raw] = salud).
  * - 'linear': interval = 100 − (raw / maxRaw) * 100.
- * En ambas: limitación = 100 − interval (redondeado). Si se omite `levels`,
- * el motor usa los cortes por defecto 30 / 60.
+ * - 'weighted-subscales': score = round( Σ (sumaÍtems/maxRaw) * weight * 100 ).
+ *   Con direction 'higher-is-worse' la limitación es el score directo (SIN la
+ *   inversión 100−x de las tablas). table/linear son 'higher-is-better'
+ *   implícitas (limitación = 100 − interval).
+ * En todas: si se omite `levels`, el motor usa los cortes por defecto 30 / 60.
  */
 export type Scoring =
   | { kind: "table"; table: number[]; levels?: ScoringLevels }
-  | { kind: "linear"; maxRaw: number; levels?: ScoringLevels };
+  | { kind: "linear"; maxRaw: number; levels?: ScoringLevels }
+  | {
+      kind: "weighted-subscales";
+      direction: "higher-is-worse";
+      subscales: Subscale[];
+      levels?: ScoringLevels;
+    };
 
 /** Presentación del desglose de resultado. 'checklist' para instrumentos Sí/No. */
 export type ResultDisplay = "bars" | "checklist";
@@ -108,6 +139,18 @@ export type TestDefinition = {
   resultDisplay?: ResultDisplay;
   /** Sustantivo del ítem en los encabezados; default {singular:"pregunta", plural:"preguntas"}. */
   questionNoun?: QuestionNoun;
+  /**
+   * Línea de contexto opcional mostrada antes del instrumento (en AlarmScreen).
+   * Ej.: instrucción de estimación para actividades que el paciente no realiza.
+   */
+  instructions?: string;
+  /**
+   * Umbrales del promedio para el semáforo por dominio:
+   * verde < t0 · amarillo < t1 · naranja < t2 · rojo ≥ t2. El segundo umbral (t1)
+   * es además el mínimo para que un ítem aporte su mirrorPhrase. Default [1,2,3]
+   * (instrumentos 0-4); los tests de escala 0-10 usan [2.5, 5, 7.5].
+   */
+  domainThresholds?: [number, number, number];
   /**
    * Frase legible de cada flag informativo del test. Los flags presentes aquí
    * aparecen en "Datos adicionales de tus respuestas" y NO afectan nivel ni alerta.

@@ -166,7 +166,7 @@ export const espaldaBajaTest: TestDefinition = {
     trauma: "El dolor inició tras un golpe o caída",
   },
 
-  // Ítems 1,6,8,13,15,20,22,24 solo puntúan el score global (no son de dominio).
+  // Ítems 1,6,8,13,15,18,20,22,24 solo puntúan el score global (no son de dominio).
   domains: [
     {
       id: "basicas",
@@ -177,8 +177,8 @@ export const espaldaBajaTest: TestDefinition = {
     {
       id: "moderadas",
       label: "Actividad moderada",
-      examples: "caminar, estar de pie, escaleras, dormir",
-      itemIds: ["q2", "q3", "q5", "q10", "q17", "q18", "q23"],
+      examples: "caminar, estar de pie, escaleras",
+      itemIds: ["q2", "q3", "q5", "q10", "q17", "q23"],
     },
     {
       id: "demandantes",

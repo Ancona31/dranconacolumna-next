@@ -69,6 +69,12 @@ export default function AlarmScreen({ test, onContinue }: AlarmScreenProps) {
         {durationLabel(test)}
       </p>
 
+      {test.instructions && (
+        <p className="mt-4 rounded-xl border border-ink/10 bg-primary-soft/40 p-3 font-body text-sm text-ink/70">
+          {test.instructions}
+        </p>
+      )}
+
       <ul className="mt-6 space-y-3">
         {items.map((item) => {
           const active = selected.has(item.id);

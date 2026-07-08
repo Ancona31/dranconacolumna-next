@@ -35,6 +35,28 @@ const URGENT_FLAG_BANNERS: Record<string, { title: string; body: string }> = {
 };
 
 /**
+ * Banner de 'urgente-trauma' específico por zona: el texto por defecto ("no
+ * puedes apoyar el pie") es correcto para miembro inferior; el miembro superior
+ * lo sobrescribe con un texto acorde a la lesión que el paciente indicó.
+ */
+const URGENT_TRAUMA_BANNER_BY_ZONE: Partial<
+  Record<string, { title: string; body: string }>
+> = {
+  hombro: {
+    title: "Tu lesión necesita valoración hoy",
+    body: "Indicaste que tras un golpe o caída tienes deformidad o no puedes mover el brazo o la mano afectada. Eso debe revisarse presencialmente hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo; le servirá al médico que te atienda.",
+  },
+  codo: {
+    title: "Tu lesión necesita valoración hoy",
+    body: "Indicaste que tras un golpe o caída tienes deformidad o no puedes mover el brazo o la mano afectada. Eso debe revisarse presencialmente hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo; le servirá al médico que te atienda.",
+  },
+  muneca: {
+    title: "Tu lesión necesita valoración hoy",
+    body: "Indicaste que tras un golpe o caída tienes deformidad o no puedes mover el brazo o la mano afectada. Eso debe revisarse presencialmente hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo; le servirá al médico que te atienda.",
+  },
+};
+
+/**
  * MATRIZ DE RECOMENDACIÓN por nivel funcional (alertLevel 'none').
  * Comunica la ventana temporal recomendada, sin invitación de contacto: esa
  * vive ÚNICAMENTE en el CTA final y en la firma de "qué debe evaluarse".
@@ -78,12 +100,34 @@ function levelFromScore(score: number, levels: ScoringLevels): NonUrgentLevel {
   return "severa";
 }
 
-/** Intervalo de salud 0-100 a partir del raw, según la forma de scoring. */
-function intervalFromRaw(scoring: Scoring, raw: number): number {
-  if (scoring.kind === "linear") {
-    return 100 - (raw / scoring.maxRaw) * 100;
+/**
+ * Deriva raw (suma de todos los ítems), interval (salud 0-100) y score (índice
+ * de limitación 0-100) según la forma de scoring.
+ * - table/linear ('higher-is-better'): score = 100 − interval.
+ * - weighted-subscales ('higher-is-worse'): score directo, SIN inversión;
+ *   interval = 100 − score.
+ */
+function computeScore(
+  scoring: Scoring,
+  answers: AnswerMap,
+  questions: TestDefinition["questions"]
+): { raw: number; interval: number; score: number } {
+  const raw = questions.reduce((sum, q) => sum + (answers[q.id] ?? 0), 0);
+
+  if (scoring.kind === "weighted-subscales") {
+    const scoreRaw = scoring.subscales.reduce((acc, sub) => {
+      const sum = sub.itemIds.reduce((s, id) => s + (answers[id] ?? 0), 0);
+      return acc + (sum / sub.maxRaw) * sub.weight * 100;
+    }, 0);
+    const score = Math.round(scoreRaw);
+    return { raw, interval: 100 - score, score };
   }
-  return scoring.table[raw] ?? 0;
+
+  const interval =
+    scoring.kind === "linear"
+      ? 100 - (raw / scoring.maxRaw) * 100
+      : scoring.table[raw] ?? 0;
+  return { raw, interval, score: Math.round(100 - interval) };
 }
 
 /** Folio "EV-" + yyMM + "-" + 4 dígitos aleatorios (ej. EV-2607-4831). */
@@ -212,7 +256,12 @@ export type AlertBanner = {
 export function buildAlertBanner(result: EvaluationResult): AlertBanner | null {
   if (result.alertLevel === "urgente") {
     const flag = result.flags.find((f) => f in URGENT_FLAG_BANNERS);
-    const banner = URGENT_FLAG_BANNERS[flag ?? URGENT_TRAUMA_FLAG];
+    // El trauma tiene texto por zona (miembro superior sobrescribe el default).
+    const zoneBanner =
+      flag === URGENT_TRAUMA_FLAG
+        ? URGENT_TRAUMA_BANNER_BY_ZONE[result.test.zoneId]
+        : undefined;
+    const banner = zoneBanner ?? URGENT_FLAG_BANNERS[flag ?? URGENT_TRAUMA_FLAG];
     return { tone: "urgente", title: banner.title, body: banner.body };
   }
   if (result.alertLevel === "precaucion") {
@@ -387,6 +436,9 @@ export function computeDomains(
   const domains = test.domains ?? [];
   const isChecklist = test.resultDisplay === "checklist";
   const byId = new Map(test.questions.map((q) => [q.id, q]));
+  // Umbrales del promedio (verde<t0, amarillo<t1, naranja<t2, rojo≥t2). t1 es
+  // además el mínimo para que un ítem aporte su mirror. Default 0-4: [1,2,3].
+  const [tVerde, tAmarillo, tNaranja] = test.domainThresholds ?? [1, 2, 3];
 
   // 1. Estado bruto + mirrors por dominio (lógica por test intacta).
   const raw = domains.map((domain) => {
@@ -415,9 +467,15 @@ export function computeDomains(
       const avg =
         items.reduce((s, it) => s + it.value, 0) / (items.length || 1);
       rawState =
-        avg < 1 ? "verde" : avg < 2 ? "amarillo" : avg < 3 ? "naranja" : "rojo";
+        avg < tVerde
+          ? "verde"
+          : avg < tAmarillo
+            ? "amarillo"
+            : avg < tNaranja
+              ? "naranja"
+              : "rojo";
       mirrorItems = [...items]
-        .filter((it) => it.value >= 2)
+        .filter((it) => it.value >= tAmarillo)
         .sort((a, b) => b.value - a.value)
         .slice(0, 2);
     }
@@ -508,6 +566,42 @@ const EVALUATION_PLANS: Record<
       trauma: "Descartaré una lesión en el hueso por el golpe que mencionaste",
     },
   },
+  hombro: {
+    base: [
+      "Exploraré los movimientos de tu hombro con maniobras específicas del manguito rotador",
+      "Revisaré tu fuerza para elevar y rotar el brazo",
+      "Valoraré estudios de imagen si tu caso los requiere",
+    ],
+    byFlag: {
+      manguito:
+        "Pondré especial atención a la pérdida de fuerza que notaste tras el esfuerzo",
+      "origen-cervical":
+        "Revisaré también tu cuello: parte del dolor de hombro puede originarse ahí",
+      trauma: "Descartaré una lesión en el hueso por el golpe que mencionaste",
+    },
+  },
+  codo: {
+    base: [
+      "Exploraré la movilidad completa de tu codo y los puntos exactos donde duele",
+      "Evaluaré la fuerza de tu brazo y antebrazo",
+      "Valoraré estudios de imagen si se requieren",
+    ],
+    byFlag: {
+      cubital: "Revisaré el nervio que causa el hormigueo en tus dedos",
+      trauma: "Descartaré una lesión en el hueso por el golpe que mencionaste",
+    },
+  },
+  muneca: {
+    base: [
+      "Exploraré tu muñeca y tu mano: movilidad, fuerza de puño y puntos de dolor",
+      "Revisaré la función de tus nervios y tendones",
+      "Valoraré estudios de imagen si se requieren",
+    ],
+    byFlag: {
+      mediano: "Evaluaré el nervio que provoca el hormigueo nocturno",
+      trauma: "Descartaré una fractura por la caída que mencionaste",
+    },
+  },
 };
 
 /** Bullets de "Qué debe evaluarse en tu caso": base por zona + condicionales por flag. */
@@ -538,6 +632,21 @@ const WARNING_SIGNS: Record<string, string[]> = {
     "Hinchazón súbita e importante",
     "Fiebre con la rodilla caliente y enrojecida",
   ],
+  hombro: [
+    "Deformidad visible del hombro tras un golpe o caída",
+    "Incapacidad total para mover el brazo",
+    "Fiebre con el hombro caliente e hinchado",
+  ],
+  codo: [
+    "Deformidad visible del codo",
+    "Imposibilidad de doblar o estirar el codo",
+    "Fiebre con el codo caliente e hinchado",
+  ],
+  muneca: [
+    "Deformidad visible tras una caída",
+    "Dedos fríos, pálidos o amoratados",
+    "Fiebre con hinchazón de la muñeca o la mano",
+  ],
 };
 
 /** Bullets de "Señales para no esperar tu cita" por zona. */
@@ -554,9 +663,11 @@ export function computeResult(
   answers: AnswerMap,
   flags: string[]
 ): EvaluationResult {
-  const raw = test.questions.reduce((sum, q) => sum + (answers[q.id] ?? 0), 0);
-  const interval = intervalFromRaw(test.scoring, raw);
-  const score = Math.round(100 - interval);
+  const { raw, interval, score } = computeScore(
+    test.scoring,
+    answers,
+    test.questions
+  );
   const level = levelFromScore(score, test.scoring.levels ?? DEFAULT_LEVELS);
 
   const alertMarks = RED_FLAGS.filter((rf) => flags.includes(rf.id)).map(

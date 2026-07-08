@@ -59,26 +59,58 @@ export default function QuestionScreen({
         {question.text}
       </h1>
 
-      <ul className="mt-6 space-y-3">
-        {question.options.map((opt) => {
-          const active = picked === opt.value;
-          return (
-            <li key={opt.value}>
-              <button
-                type="button"
-                onClick={() => choose(opt.value)}
-                className={`w-full rounded-2xl border p-4 text-left font-body text-lg font-medium transition duration-150 active:scale-[0.99] ${
-                  active
-                    ? "border-accent bg-primary-soft text-primary"
-                    : "border-ink/15 bg-background text-ink hover:border-accent hover:bg-primary-soft"
-                }`}
-              >
-                {opt.label}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      {question.kind === "scale" ? (
+        <div className="mt-6">
+          {/* Escala 0-10: 11 botones de ancho uniforme, alto táctil ≥48px. */}
+          <div className="grid grid-cols-11 gap-1 sm:gap-1.5">
+            {Array.from({ length: 11 }, (_, value) => {
+              const active = picked === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => choose(value)}
+                  aria-label={`${value}`}
+                  className={`flex min-h-12 items-center justify-center rounded-lg border font-body text-sm font-semibold tabular-nums transition duration-150 active:scale-[0.97] sm:text-base ${
+                    active
+                      ? "border-accent bg-primary-soft text-primary"
+                      : "border-ink/15 bg-background text-ink hover:border-accent hover:bg-primary-soft"
+                  }`}
+                >
+                  {value}
+                </button>
+              );
+            })}
+          </div>
+          {question.anchors && (
+            <div className="mt-2 flex justify-between font-body text-xs text-ink/50">
+              <span>{question.anchors.min}</span>
+              <span className="text-right">{question.anchors.max}</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <ul className="mt-6 space-y-3">
+          {(question.options ?? []).map((opt) => {
+            const active = picked === opt.value;
+            return (
+              <li key={opt.value}>
+                <button
+                  type="button"
+                  onClick={() => choose(opt.value)}
+                  className={`w-full rounded-2xl border p-4 text-left font-body text-lg font-medium transition duration-150 active:scale-[0.99] ${
+                    active
+                      ? "border-accent bg-primary-soft text-primary"
+                      : "border-ink/15 bg-background text-ink hover:border-accent hover:bg-primary-soft"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }
