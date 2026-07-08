@@ -122,23 +122,30 @@ export default function BodyFigureSVG({
         )}
       </g>
 
-      {/* Chip de zona destacada */}
-      {showChip && hot && (
-        <g>
-          <rect x={hot.cx + 18} y={hot.cy - 14} width="92" height="28" rx="14" fill={INK} />
-          <text
-            x={hot.cx + 64}
-            y={hot.cy + 4.5}
-            textAnchor="middle"
-            fontFamily="inherit"
-            fontSize="12.5"
-            fontWeight="600"
-            fill={PAPER}
-          >
-            {hot.label} →
-          </text>
-        </g>
-      )}
+      {/* Chip de zona destacada. En zonas del lado derecho (cx > 110) se dibuja
+          a la izquierda del punto para no salirse del viewBox (ancho 220). */}
+      {showChip &&
+        hot &&
+        (() => {
+          const left = hot.cx > 110;
+          const rectX = left ? hot.cx - 18 - 92 : hot.cx + 18;
+          return (
+            <g>
+              <rect x={rectX} y={hot.cy - 14} width="92" height="28" rx="14" fill={INK} />
+              <text
+                x={rectX + 46}
+                y={hot.cy + 4.5}
+                textAnchor="middle"
+                fontFamily="inherit"
+                fontSize="12.5"
+                fontWeight="600"
+                fill={PAPER}
+              >
+                {left ? `← ${hot.label}` : `${hot.label} →`}
+              </text>
+            </g>
+          );
+        })()}
     </svg>
   );
 }

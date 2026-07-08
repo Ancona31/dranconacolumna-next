@@ -111,6 +111,38 @@ html.js .reveal.revealed {
   transform: scaleX(1);
 }
 
+/* Motor de evaluación: transiciones de entrada entre pantallas y bottom sheet.
+   El bloque global de prefers-reduced-motion las neutraliza. */
+@keyframes eval-screen-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.eval-screen {
+  animation: eval-screen-in 200ms ease-out;
+}
+
+@keyframes eval-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.eval-sheet {
+  animation: eval-sheet-in 200ms ease-out;
+}
+
 /* Respeto global a prefers-reduced-motion: neutraliza animaciones y
    transiciones (incluye Reveal, drawer, botones y page-enter). */
 @media (prefers-reduced-motion: reduce) {

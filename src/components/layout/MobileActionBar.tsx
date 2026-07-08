@@ -1,9 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { WHATSAPP_DEFAULT_MESSAGE } from "@/lib/nav";
 
 export default function MobileActionBar() {
+  const pathname = usePathname();
   const whatsappLink = buildWhatsAppLink(WHATSAPP_DEFAULT_MESSAGE);
+
+  // El flujo de evaluación necesita foco total y trae su propio CTA.
+  if (pathname?.startsWith("/evaluacion")) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink/10 md:hidden">
