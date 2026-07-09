@@ -42,14 +42,15 @@ export default function HeroBodyMap() {
           </a>
         </Reveal>
 
-        {/* Figura (autocontenida: puntos, halo y chip los dibuja el SVG) */}
+        {/* Figura (autocontenida: puntos y halos los dibuja el SVG). Sin chip:
+            en la home nadie ha elegido zona todavía. */}
         <Reveal delay={120} className="order-2 flex justify-center">
           <Link
             href="/evaluacion"
             aria-label="Comenzar mi evaluación"
             className="relative block w-[60%] max-w-[280px] md:w-full md:max-w-[360px]"
           >
-            <BodyFigureSVG className="h-auto w-full text-primary" />
+            <BodyFigureSVG mode="ambient" className="h-auto w-full text-primary" />
           </Link>
         </Reveal>
       </div>

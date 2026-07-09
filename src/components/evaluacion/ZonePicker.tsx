@@ -39,7 +39,7 @@ export default function ZonePicker({
       <div className="relative mx-auto mt-8 w-[62%] max-w-[300px]">
         <BodyFigureSVG
           highlightedZone={highlighted}
-          showChip
+          mode="selected"
           className="h-auto w-full text-primary"
         />
 

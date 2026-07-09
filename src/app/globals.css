@@ -10,6 +10,7 @@
   --color-success: #2e7d5b; /* severidad leve */
   --color-warning: #c77d1f; /* severidad moderada */
   --color-danger: #c0453a; /* severidad severa */
+  --color-pain: #d64541; /* nodo de dolor en el mapa corporal */
   --color-whatsapp: #25d366; /* SOLO botones de WhatsApp */
 
   /* Tipografías conectadas a next/font */
@@ -128,12 +129,37 @@ html.js .reveal.revealed {
   animation: eval-screen-in 200ms ease-out;
 }
 
+/* Mapa corporal (BodyFigureSVG). En la home el nodo de dolor recorre las
+   zonas: el relevo se cruza con transiciones para que ninguna cambie de
+   color de golpe. `r` no es animable por CSS, así que el nodo activo crece
+   con transform sobre su propia caja en vez de sobre el origen del viewBox. */
+.body-figure__halo,
+.body-figure__core {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    fill 500ms ease,
+    opacity 500ms ease,
+    transform 500ms ease;
+}
+
+.body-figure__pulse {
+  transition: opacity 500ms ease;
+}
+
 /* Respeto global a prefers-reduced-motion: neutraliza animaciones y
    transiciones (incluye Reveal, drawer, botones y page-enter). */
 @media (prefers-reduced-motion: reduce) {
   html.js .reveal {
     opacity: 1;
     transform: none;
+  }
+
+  /* Los halos del mapa corporal laten con SMIL (<animate>), que no responde
+     a las reglas de animation-* de abajo. Se ocultan; los halos estáticos
+     que van debajo permanecen y la figura se ve completa. */
+  .body-figure__pulse {
+    display: none;
   }
 
   *,

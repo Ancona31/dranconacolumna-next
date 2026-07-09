@@ -1,8 +1,12 @@
+"use client";
+
 // src/components/home/BodyFigureSVG.tsx
 // Silueta humana (vista posterior) adaptada de "Male body silhouette - back"
 // de nicubunu (OpenClipart, dominio publico). Posiciones de zona calculadas
 // geometricamente sobre el contorno real. NO ajustar el path a mano; las
 // zonas se ajustan editando cx/cy en BODY_ZONES.
+
+import { useEffect, useState } from "react";
 
 export type BodyZoneId =
   | "cuello" | "espalda-alta" | "espalda-baja" | "hombro" | "codo"
@@ -53,19 +57,99 @@ const APOPHYSIS_Y = [100, 128, 156, 184, 212, 240];
 const INK = "var(--color-primary, #0B3C5D)";
 const ACCENT = "var(--color-accent, #1B6CA8)";
 const PAPER = "var(--color-background, #FBFBF9)";
+const PAIN = "var(--color-pain, #D64541)";
+
+/**
+ * "selected" hay una zona elegida (o bajo el cursor): se anuncia con un chip.
+ * "ambient" nadie ha elegido nada todavía, así que afirmar una zona sería
+ * mentir: sin chip, el nodo de dolor recorre el cuerpo y `highlightedZone`
+ * solo decide dónde empieza el recorrido.
+ */
+export type BodyFigureMode = "ambient" | "selected";
+
+/** Recorrido del nodo de dolor en modo ambient: anatómico, de arriba abajo. */
+const AMBIENT_TOUR: BodyZoneId[] = [
+  "cuello",
+  "hombro",
+  "espalda-alta",
+  "codo",
+  "espalda-baja",
+  "muneca",
+  "cadera",
+  "rodilla",
+  "tobillo",
+];
+
+const TOUR_STEP_MS = 2800;
+
+// CSS no anima `r`, así que el nodo activo crece con transform sobre su propia
+// caja. Las escalas son los radios de antes (15 y 6.5) sobre los de reposo.
+const HALO_ACTIVE_SCALE = 15 / 11;
+const CORE_ACTIVE_SCALE = 6.5 / 5;
+
+// Chip de zona (modo selected). Se dimensiona al texto porque etiquetas como
+// "Muñeca y mano" no caben en un ancho fijo.
+const VIEW_W = 220;
+const CHIP_CHAR_W = 7.4; // ancho medio de carácter a fontSize 12.5
+const CHIP_PADDING_X = 14; // por lado
+const CHIP_GAP = 18; // separación entre el nodo y el chip
+const CHIP_MARGIN = 4; // margen mínimo contra el borde del viewBox
 
 interface BodyFigureSVGProps {
   highlightedZone?: BodyZoneId;
-  showChip?: boolean;
+  mode?: BodyFigureMode;
   className?: string;
 }
 
 export default function BodyFigureSVG({
   highlightedZone = "espalda-baja",
-  showChip = true,
+  mode = "ambient",
   className,
 }: BodyFigureSVGProps) {
   const hot = BODY_ZONES.find((z) => z.id === highlightedZone);
+  const ambient = mode === "ambient";
+
+  // El servidor y el primer render del cliente parten de la misma zona, así
+  // que el tour puede arrancar después sin provocar hydration mismatch.
+  const tourStart = Math.max(0, AMBIENT_TOUR.indexOf(highlightedZone));
+  const [tourIndex, setTourIndex] = useState(tourStart);
+
+  useEffect(() => {
+    if (!ambient) return;
+
+    // SMIL y este intervalo ignoran prefers-reduced-motion por su cuenta:
+    // con reduce, el recorrido no arranca y la figura se queda quieta.
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let timer: ReturnType<typeof setInterval> | undefined;
+
+    const stop = () => {
+      if (timer !== undefined) {
+        clearInterval(timer);
+        timer = undefined;
+      }
+    };
+
+    const sync = () => {
+      stop();
+      if (reduced.matches) {
+        setTourIndex(tourStart);
+        return;
+      }
+      timer = setInterval(
+        () => setTourIndex((i) => (i + 1) % AMBIENT_TOUR.length),
+        TOUR_STEP_MS,
+      );
+    };
+
+    sync();
+    reduced.addEventListener("change", sync);
+    return () => {
+      stop();
+      reduced.removeEventListener("change", sync);
+    };
+  }, [ambient, tourStart]);
+
+  const activeZone = ambient ? AMBIENT_TOUR[tourIndex] : highlightedZone;
 
   return (
     <svg
@@ -101,39 +185,124 @@ export default function BodyFigureSVG({
         ))}
       </g>
 
-      {/* Zonas */}
-      <g>
-        {BODY_ZONES.filter((z) => z.id !== highlightedZone).map((z) => (
-          <g key={z.id}>
-            <circle cx={z.cx} cy={z.cy} r="11" fill={ACCENT} opacity="0.18" />
-            <circle cx={z.cx} cy={z.cy} r="5" fill={INK} stroke={PAPER} strokeWidth="2" />
-          </g>
-        ))}
+      {/* Zonas. Los halos estáticos van debajo de los que laten, para que al
+          ocultar los pulsos con prefers-reduced-motion la figura siga entera. */}
+      {ambient ? (
+        <g>
+          {/* Cada nodo lleva sus dos pulsos siempre corriendo y cruza opacidad
+              al entrar o salir del recorrido: así el rojo nunca salta de golpe.
+              Ambos pulsos son SMIL, la misma técnica en toda la figura. */}
+          {BODY_ZONES.map((z, i) => {
+            const active = z.id === activeZone;
+            const stagger = `${(i * 0.35).toFixed(2)}s`;
 
-        {hot && (
-          <g>
-            <circle cx={hot.cx} cy={hot.cy} r="15" fill={ACCENT} opacity="0.22" />
-            <circle cx={hot.cx} cy={hot.cy} r="15" fill={ACCENT} opacity="0.3">
-              <animate attributeName="r" values="15;21;15" dur="2.6s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.3;0.06;0.3" dur="2.6s" repeatCount="indefinite" />
-            </circle>
-            <circle cx={hot.cx} cy={hot.cy} r="6.5" fill={INK} stroke={PAPER} strokeWidth="2.2" />
-          </g>
-        )}
-      </g>
+            return (
+              <g key={z.id}>
+                <circle
+                  className="body-figure__halo"
+                  cx={z.cx}
+                  cy={z.cy}
+                  r="11"
+                  fill={active ? PAIN : ACCENT}
+                  opacity={active ? 0.25 : 0.18}
+                  style={active ? { transform: `scale(${HALO_ACTIVE_SCALE})` } : undefined}
+                />
+
+                {/* Latido azul de reposo, escalonado por índice. */}
+                <g className="body-figure__pulse" opacity={active ? 0 : 1}>
+                  <circle cx={z.cx} cy={z.cy} r="11" fill={ACCENT} opacity="0.2">
+                    <animate
+                      attributeName="r"
+                      values="11;15;11"
+                      dur="3.2s"
+                      begin={stagger}
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.2;0.06;0.2"
+                      dur="3.2s"
+                      begin={stagger}
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                </g>
+
+                {/* Pulso de dolor, visible solo mientras la zona es la activa. */}
+                <g className="body-figure__pulse" opacity={active ? 1 : 0}>
+                  <circle cx={z.cx} cy={z.cy} r="15" fill={PAIN} opacity="0.3">
+                    <animate attributeName="r" values="15;21;15" dur="2.6s" repeatCount="indefinite" />
+                    <animate
+                      attributeName="opacity"
+                      values="0.3;0.06;0.3"
+                      dur="2.6s"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                </g>
+
+                <circle
+                  className="body-figure__core"
+                  cx={z.cx}
+                  cy={z.cy}
+                  r="5"
+                  fill={active ? PAIN : INK}
+                  stroke={PAPER}
+                  strokeWidth="2"
+                  style={active ? { transform: `scale(${CORE_ACTIVE_SCALE})` } : undefined}
+                />
+              </g>
+            );
+          })}
+        </g>
+      ) : (
+        <g>
+          {BODY_ZONES.filter((z) => z.id !== highlightedZone).map((z) => (
+            <g key={z.id}>
+              <circle cx={z.cx} cy={z.cy} r="11" fill={ACCENT} opacity="0.18" />
+              <circle cx={z.cx} cy={z.cy} r="5" fill={INK} stroke={PAPER} strokeWidth="2" />
+            </g>
+          ))}
+
+          {hot && (
+            <g>
+              <circle cx={hot.cx} cy={hot.cy} r="15" fill={ACCENT} opacity="0.22" />
+              <circle
+                className="body-figure__pulse"
+                cx={hot.cx}
+                cy={hot.cy}
+                r="15"
+                fill={ACCENT}
+                opacity="0.3"
+              >
+                <animate attributeName="r" values="15;21;15" dur="2.6s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.3;0.06;0.3" dur="2.6s" repeatCount="indefinite" />
+              </circle>
+              <circle cx={hot.cx} cy={hot.cy} r="6.5" fill={INK} stroke={PAPER} strokeWidth="2.2" />
+            </g>
+          )}
+        </g>
+      )}
 
       {/* Chip de zona destacada. En zonas del lado derecho (cx > 110) se dibuja
           a la izquierda del punto para no salirse del viewBox (ancho 220). */}
-      {showChip &&
+      {!ambient &&
         hot &&
         (() => {
-          const left = hot.cx > 110;
-          const rectX = left ? hot.cx - 18 - 92 : hot.cx + 18;
+          const chipWidth = Math.round(hot.label.length * CHIP_CHAR_W + CHIP_PADDING_X * 2);
+          const anchoredX =
+            hot.cx > 110 ? hot.cx - CHIP_GAP - chipWidth : hot.cx + CHIP_GAP;
+          // Las etiquetas largas se salen del lienzo desde su anclaje: se
+          // corren hacia dentro en vez de recortarse.
+          const rectX = Math.min(
+            Math.max(anchoredX, CHIP_MARGIN),
+            VIEW_W - CHIP_MARGIN - chipWidth,
+          );
           return (
             <g>
-              <rect x={rectX} y={hot.cy - 14} width="92" height="28" rx="14" fill={INK} />
+              <rect x={rectX} y={hot.cy - 14} width={chipWidth} height="28" rx="14" fill={INK} />
               <text
-                x={rectX + 46}
+                x={rectX + chipWidth / 2}
                 y={hot.cy + 4.5}
                 textAnchor="middle"
                 fontFamily="inherit"
@@ -141,7 +310,7 @@ export default function BodyFigureSVG({
                 fontWeight="600"
                 fill={PAPER}
               >
-                {left ? `← ${hot.label}` : `${hot.label} →`}
+                {hot.label}
               </text>
             </g>
           );
