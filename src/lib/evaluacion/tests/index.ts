@@ -2,6 +2,8 @@ import type { BodyZoneId } from "@/components/home/BodyFigureSVG";
 import type { TestDefinition } from "@/lib/evaluacion/types";
 import { caderaTest } from "./cadera";
 import { codoTest } from "./codo";
+import { cuelloTest } from "./cuello";
+import { espaldaAltaTest } from "./espalda-alta";
 import { espaldaBajaTest } from "./espalda-baja";
 import { hombroTest } from "./hombro";
 import { munecaTest } from "./muneca";
@@ -15,6 +17,8 @@ import { rodillaTest } from "./rodilla";
 export const TESTS: Partial<Record<BodyZoneId, TestDefinition>> = {
   cadera: caderaTest,
   codo: codoTest,
+  cuello: cuelloTest,
+  "espalda-alta": espaldaAltaTest,
   "espalda-baja": espaldaBajaTest,
   hombro: hombroTest,
   muneca: munecaTest,

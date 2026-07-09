@@ -3,15 +3,19 @@
 import { useEffect, useState } from "react";
 import {
   Activity,
+  AlarmClock,
   AlertCircle,
   AlertTriangle,
+  CalendarClock,
   Check,
   Dot,
   Dumbbell,
   Footprints,
+  Heart,
   MessageCircle,
   MoreHorizontal,
   Stethoscope,
+  Zap,
 } from "lucide-react";
 import type {
   DomainId,
@@ -27,8 +31,10 @@ import {
   FUNC_STATE_LABELS,
   type FuncState,
   getEvaluationPlan,
-  getRecommendationText,
+  getRecommendation,
+  getRecommendationColors,
   getResultWhatsAppLink,
+  getSemaphoreTitle,
   getWarningSigns,
   nivelDefinitions,
   NIVEL_BADGE_COLORS,
@@ -42,32 +48,21 @@ const BANNER_STYLES = {
   urgente: { box: "border-danger bg-danger/10", title: "text-danger" },
 };
 
-const LEVEL_STYLES: Record<
-  NonUrgentLevel,
-  { pill: string; border: string; label: string }
-> = {
-  leve: {
-    pill: "bg-success/10 text-success",
-    border: "border-success",
-    label: "Limitación leve",
-  },
-  moderada: {
-    pill: "bg-warning/10 text-warning",
-    border: "border-warning",
-    label: "Limitación moderada",
-  },
-  severa: {
-    pill: "bg-danger/10 text-danger",
-    border: "border-danger",
-    label: "Limitación severa",
-  },
+const LEVEL_STYLES: Record<NonUrgentLevel, { pill: string; label: string }> = {
+  leve: { pill: "bg-success/10 text-success", label: "Limitación leve" },
+  moderada: { pill: "bg-warning/10 text-warning", label: "Limitación moderada" },
+  severa: { pill: "bg-danger/10 text-danger", label: "Limitación severa" },
 };
 
-// Icono lucide por dominio y glifo de estado (SVG, nunca emoji).
+// Icono lucide por dominio y glifo de estado (SVG, nunca emoji). Cubre la
+// tríada funcional y las dimensiones del COMI; Activity es el respaldo.
 const DOMAIN_ICON: Record<DomainId, typeof Activity> = {
   basicas: Footprints,
   moderadas: Activity,
   demandantes: Dumbbell,
+  dolor: Zap,
+  actividades: Activity,
+  bienestar: Heart,
 };
 const STATE_GLYPH: Record<FuncState, typeof Check> = {
   verde: Check,
@@ -140,7 +135,7 @@ function CapacityCard({
   domain: ReturnType<typeof computeDomains>[number];
 }) {
   const { bg, strong } = FUNC_COLORS[domain.state];
-  const Icon = DOMAIN_ICON[domain.id];
+  const Icon = DOMAIN_ICON[domain.id] ?? Activity;
   const Glyph = STATE_GLYPH[domain.state];
   return (
     <div
@@ -185,6 +180,9 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
   }, []);
 
   const style = LEVEL_STYLES[result.level];
+  const rec = getRecommendation(result.level, result.alertLevel);
+  const recColors = getRecommendationColors(rec);
+  const RecIcon = rec.urgent ? AlarmClock : CalendarClock;
   const whatsappLink = getResultWhatsAppLink(result);
   const paragraphs = result.test.reportTexts[result.level];
   const banner = buildAlertBanner(result);
@@ -273,20 +271,11 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
         </p>
       </div>
 
-      {/* Recomendación */}
-      <div
-        className={`mt-8 rounded-r-xl border-l-4 bg-primary-soft/60 p-4 ${style.border}`}
-      >
-        <p className="font-body text-ink/80">
-          {getRecommendationText(result.level, result.alertLevel)}
-        </p>
-      </div>
-
-      {/* Tu capacidad hoy, según tus respuestas (semáforo funcional) */}
+      {/* Semáforo: capacidad funcional o dimensiones, según el test */}
       {domains.length > 0 && (
         <div className="mt-8">
           <h2 className="font-heading text-lg font-bold text-primary">
-            Tu capacidad hoy, según tus respuestas
+            {getSemaphoreTitle(result.test)}
           </h2>
           <div className="mt-4 space-y-3">
             {domains.map((domain) => (
@@ -365,8 +354,42 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
         </div>
       )}
 
-      {/* CTA (con alertLevel 'urgente' cambia el mensaje) */}
-      <div className="mt-8 space-y-3">
+      {/* Recomendación: cierre del recorrido. La ventana de tiempo es el
+          titular; el color no marca severidad, solo urgencia. */}
+      <div
+        className="relative mt-8 overflow-hidden rounded-xl border-[1.5px] p-5 pl-6"
+        style={{ backgroundColor: recColors.bg, borderColor: recColors.strong }}
+      >
+        <span
+          className="absolute left-0 top-0 h-full w-[3px]"
+          style={{ backgroundColor: recColors.strong }}
+          aria-hidden="true"
+        />
+        <p
+          className="font-body text-[11px] font-bold uppercase tracking-[0.14em]"
+          style={{ color: recColors.strong }}
+        >
+          {rec.label}
+        </p>
+        <div className="mt-2 flex items-center gap-2.5">
+          <RecIcon
+            className="h-[18px] w-[18px] shrink-0"
+            style={{ color: recColors.strong }}
+            strokeWidth={1.75}
+          />
+          <p
+            className="font-heading text-[17px] font-semibold leading-snug sm:text-lg"
+            style={{ color: recColors.strong }}
+          >
+            {rec.window}
+          </p>
+        </div>
+        <p className="mt-2.5 font-body text-sm text-ink">{rec.context}</p>
+      </div>
+
+      {/* CTA (con alertLevel 'urgente' cambia el mensaje). Gap reducido: la
+          recomendación y el CTA se leen como una sola unidad de cierre. */}
+      <div className="mt-5 space-y-3">
         <a
           href={whatsappLink}
           target="_blank"

@@ -10,10 +10,15 @@ import {
   Line,
   Circle,
   Ellipse,
+  Rect,
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
-import type { DomainId, EvaluationResult } from "@/lib/evaluacion/types";
+import type {
+  DomainId,
+  EvaluationResult,
+  Recommendation,
+} from "@/lib/evaluacion/types";
 import {
   buildAlertBanner,
   computeDomains,
@@ -24,8 +29,10 @@ import {
   FUNC_STATE_LABELS,
   type FuncState,
   getEvaluationPlan,
-  getRecommendationText,
+  getRecommendation,
+  getRecommendationColors,
   getQrWhatsAppLink,
+  getSemaphoreTitle,
   getWarningSigns,
   nivelDefinitions,
   NIVEL_BADGE_COLORS,
@@ -53,7 +60,6 @@ Font.registerHyphenationCallback((word) => [word]);
 
 const C = {
   primary: "#0B3C5D",
-  primarySoft: "#E8F1F8",
   accent: "#1B6CA8",
   bg: "#FBFBF9",
   ink: "#16232E",
@@ -148,11 +154,11 @@ const styles = StyleSheet.create({
     lineHeight: 1.2,
   },
   recBox: {
-    borderLeftWidth: 3,
-    backgroundColor: C.primarySoft,
-    padding: 8,
+    borderWidth: 1,
+    borderLeftWidth: 2.5,
+    padding: 9,
     marginTop: 8,
-    borderRadius: 3,
+    borderRadius: 4,
   },
   nivelBadge: {
     borderWidth: 1,
@@ -314,6 +320,49 @@ function Legal({ citation }: { citation: string }) {
   );
 }
 
+// Recomendación de cierre: la ventana de tiempo es el titular. El color no
+// marca severidad — azul de marca salvo en urgente, donde vira a coral.
+function RecommendationBlock({ rec }: { rec: Recommendation }) {
+  const { bg, strong } = getRecommendationColors(rec);
+  return (
+    <View style={[styles.recBox, { backgroundColor: bg, borderColor: strong }]}>
+      <Text
+        style={{
+          fontFamily: "Helvetica-Bold",
+          fontSize: 7.5,
+          letterSpacing: 1.1,
+          color: strong,
+        }}
+      >
+        {rec.label}
+      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 5,
+          marginTop: 3,
+        }}
+      >
+        <PdfRecIcon urgent={rec.urgent} color={strong} bg={bg} />
+        <Text
+          style={{
+            fontFamily: "Helvetica-Bold",
+            fontSize: 12.75,
+            lineHeight: 1.2,
+            color: strong,
+          }}
+        >
+          {rec.window}
+        </Text>
+      </View>
+      <Text style={{ fontSize: 9, color: C.ink, marginTop: 4 }}>
+        {rec.context}
+      </Text>
+    </View>
+  );
+}
+
 function CtaBlock({ waLink, urgent }: { waLink: string; urgent: boolean }) {
   return (
     <View style={styles.ctaBox} wrap={false}>
@@ -421,6 +470,47 @@ function PdfMiniSilhouette({ result }: { result: EvaluationResult }) {
   );
 }
 
+// Icono del titular de la recomendación con primitivos SVG (equivalente a los
+// lucide de pantalla: CalendarClock, o AlarmClock cuando es urgente). El reloj
+// del calendario se recorta contra `bg`, el fondo suave del bloque.
+function PdfRecIcon({
+  urgent,
+  color,
+  bg,
+}: {
+  urgent: boolean;
+  color: string;
+  bg: string;
+}) {
+  const p = { stroke: color, strokeWidth: 1.2, fill: "none" as const };
+  if (urgent) {
+    return (
+      <Svg width={13} height={13} viewBox="0 0 16 16">
+        <Circle cx={8} cy={9} r={5.2} {...p} />
+        <Line x1={3.2} y1={4.4} x2={1.3} y2={2.5} {...p} strokeLinecap="round" />
+        <Line x1={12.8} y1={4.4} x2={14.7} y2={2.5} {...p} strokeLinecap="round" />
+        <Line x1={8} y1={6.2} x2={8} y2={9} {...p} strokeLinecap="round" />
+        <Line x1={8} y1={9} x2={10.1} y2={9} {...p} strokeLinecap="round" />
+        <Line x1={4.6} y1={13.4} x2={3.6} y2={14.7} {...p} strokeLinecap="round" />
+        <Line x1={11.4} y1={13.4} x2={12.4} y2={14.7} {...p} strokeLinecap="round" />
+      </Svg>
+    );
+  }
+  return (
+    <Svg width={15} height={15} viewBox="0 0 16 16">
+      <Rect x={1} y={3} width={9.5} height={10} rx={1.4} {...p} />
+      <Line x1={1} y1={6} x2={10.5} y2={6} {...p} />
+      <Line x1={3.6} y1={1.6} x2={3.6} y2={4} {...p} strokeLinecap="round" />
+      <Line x1={7.9} y1={1.6} x2={7.9} y2={4} {...p} strokeLinecap="round" />
+      {/* Placa opaca: el reloj monta sobre la esquina del calendario. */}
+      <Circle cx={11.4} cy={10.4} r={4.6} fill={bg} />
+      <Circle cx={11.4} cy={10.4} r={3.9} {...p} />
+      <Line x1={11.4} y1={8.1} x2={11.4} y2={10.4} {...p} strokeLinecap="round" />
+      <Line x1={11.4} y1={10.4} x2={13.1} y2={10.4} {...p} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
 // Glifo de estado con primitivos SVG (legible incluso impreso en B/N).
 function PdfStatusGlyph({ state, color }: { state: FuncState; color: string }) {
   return (
@@ -452,12 +542,15 @@ function PdfStatusGlyph({ state, color }: { state: FuncState; color: string }) {
 }
 
 // Icono de dominio con primitivos SVG (equivalente a los lucide de pantalla:
-// Footprints básicas · Activity moderadas · Dumbbell demandantes).
+// Footprints básicas · Activity moderadas/actividades · Dumbbell demandantes ·
+// Zap dolor · Heart bienestar). Sin id conocido cae en el trazo de Activity.
 function PdfDomainIcon({ id, color }: { id: DomainId; color: string }) {
   const p = { stroke: color, strokeWidth: 1.3, fill: "none" as const };
+  const isPulse = id === "moderadas" || id === "actividades";
+  const isFallback = !["basicas", "moderadas", "demandantes", "dolor", "bienestar", "actividades"].includes(id);
   return (
     <Svg width={13} height={13} viewBox="0 0 16 16">
-      {id === "moderadas" ? (
+      {isPulse || isFallback ? (
         <Path
           d="M1 8 H4.5 L6.5 3 L9.5 13 L11.5 8 H15"
           {...p}
@@ -479,6 +572,22 @@ function PdfDomainIcon({ id, color }: { id: DomainId; color: string }) {
           <Ellipse cx={5.5} cy={6} rx={2.3} ry={3.2} {...p} />
           <Ellipse cx={10.5} cy={10} rx={2.3} ry={3.2} {...p} />
         </>
+      ) : null}
+      {/* Rayo (dolor) */}
+      {id === "dolor" ? (
+        <Path
+          d="M9 1.5 L3.5 9 H7.5 L6.5 14.5 L12.5 7 H8.5 Z"
+          {...p}
+          strokeLinejoin="round"
+        />
+      ) : null}
+      {/* Corazón (bienestar) */}
+      {id === "bienestar" ? (
+        <Path
+          d="M8 13.5 C8 13.5 1.5 9.6 1.5 5.6 C1.5 3.6 3 2.2 4.8 2.2 C6.1 2.2 7.3 3 8 4.2 C8.7 3 9.9 2.2 11.2 2.2 C13 2.2 14.5 3.6 14.5 5.6 C14.5 9.6 8 13.5 8 13.5 Z"
+          {...p}
+          strokeLinejoin="round"
+        />
       ) : null}
     </Svg>
   );
@@ -546,6 +655,7 @@ export default function ReportPdf({
   qrDataUrl?: string;
 }) {
   const level = LEVELS[result.level];
+  const rec = getRecommendation(result.level, result.alertLevel);
   // Fuente única del enlace para QR y ambos <Link>; recorta por densidad.
   const fullLink = getQrWhatsAppLink(result);
   const fullVersion = QRCode.create(fullLink, {
@@ -666,17 +776,13 @@ export default function ReportPdf({
                 {nivelDefinitions[result.level]}
               </Text>
             </View>
-
-            <View style={[styles.recBox, { borderLeftColor: level.color }]}>
-              <Text>{getRecommendationText(result.level, result.alertLevel)}</Text>
-            </View>
           </View>
 
-          {/* Tu capacidad hoy (variante compacta) */}
+          {/* Semáforo del test (variante compacta) */}
           {domains.length > 0 ? (
             <View style={styles.section} wrap={false}>
               <Text style={styles.sectionTitle}>
-                TU CAPACIDAD HOY, SEGÚN TUS RESPUESTAS
+                {getSemaphoreTitle(result.test).toUpperCase()}
               </Text>
               {domains.map((domain) => (
                 <CapacityCardPdf key={domain.id} domain={domain} />
@@ -725,9 +831,10 @@ export default function ReportPdf({
             </View>
           ) : null}
 
-          {/* CTA + pie legal agrupados: anti-huérfano. Viajan juntos a la
-              página siguiente si no caben; el CTA nunca queda solo. */}
+          {/* Cierre: recomendación + CTA + pie legal agrupados. Anti-huérfano —
+              viajan juntos a la página siguiente si no caben. */}
           <View wrap={false}>
+            <RecommendationBlock rec={rec} />
             <CtaBlock
               waLink={qrValue}
               urgent={result.alertLevel === "urgente"}

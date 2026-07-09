@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack --yes)",
+      "Bash(npm ls *)",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(node *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 *)",
+      "Bash(perl -0pi -e 's/AVAILABLE_TESTS/TESTS/g' src/components/evaluacion/EvaluationFlow.tsx)",
+      "Bash(cd *)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules SKIP_BADGE=1 node /tmp/pdfscan.js)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules node /tmp/pdfscan.js)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules node /tmp/footer.js)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules node /tmp/v22b.js)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules node /tmp/v22.js)",
+      "Bash(sed 's/console.error=\\(\\)=>{};//' /tmp/v22b.js)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules node /tmp/v22c.js)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules node /tmp/v22d.js)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules node /tmp/v23b.js)",
+      "Bash(perl -0pi -e 's/const BOIL=\\\\[.*?\\\\];/const BOIL=[\\\\/dranconacolumna\\\\/i,\\\\/WhatsApp\\\\\\\\s*999\\\\/i,\\\\/Ortopedia\\\\/i,\\\\/\\\\^C[e\\\\x{e9}]d\\\\/i,\\\\/Certificado CMOT\\\\/i,\\\\/M[e\\\\x{e9}]rida y Um\\\\/i,\\\\/999 636\\\\/i,\\\\/\\\\^P[a\\\\x{e1}]gina \\\\\\\\d\\\\/,\\\\/Ancona P[e\\\\x{e9}]rez\\\\/,\\\\/\\\\^9552456\\\\$\\\\/,\\\\/\\\\^12085805\\\\$\\\\/,\\\\/\\\\^CMOT\\\\/i];/s' /tmp/v23.js)",
+      "Bash(perl -0pi -e 's|const pageNo=.*?;|const pageNo=p.find\\(x=>/P[a\\\\x{e1}]gina \\\\\\\\d+ de \\\\\\\\d+/.test\\(x\\)\\)||null;|' /tmp/v23.js)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules node /tmp/v23.js)",
+      "Bash(npx tsc *)",
+      "Bash(lsof -iTCP -sTCP:LISTEN -P -n)",
+      "Bash(ln -s /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/afd57b93-82d8-432f-b4b6-4d3438faa678/scratchpad/out node_modules/@)",
+      "Bash(NODE_PATH=\"$PWD/node_modules\" node *)",
+      "Bash(NODE_PATH=__TRACKED_VAR__/node_modules node /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/afd57b93-82d8-432f-b4b6-4d3438faa678/scratchpad/verify2.js)"
+    ]
+  }
+}

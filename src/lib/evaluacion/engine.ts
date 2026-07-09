@@ -4,17 +4,31 @@ import type {
   AlertLevel,
   AnswerMap,
   DomainId,
+  DomainPhrases,
   EvaluationResult,
+  FuncState,
   NonUrgentLevel,
+  Recommendation,
+  RecommendationKey,
   Scoring,
   ScoringLevels,
   TestDefinition,
 } from "./types";
 
+export type { FuncState } from "./types";
+
 /** Flag de urgencia (hoy solo: trauma sin poder apoyar el pie). */
 export const URGENT_TRAUMA_FLAG = "urgente-trauma";
 /** Flag informativo: trauma con apoyo. No cambia el nivel funcional. */
 export const TRAUMA_FLAG = "trauma";
+
+/**
+ * Flags de triaje que ameritan valoración prioritaria pero NO urgencias: el
+ * déficit neurológico de instauración lenta. Elevan el alertLevel a 'precaución'
+ * y se listan en "Marcaste:" con su `flagLabel`, junto a la alarma universal.
+ * El déficit AGUDO tiene su propio flag urgente y no vive aquí.
+ */
+export const CAUTION_FLAGS = new Set(["mielopatia", "deficit-dorsal"]);
 
 /** Cortes por defecto del nivel funcional cuando el scoring no define `levels`. */
 const DEFAULT_LEVELS: ScoringLevels = { leveMax: 30, moderadaMax: 60 };
@@ -31,6 +45,10 @@ const URGENT_FLAG_BANNERS: Record<string, { title: string; body: string }> = {
   "urgente-neurologico": {
     title: "Tus respuestas incluyen datos que deben valorarse hoy",
     body: "Indicaste debilidad que avanza, adormecimiento en la zona genital o dificultad nueva para controlar esfínteres. Esos datos requieren valoración presencial hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo.",
+  },
+  "urgente-neurologico-dorsal": {
+    title: "Tus respuestas incluyen datos que deben valorarse hoy",
+    body: "Indicaste debilidad o torpeza en las piernas de aparición súbita. Ese dato debe valorarse presencialmente hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo.",
   },
 };
 
@@ -56,17 +74,41 @@ const URGENT_TRAUMA_BANNER_BY_ZONE: Partial<
   },
 };
 
+/** Eyebrow del bloque de recomendación. Fuente única (pantalla y PDF). */
+export const RECOMMENDATION_EYEBROW = "VALORACIÓN RECOMENDADA";
+
 /**
- * MATRIZ DE RECOMENDACIÓN por nivel funcional (alertLevel 'none').
- * Comunica la ventana temporal recomendada, sin invitación de contacto: esa
- * vive ÚNICAMENTE en el CTA final y en la firma de "qué debe evaluarse".
+ * MATRIZ DE RECOMENDACIÓN, indexada por nivel funcional o —si hay alerta— por el
+ * nivel de alerta, que lo sobrescribe. La ventana temporal es el protagonista;
+ * el contexto la justifica. Sin invitación de contacto: esa vive ÚNICAMENTE en
+ * el CTA final y en la firma de "qué debe evaluarse".
  */
-export const RECOMMENDATION_TEXTS: Record<NonUrgentLevel, string> = {
-  leve: "Tu resultado no muestra datos de urgencia. Una valoración médica te dará un diagnóstico claro y un plan — lo recomendable es agendarla esta semana.",
-  moderada:
-    "Este nivel de limitación amerita valoración médica. Lo recomendable es agendarla en los próximos 3 días.",
-  severa:
-    "Tu resultado amerita valoración pronta: lo recomendable es agendarla dentro de las próximas 24 a 48 horas.",
+export const RECOMMENDATIONS: Record<
+  RecommendationKey,
+  { window: string; context: string }
+> = {
+  leve: {
+    window: "Esta semana",
+    context:
+      "Tu resultado no muestra datos de urgencia. Una valoración médica te dará un diagnóstico claro y un plan.",
+  },
+  moderada: {
+    window: "En los próximos 3 días",
+    context: "Este nivel de limitación amerita valoración médica.",
+  },
+  severa: {
+    window: "En las próximas 24 a 48 horas",
+    context: "Tu resultado amerita valoración pronta.",
+  },
+  precaucion: {
+    window: "En las próximas 24 a 48 horas",
+    context:
+      "Además de tu nivel de limitación, los datos que marcaste ameritan valoración pronta.",
+  },
+  urgente: {
+    window: "Hoy mismo, en un servicio de urgencias",
+    context: "Lo indicado es valoración presencial.",
+  },
 };
 
 /**
@@ -94,17 +136,43 @@ export const NIVEL_BADGE_COLORS: Record<
   severa: { bg: "#F9EAE8", strong: "#C0453A" },
 };
 
+/**
+ * Paleta del bloque de recomendación, DESACOPLADA de la severidad: el color no
+ * dice qué tan grave es el resultado, solo si hay urgencia. Estándar (azul de
+ * marca) para leve, moderada, severa y precaución; coral únicamente en urgente.
+ * Fuente única para pantalla y PDF.
+ */
+export const RECOMMENDATION_COLORS: Record<
+  "standard" | "urgente",
+  { bg: string; strong: string }
+> = {
+  standard: { bg: "#E8F1F8", strong: "#0B3C5D" },
+  urgente: { bg: "#F9EAE8", strong: "#C0453A" },
+};
+
+/** Par de color del bloque a partir de su variante. */
+export function getRecommendationColors(rec: Recommendation) {
+  return RECOMMENDATION_COLORS[rec.urgent ? "urgente" : "standard"];
+}
+
 function levelFromScore(score: number, levels: ScoringLevels): NonUrgentLevel {
   if (score <= levels.leveMax) return "leve";
   if (score <= levels.moderadaMax) return "moderada";
   return "severa";
 }
 
+/** Media aritmética; 0 con lista vacía. */
+function mean(values: number[]): number {
+  return values.length
+    ? values.reduce((s, v) => s + v, 0) / values.length
+    : 0;
+}
+
 /**
  * Deriva raw (suma de todos los ítems), interval (salud 0-100) y score (índice
  * de limitación 0-100) según la forma de scoring.
  * - table/linear ('higher-is-better'): score = 100 − interval.
- * - weighted-subscales ('higher-is-worse'): score directo, SIN inversión;
+ * - weighted-subscales / comi ('higher-is-worse'): score directo, SIN inversión;
  *   interval = 100 − score.
  */
 function computeScore(
@@ -113,6 +181,23 @@ function computeScore(
   questions: TestDefinition["questions"]
 ): { raw: number; interval: number; score: number } {
   const raw = questions.reduce((sum, q) => sum + (answers[q.id] ?? 0), 0);
+
+  if (scoring.kind === "comi") {
+    const v = (id: string) => answers[id] ?? 0;
+    // Dolor: el peor de los dos sitios. Discapacidad: promedio de sus dos ítems.
+    const pain = Math.max(...scoring.painItems.map(v));
+    const disability = mean(scoring.disabilityItems.map(v));
+    const score = Math.round(
+      mean([
+        pain,
+        v(scoring.functionItem),
+        v(scoring.wellbeingItem),
+        v(scoring.qolItem),
+        disability,
+      ]) * 10
+    );
+    return { raw, interval: 100 - score, score };
+  }
 
   if (scoring.kind === "weighted-subscales") {
     const scoreRaw = scoring.subscales.reduce((acc, sub) => {
@@ -227,20 +312,20 @@ export function getQrWhatsAppLink(
 }
 
 /**
- * Texto ÚNICO del recuadro de recomendación según (nivel, alertLevel).
- * Una sola voz: sin ventanas contradictorias.
+ * Bloque ÚNICO de recomendación según (nivel, alertLevel). Una sola voz: sin
+ * ventanas contradictorias. El nivel de alerta, si existe, manda sobre el nivel
+ * funcional. Fuente única para pantalla y PDF.
  */
-export function getRecommendationText(
+export function getRecommendation(
   level: NonUrgentLevel,
   alertLevel: AlertLevel
-): string {
-  if (alertLevel === "urgente") {
-    return "Lo indicado es valoración presencial hoy mismo, en un servicio de urgencias.";
-  }
-  if (alertLevel === "precaucion") {
-    return "Además de tu nivel de limitación, los datos que marcaste ameritan valoración pronta: lo recomendable es agendarla en las próximas 24 a 48 horas.";
-  }
-  return RECOMMENDATION_TEXTS[level];
+): Recommendation {
+  const key: RecommendationKey = alertLevel === "none" ? level : alertLevel;
+  return {
+    label: RECOMMENDATION_EYEBROW,
+    ...RECOMMENDATIONS[key],
+    urgent: alertLevel === "urgente",
+  };
 }
 
 export type AlertBanner = {
@@ -278,15 +363,17 @@ export function buildAlertBanner(result: EvaluationResult): AlertBanner | null {
 
 /**
  * Frases legibles de los flags informativos presentes (los que el test define
- * en `flagLabels`). No incluye flags de alarma/urgencia. Respeta el orden de
- * los flags acumulados.
+ * en `flagLabels`). No incluye flags de alarma/urgencia ni los de precaución:
+ * esos ya viven en la lista "Marcaste:" del banner. Respeta el orden de los
+ * flags acumulados.
  */
 export function getInfoFlagLabels(result: EvaluationResult): string[] {
   const map = result.test.flagLabels;
   if (!map) return [];
-  return result.flags.map((f) => map[f]).filter((label): label is string =>
-    Boolean(label)
-  );
+  return result.flags
+    .filter((f) => !CAUTION_FLAGS.has(f))
+    .map((f) => map[f])
+    .filter((label): label is string => Boolean(label));
 }
 
 /**
@@ -302,8 +389,6 @@ export function getMarkedItems(
 }
 
 /* ===================== SEMÁFORO FUNCIONAL POR DOMINIO ===================== */
-
-export type FuncState = "verde" | "amarillo" | "naranja" | "rojo";
 
 /**
  * Paleta EXCLUSIVA del semáforo funcional (4 matices). No reutilizar los tokens
@@ -326,6 +411,14 @@ export const FUNC_STATE_LABELS: Record<FuncState, string> = {
 /** Línea global cuando los tres dominios salen verdes. */
 export const FUNC_ALL_GREEN_LINE =
   "Tus respuestas no muestran limitación funcional. Si el dolor persiste a pesar de eso, también merece explicación.";
+
+/** Título de la sección del semáforo cuando el test no define el suyo. */
+export const DEFAULT_SEMAPHORE_TITLE = "Tu capacidad hoy, según tus respuestas";
+
+/** Título de la sección del semáforo. Fuente única para pantalla y PDF. */
+export function getSemaphoreTitle(test: TestDefinition): string {
+  return test.semaphoreTitle ?? DEFAULT_SEMAPHORE_TITLE;
+}
 
 export type DomainResult = {
   id: DomainId;
@@ -358,11 +451,13 @@ function exampleFragment(mirrors: string[]): string {
 }
 
 /**
- * Matriz de 12 frases (estado × dominio). Cada dominio tiene voz propia en cada
- * estado, así dos dominios en el mismo estado nunca repiten texto. El marcador
- * {ej} se sustituye por el fragmento de ejemplos (verde nunca lo lleva).
+ * Matriz global de 12 frases (estado × dominio) para la tríada funcional. Cada
+ * dominio tiene voz propia en cada estado, así dos dominios en el mismo estado
+ * nunca repiten texto. El marcador {ej} se sustituye por el fragmento de
+ * ejemplos (verde nunca lo lleva). Un test con dimensiones propias la
+ * sobrescribe con su `domainPhrases`.
  */
-const DOMAIN_PHRASES: Record<FuncState, Record<DomainId, string>> = {
+const DOMAIN_PHRASES: DomainPhrases = {
   verde: {
     basicas:
       "Lo esencial de tu día se mantiene sin dificultad importante. Cuida esa base: es tu punto de partida para recuperarte.",
@@ -397,13 +492,15 @@ const DOMAIN_PHRASES: Record<FuncState, Record<DomainId, string>> = {
   },
 };
 
-/** Frase de la matriz con los ejemplos ya incorporados. */
+/** Frase de la matriz (propia del test o global) con los ejemplos incorporados. */
 function domainPhrase(
   state: FuncState,
   domainId: DomainId,
-  mirrors: string[]
+  mirrors: string[],
+  phrases: DomainPhrases
 ): string {
-  return DOMAIN_PHRASES[state][domainId].replace("{ej}", exampleFragment(mirrors));
+  const phrase = phrases[state][domainId] ?? "";
+  return phrase.replace("{ej}", exampleFragment(mirrors));
 }
 
 // Frases para dominios elevados por el gradiente (sin mirrors: el paciente no
@@ -422,12 +519,15 @@ function elevatedFullPhrase(state: FuncState): string {
 }
 
 /**
- * Semáforo por dominio. 'bars' (0-4): estado por promedio; mirrors = ítems de
- * mayor valor (≥2). 'checklist' (Sí/No): estado por proporción de marcadas;
- * mirrors = hasta 2 marcadas en orden.
+ * Semáforo por dominio. 'bars': estado por el valor agregado del dominio
+ * (promedio, o máximo si el dominio declara aggregation 'max'); mirrors = ítems
+ * de mayor valor (≥ t1). 'checklist' (Sí/No): estado por proporción de
+ * marcadas; mirrors = hasta 2 marcadas en orden.
  *
- * Gradiente funcional: tras los estados brutos se eleva hacia dominios más
- * demandantes (basicas → moderadas → demandantes), nunca a la inversa.
+ * Gradiente funcional (opt-out con applyGradient:false): tras los estados
+ * brutos se eleva cada dominio al estado del anterior, en el orden del arreglo
+ * `domains` (ligeras → demandantes), nunca a la inversa. Los tests de
+ * dimensiones lo desactivan: sus dominios no se ordenan por exigencia.
  */
 export function computeDomains(
   test: TestDefinition,
@@ -436,9 +536,11 @@ export function computeDomains(
   const domains = test.domains ?? [];
   const isChecklist = test.resultDisplay === "checklist";
   const byId = new Map(test.questions.map((q) => [q.id, q]));
-  // Umbrales del promedio (verde<t0, amarillo<t1, naranja<t2, rojo≥t2). t1 es
-  // además el mínimo para que un ítem aporte su mirror. Default 0-4: [1,2,3].
+  // Umbrales del valor agregado (verde<t0, amarillo<t1, naranja<t2, rojo≥t2).
+  // t1 es además el mínimo para que un ítem aporte su mirror. Default 0-4:
+  // [1,2,3]; los tests de escala 0-10 usan [2.5, 5, 7.5]. Nunca asumen enteros.
   const [tVerde, tAmarillo, tNaranja] = test.domainThresholds ?? [1, 2, 3];
+  const phrases = test.domainPhrases ?? DOMAIN_PHRASES;
 
   // 1. Estado bruto + mirrors por dominio (lógica por test intacta).
   const raw = domains.map((domain) => {
@@ -464,14 +566,19 @@ export function computeDomains(
               : "rojo";
       mirrorItems = markedItems.slice(0, 2);
     } else {
-      const avg =
-        items.reduce((s, it) => s + it.value, 0) / (items.length || 1);
+      const values = items.map((it) => it.value);
+      const aggregate =
+        domain.aggregation === "max"
+          ? values.length
+            ? Math.max(...values)
+            : 0
+          : mean(values);
       rawState =
-        avg < tVerde
+        aggregate < tVerde
           ? "verde"
-          : avg < tAmarillo
+          : aggregate < tAmarillo
             ? "amarillo"
-            : avg < tNaranja
+            : aggregate < tNaranja
               ? "naranja"
               : "rojo";
       mirrorItems = [...items]
@@ -487,22 +594,18 @@ export function computeDomains(
     return { domain, rawState, mirrors };
   });
 
-  // 2. Gradiente funcional: elevar en orden basicas → moderadas → demandantes.
-  const rawById = new Map(raw.map((r) => [r.domain.id, r.rawState]));
-  const finalById = new Map<DomainId, FuncState>();
-  const basicasFinal = rawById.get("basicas") ?? "verde";
-  const moderadasFinal = maxState(rawById.get("moderadas") ?? "verde", basicasFinal);
-  const demandantesFinal = maxState(
-    rawById.get("demandantes") ?? "verde",
-    moderadasFinal
-  );
-  finalById.set("basicas", basicasFinal);
-  finalById.set("moderadas", moderadasFinal);
-  finalById.set("demandantes", demandantesFinal);
+  // 2. Gradiente funcional: máximo acumulado en el orden del arreglo.
+  const applyGradient = test.applyGradient !== false;
+  let running: FuncState = "verde";
+  const finalStates = raw.map(({ rawState }) => {
+    if (!applyGradient) return rawState;
+    running = maxState(running, rawState);
+    return running;
+  });
 
   // 3. Construir resultados con estado final + elevated + frases.
-  return raw.map(({ domain, rawState, mirrors }) => {
-    const state = finalById.get(domain.id) ?? rawState;
+  return raw.map(({ domain, rawState, mirrors }, i) => {
+    const state = finalStates[i];
     const elevated = STATE_ORDER[state] > STATE_ORDER[rawState];
     const usedMirrors = elevated ? [] : mirrors;
     return {
@@ -514,7 +617,7 @@ export function computeDomains(
       mirrors: usedMirrors,
       fullPhrase: elevated
         ? elevatedFullPhrase(state)
-        : domainPhrase(state, domain.id, usedMirrors),
+        : domainPhrase(state, domain.id, usedMirrors, phrases),
     };
   });
 }
@@ -533,6 +636,34 @@ const EVALUATION_PLANS: Record<
   string,
   { base: string[]; byFlag?: Record<string, string> }
 > = {
+  cuello: {
+    base: [
+      "Exploraré la movilidad de tu cuello y los movimientos que despiertan tu dolor",
+      "Revisaré la fuerza, los reflejos y la sensibilidad de tus brazos",
+      "Valoraré estudios de imagen si tu caso los requiere",
+    ],
+    byFlag: {
+      "radicular-cervical":
+        "Buscaré el origen exacto del dolor que baja por tu brazo",
+      mielopatia:
+        "Exploraré con detalle la función de tus manos, tus reflejos y tu marcha — los datos que marcaste son importantes y merecen una revisión neurológica cuidadosa.",
+      trauma: "Descartaré lesiones por el accidente que mencionaste",
+    },
+  },
+  "espalda-alta": {
+    base: [
+      "Exploraré tu columna dorsal y las posturas o movimientos que despiertan el dolor",
+      "Revisaré la fuerza y los reflejos de tus piernas",
+      "Valoraré estudios de imagen — en esta zona suelen ser especialmente útiles",
+    ],
+    byFlag: {
+      "banda-dorsal":
+        "Evaluaré el trayecto del dolor que rodea hacia tu pecho",
+      "deficit-dorsal":
+        "Exploraré a fondo la fuerza y los reflejos de tus piernas — ese dato guiará tu valoración.",
+      trauma: "Descartaré una fractura vertebral por el golpe que mencionaste",
+    },
+  },
   "espalda-baja": {
     base: [
       "Revisaré cómo se mueve tu columna y qué movimientos despiertan tu dolor",
@@ -617,6 +748,16 @@ export function getEvaluationPlan(result: EvaluationResult): string[] {
 }
 
 const WARNING_SIGNS: Record<string, string[]> = {
+  cuello: [
+    "Torpeza en las manos o inestabilidad que empeora rápidamente",
+    "Debilidad nueva en un brazo o una mano",
+    "Fiebre junto con el dolor de cuello",
+  ],
+  "espalda-alta": [
+    "Debilidad o torpeza nueva en las piernas",
+    "Dificultad nueva para controlar la orina o el excremento",
+    "Fiebre junto con el dolor de espalda",
+  ],
   "espalda-baja": [
     "Debilidad nueva o creciente en el pie o la pierna",
     "Adormecimiento en la zona genital o dificultad nueva para controlar la orina o el excremento",
@@ -670,9 +811,14 @@ export function computeResult(
   );
   const level = levelFromScore(score, test.scoring.levels ?? DEFAULT_LEVELS);
 
-  const alertMarks = RED_FLAGS.filter((rf) => flags.includes(rf.id)).map(
-    (rf) => rf.label
-  );
+  // "Marcaste:" = alarma universal + flags de triaje de precaución, en ese orden.
+  const alertMarks = [
+    ...RED_FLAGS.filter((rf) => flags.includes(rf.id)).map((rf) => rf.label),
+    ...flags
+      .filter((f) => CAUTION_FLAGS.has(f))
+      .map((f) => test.flagLabels?.[f])
+      .filter((label): label is string => Boolean(label)),
+  ];
   const alertLevel: AlertLevel = flags.some((f) => f in URGENT_FLAG_BANNERS)
     ? "urgente"
     : alertMarks.length > 0

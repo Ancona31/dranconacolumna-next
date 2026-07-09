@@ -12,8 +12,36 @@ export type NonUrgentLevel = Exclude<Severity, "urgente">;
  */
 export type AlertLevel = "none" | "precaucion" | "urgente";
 
-/** Opción de una pregunta puntuable (value 0-4). */
+/**
+ * Opción de una pregunta puntuable. `value` no asume enteros: los instrumentos
+ * que reparten 5 opciones sobre una escala 0-10 usan 0 / 2.5 / 5 / 7.5 / 10.
+ */
 export type QuestionOption = { label: string; value: number };
+
+/**
+ * Clave del bloque de recomendación: el nivel funcional cuando no hay alerta, o
+ * el propio nivel de alerta cuando lo hay (precaución/urgente lo sobrescriben).
+ */
+export type RecommendationKey = NonUrgentLevel | "precaucion" | "urgente";
+
+/**
+ * Bloque de recomendación de cierre. La ventana temporal (`window`) es el
+ * titular; `context` la justifica. Mismo contenido en pantalla y PDF.
+ *
+ * El color NO depende del nivel funcional: la variante estándar es azul de
+ * marca para leve, moderada, severa y precaución. Solo `urgent` cambia la
+ * paleta (coral) y el icono. Ver RECOMMENDATION_COLORS.
+ */
+export type Recommendation = {
+  /** Eyebrow del bloque (mayúsculas, tracking amplio). */
+  label: string;
+  /** Ventana de atención recomendada. Titular del bloque. */
+  window: string;
+  /** Frase que justifica la ventana. */
+  context: string;
+  /** true solo con alertLevel 'urgente'; selecciona paleta e icono. */
+  urgent: boolean;
+};
 
 /** Tipo de reactivo. 'options' (default): botones etiquetados. 'scale': 0-10. */
 export type QuestionKind = "options" | "scale";
@@ -40,9 +68,26 @@ export type TestQuestion = {
   anchors?: ScaleAnchors;
 };
 
-/** Dominio funcional del semáforo. */
-export type DomainId = "basicas" | "moderadas" | "demandantes";
+/** Estado del semáforo (4 matices). */
+export type FuncState = "verde" | "amarillo" | "naranja" | "rojo";
 
+/**
+ * Id de dominio del semáforo. Los tests de actividades usan la tríada funcional
+ * ("basicas" / "moderadas" / "demandantes"); los multidimensionales (COMI) usan
+ * sus propias dimensiones ("dolor" / "actividades" / "bienestar").
+ */
+export type DomainId = string;
+
+/**
+ * Matriz de frases estado × dominio. El marcador {ej} se sustituye por el
+ * fragmento de ejemplos (verde nunca lo lleva).
+ */
+export type DomainPhrases = Record<FuncState, Record<DomainId, string>>;
+
+/** Cómo se agrega el valor del dominio a partir de sus ítems; default 'mean'. */
+export type DomainAggregation = "mean" | "max";
+
+/** Dominio del semáforo (actividad funcional o dimensión del instrumento). */
 export type Domain = {
   id: DomainId;
   label: string;
@@ -50,6 +95,12 @@ export type Domain = {
   examples: string;
   /** Ítems (question ids) que puntúan este dominio. */
   itemIds: string[];
+  /**
+   * Agregación de los ítems para derivar el estado; default 'mean'. 'max' es la
+   * forma correcta cuando el dominio mide intensidad y no promedio (p. ej. el
+   * dolor del COMI: manda el peor de los dos sitios).
+   */
+  aggregation?: DomainAggregation;
 };
 
 /**
@@ -97,10 +148,11 @@ export type Subscale = {
 };
 
 /**
- * Tres formas de derivar el score (índice de limitación 0-100):
+ * Cuatro formas de derivar el score (índice de limitación 0-100):
  * - 'table': tabla oficial indexada por raw (raw 0..N → table[raw] = salud).
  * - 'linear': interval = 100 − (raw / maxRaw) * 100.
  * - 'weighted-subscales': score = round( Σ (sumaÍtems/maxRaw) * weight * 100 ).
+ * - 'comi': índice multidimensional 0-10 escalado a 0-100 (ver abajo).
  *   Con direction 'higher-is-worse' la limitación es el score directo (SIN la
  *   inversión 100−x de las tablas). table/linear son 'higher-is-better'
  *   implícitas (limitación = 100 − interval).
@@ -113,6 +165,23 @@ export type Scoring =
       kind: "weighted-subscales";
       direction: "higher-is-worse";
       subscales: Subscale[];
+      levels?: ScoringLevels;
+    }
+  /**
+   * COMI (Core Outcome Measures Index): cinco dominios en escala 0-10, cada uno
+   * con el mismo peso. El dolor toma el PEOR de sus dos sitios; la discapacidad
+   * promedia sus dos ítems. score = round( media de los 5 dominios × 10 ).
+   * 0-100, más = peor (higher-is-worse: sin inversión).
+   */
+  | {
+      kind: "comi";
+      /** Los dos sitios de dolor; el dominio toma el máximo. */
+      painItems: [string, string];
+      functionItem: string;
+      wellbeingItem: string;
+      qolItem: string;
+      /** Los dos ítems de discapacidad; el dominio toma su promedio. */
+      disabilityItems: [string, string];
       levels?: ScoringLevels;
     };
 
@@ -152,12 +221,29 @@ export type TestDefinition = {
    */
   domainThresholds?: [number, number, number];
   /**
-   * Frase legible de cada flag informativo del test. Los flags presentes aquí
-   * aparecen en "Datos adicionales de tus respuestas" y NO afectan nivel ni alerta.
+   * Frase legible de cada flag del test. Los informativos aparecen en "Datos
+   * adicionales de tus respuestas" y NO afectan nivel ni alerta; los de triaje
+   * declarados en CAUTION_FLAGS toman su texto de aquí para la lista "Marcaste:"
+   * del banner de precaución. Ninguno cambia jamás el nivel funcional.
    */
   flagLabels?: Record<string, string>;
-  /** Dominios funcionales del semáforo (básicas / moderadas / demandantes). */
+  /** Dominios del semáforo (actividades funcionales o dimensiones del instrumento). */
   domains?: Domain[];
+  /**
+   * Título de la sección del semáforo; default "Tu capacidad hoy, según tus
+   * respuestas". Los tests de dimensiones (COMI) no miden capacidad, sino
+   * afectación: usan su propio título.
+   */
+  semaphoreTitle?: string;
+  /**
+   * Gradiente funcional: eleva cada dominio al estado del anterior, en el orden
+   * del arreglo `domains` (ligeras → demandantes). Default true. Los tests de
+   * dimensiones lo desactivan: dolor, actividades y bienestar no se ordenan por
+   * exigencia, y un estado no implica el siguiente.
+   */
+  applyGradient?: boolean;
+  /** Matriz de frases propia del test; sobrescribe la matriz global por dominio. */
+  domainPhrases?: DomainPhrases;
   triage: TriageQuestion[];
   questions: TestQuestion[];
   scoring: Scoring;
