@@ -79,7 +79,8 @@ export default function EvaluationFlow({
     setStep("test");
   }
 
-  function handleAnswer(value: number) {
+  /** `value` es null cuando el paciente marcó "No aplica". */
+  function handleAnswer(value: number | null) {
     if (!test) return;
     const q = test.questions[qIndex];
     const nextAnswers = { ...answers, [q.id]: value };

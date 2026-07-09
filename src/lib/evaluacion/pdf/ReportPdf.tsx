@@ -16,10 +16,12 @@ import {
 } from "@react-pdf/renderer";
 import type {
   DomainId,
+  DomainState,
   EvaluationResult,
   Recommendation,
 } from "@/lib/evaluacion/types";
 import {
+  allDomainsGreen,
   buildAlertBanner,
   computeDomains,
   type DomainResult,
@@ -27,8 +29,8 @@ import {
   FUNC_ALL_GREEN_LINE,
   FUNC_COLORS,
   FUNC_STATE_LABELS,
-  type FuncState,
   getEvaluationPlan,
+  getPartialAnswersNote,
   getRecommendation,
   getRecommendationColors,
   getQrWhatsAppLink,
@@ -512,10 +514,13 @@ function PdfRecIcon({
 }
 
 // Glifo de estado con primitivos SVG (legible incluso impreso en B/N).
-function PdfStatusGlyph({ state, color }: { state: FuncState; color: string }) {
+function PdfStatusGlyph({ state, color }: { state: DomainState; color: string }) {
   return (
     <Svg width={13} height={13} viewBox="0 0 14 14">
       <Circle cx={7} cy={7} r={7} fill={color} />
+      {state === "na" ? (
+        <Line x1={4} y1={7} x2={10} y2={7} stroke="#fff" strokeWidth={1.7} />
+      ) : null}
       {state === "verde" ? (
         <Path
           d="M 3.5 7.2 L 6 9.6 L 10.5 4.4"
@@ -670,10 +675,10 @@ export default function ReportPdf({
     timeStyle: "short",
   });
   const domains = computeDomains(result.test, result.answers);
-  const allGreen =
-    domains.length > 0 && domains.every((d) => d.state === "verde");
+  const allGreen = allDomainsGreen(domains);
   const evaluationPlan = getEvaluationPlan(result);
   const warningSigns = getWarningSigns(result);
+  const partialNote = getPartialAnswersNote(result);
 
   return (
     <Document>
@@ -751,6 +756,14 @@ export default function ReportPdf({
                 </View>
               </View>
             </View>
+
+            {/* Validez del instrumento: el score salió de menos ítems de los
+                que exige (el resto quedó fuera por "No aplica"). */}
+            {partialNote ? (
+              <Text style={{ fontSize: 7.5, color: C.muted, marginTop: 5 }}>
+                {partialNote}
+              </Text>
+            ) : null}
 
             {/* Definición del nivel (badge según el nivel funcional del score) */}
             <View

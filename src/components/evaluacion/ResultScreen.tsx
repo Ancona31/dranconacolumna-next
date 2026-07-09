@@ -13,24 +13,27 @@ import {
   Footprints,
   Heart,
   MessageCircle,
+  Minus,
   MoreHorizontal,
   Stethoscope,
   Zap,
 } from "lucide-react";
 import type {
   DomainId,
+  DomainState,
   EvaluationResult,
   NonUrgentLevel,
 } from "@/lib/evaluacion/types";
 import {
+  allDomainsGreen,
   buildAlertBanner,
   computeDomains,
   EVALUATION_SIGNATURE,
   FUNC_ALL_GREEN_LINE,
   FUNC_COLORS,
   FUNC_STATE_LABELS,
-  type FuncState,
   getEvaluationPlan,
+  getPartialAnswersNote,
   getRecommendation,
   getRecommendationColors,
   getResultWhatsAppLink,
@@ -38,6 +41,7 @@ import {
   getWarningSigns,
   nivelDefinitions,
   NIVEL_BADGE_COLORS,
+  UNSCORABLE_MESSAGE,
   WARNING_CLOSING,
 } from "@/lib/evaluacion/engine";
 import { BODY_PATH, BODY_ZONES } from "@/components/home/BodyFigureSVG";
@@ -64,11 +68,12 @@ const DOMAIN_ICON: Record<DomainId, typeof Activity> = {
   actividades: Activity,
   bienestar: Heart,
 };
-const STATE_GLYPH: Record<FuncState, typeof Check> = {
+const STATE_GLYPH: Record<DomainState, typeof Check> = {
   verde: Check,
   amarillo: Dot,
   naranja: MoreHorizontal,
   rojo: AlertCircle,
+  na: Minus,
 };
 
 // Geometría del medidor semicircular.
@@ -172,6 +177,108 @@ function CapacityCard({
   );
 }
 
+/** Encabezado común: mini-silueta + título + folio. */
+function ResultHeader({ result }: { result: EvaluationResult }) {
+  return (
+    <div className="flex items-center justify-center gap-3">
+      <MiniSilhouette result={result} />
+      <div className="text-left">
+        <h1 className="font-heading text-2xl font-bold text-primary sm:text-3xl">
+          Tu evaluación de {result.zoneLabel}
+        </h1>
+        <p className="mt-1 font-body text-sm text-ink/50">
+          Folio {result.folio}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function AlertBanner({ result }: { result: EvaluationResult }) {
+  const banner = buildAlertBanner(result);
+  if (!banner) return null;
+  return (
+    <div
+      className={`mt-6 rounded-r-xl border-l-4 p-4 ${
+        BANNER_STYLES[banner.tone].box
+      }`}
+    >
+      <div className="flex items-start gap-2">
+        <AlertTriangle
+          className={`mt-0.5 h-5 w-5 shrink-0 ${BANNER_STYLES[banner.tone].title}`}
+          strokeWidth={1.5}
+        />
+        <div>
+          <p
+            className={`font-heading font-bold ${BANNER_STYLES[banner.tone].title}`}
+          >
+            {banner.title}
+          </p>
+          <p className="mt-1 font-body text-sm text-ink/80">{banner.body}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Sin ítems puntuables no hay medidor, nivel ni semáforo: nada de eso existe.
+ * Queda lo que sigue siendo cierto — la alerta si la hubo, las señales de la
+ * zona y la puerta de contacto. Sin PDF: el reporte se articula sobre el score.
+ */
+function UnscorableScreen({ result }: { result: EvaluationResult }) {
+  const warningSigns = getWarningSigns(result);
+  return (
+    <div className="mx-auto w-full max-w-2xl">
+      <ResultHeader result={result} />
+      <AlertBanner result={result} />
+
+      <div className="mt-6 rounded-xl border-[1.5px] border-ink/15 bg-ink/[0.03] p-5">
+        <p className="font-body text-ink/80">{UNSCORABLE_MESSAGE}</p>
+      </div>
+
+      {warningSigns.length > 0 && (
+        <div className="mt-8 rounded-xl border-l-4 border-danger bg-danger/5 p-4">
+          <h2 className="font-heading text-lg font-bold text-danger">
+            Señales para no esperar tu cita
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {warningSigns.map((sign) => (
+              <li key={sign} className="flex gap-2 font-body text-sm text-ink/80">
+                <AlertTriangle
+                  className="mt-0.5 h-4 w-4 shrink-0 text-danger"
+                  strokeWidth={1.75}
+                />
+                <span>{sign}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 font-body text-sm font-semibold text-ink">
+            {WARNING_CLOSING}
+          </p>
+        </div>
+      )}
+
+      <a
+        href={getResultWhatsAppLink(result)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
+      >
+        <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
+        {result.alertLevel === "urgente"
+          ? "Avísanos de tu caso por WhatsApp"
+          : "Escríbenos para agendar tu valoración"}
+      </a>
+
+      <p className="mt-6 font-body text-xs text-ink/45">
+        Esta evaluación es orientativa y no sustituye una consulta médica. Tus
+        respuestas no salen de tu dispositivo.
+      </p>
+    </div>
+  );
+}
+
 export default function ResultScreen({ result }: { result: EvaluationResult }) {
   const [ready, setReady] = useState(false);
   useEffect(() => {
@@ -179,60 +286,26 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
     return () => cancelAnimationFrame(id);
   }, []);
 
+  if (result.unscorable) return <UnscorableScreen result={result} />;
+
   const style = LEVEL_STYLES[result.level];
   const rec = getRecommendation(result.level, result.alertLevel);
   const recColors = getRecommendationColors(rec);
   const RecIcon = rec.urgent ? AlarmClock : CalendarClock;
   const whatsappLink = getResultWhatsAppLink(result);
   const paragraphs = result.test.reportTexts[result.level];
-  const banner = buildAlertBanner(result);
   const domains = computeDomains(result.test, result.answers);
-  const allGreen = domains.length > 0 && domains.every((d) => d.state === "verde");
+  const allGreen = allDomainsGreen(domains);
   const evaluationPlan = getEvaluationPlan(result);
   const warningSigns = getWarningSigns(result);
+  const partialNote = getPartialAnswersNote(result);
 
   return (
     <div className="mx-auto w-full max-w-2xl">
-      {/* Título + mini-silueta de marca */}
-      <div className="flex items-center justify-center gap-3">
-        <MiniSilhouette result={result} />
-        <div className="text-left">
-          <h1 className="font-heading text-2xl font-bold text-primary sm:text-3xl">
-            Tu evaluación de {result.zoneLabel}
-          </h1>
-          <p className="mt-1 font-body text-sm text-ink/50">
-            Folio {result.folio}
-          </p>
-        </div>
-      </div>
+      <ResultHeader result={result} />
 
       {/* Banner de alerta condicional (arriba del medidor) */}
-      {banner && (
-        <div
-          className={`mt-6 rounded-r-xl border-l-4 p-4 ${
-            BANNER_STYLES[banner.tone].box
-          }`}
-        >
-          <div className="flex items-start gap-2">
-            <AlertTriangle
-              className={`mt-0.5 h-5 w-5 shrink-0 ${
-                BANNER_STYLES[banner.tone].title
-              }`}
-              strokeWidth={1.5}
-            />
-            <div>
-              <p
-                className={`font-heading font-bold ${
-                  BANNER_STYLES[banner.tone].title
-                }`}
-              >
-                {banner.title}
-              </p>
-              <p className="mt-1 font-body text-sm text-ink/80">{banner.body}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      <AlertBanner result={result} />
 
       {/* Medidor + score */}
       <div className="mt-6 flex flex-col items-center">
@@ -250,6 +323,11 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
         >
           {style.label}
         </span>
+        {partialNote && (
+          <p className="mt-3 max-w-md text-center font-body text-xs text-ink/50">
+            {partialNote}
+          </p>
+        )}
       </div>
 
       {/* Definición del nivel (badge, según el nivel funcional del score) */}

@@ -66,10 +66,22 @@ export type TestQuestion = {
   options?: QuestionOption[];
   /** Solo 'scale': anclas de los extremos (0-10). */
   anchors?: ScaleAnchors;
+  /**
+   * Ofrece "No aplica" bajo las opciones (respuesta `null`). Es la opción
+   * oficial de los instrumentos que la contemplan (FAAM): el ítem sale del
+   * denominador en vez de puntuar 0.
+   */
+  allowNA?: boolean;
 };
 
 /** Estado del semáforo (4 matices). */
 export type FuncState = "verde" | "amarillo" | "naranja" | "rojo";
+
+/**
+ * Estado de la tarjeta de dominio: los 4 matices del semáforo, o 'na' cuando
+ * ningún ítem del dominio fue respondido (todos marcados "No aplica").
+ */
+export type DomainState = FuncState | "na";
 
 /**
  * Id de dominio del semáforo. Los tests de actividades usan la tríada funcional
@@ -148,9 +160,10 @@ export type Subscale = {
 };
 
 /**
- * Cuatro formas de derivar el score (índice de limitación 0-100):
+ * Cinco formas de derivar el score (índice de limitación 0-100):
  * - 'table': tabla oficial indexada por raw (raw 0..N → table[raw] = salud).
  * - 'linear': interval = 100 − (raw / maxRaw) * 100.
+ * - 'linear-adaptive': denominador adaptativo — solo los ítems respondidos.
  * - 'weighted-subscales': score = round( Σ (sumaÍtems/maxRaw) * weight * 100 ).
  * - 'comi': índice multidimensional 0-10 escalado a 0-100 (ver abajo).
  *   Con direction 'higher-is-worse' la limitación es el score directo (SIN la
@@ -161,6 +174,14 @@ export type Subscale = {
 export type Scoring =
   | { kind: "table"; table: number[]; levels?: ScoringLevels }
   | { kind: "linear"; maxRaw: number; levels?: ScoringLevels }
+  /**
+   * Denominador adaptativo (FAAM): los ítems marcados "No aplica" salen del
+   * cálculo en vez de puntuar 0.
+   *   limitación = round( sumaRespondidos / (perItemMax × respondidos) × 100 )
+   * Más = peor (higher-is-worse: sin inversión). Con 0 respondidos el resultado
+   * no es puntuable (`unscorable`).
+   */
+  | { kind: "linear-adaptive"; perItemMax: number; levels?: ScoringLevels }
   | {
       kind: "weighted-subscales";
       direction: "higher-is-worse";
@@ -209,6 +230,12 @@ export type TestDefinition = {
   /** Sustantivo del ítem en los encabezados; default {singular:"pregunta", plural:"preguntas"}. */
   questionNoun?: QuestionNoun;
   /**
+   * Mínimo de ítems respondidos para que el resultado sea plenamente válido
+   * según el instrumento. Por debajo, el score se calcula igual (denominador
+   * adaptativo) pero se etiqueta como orientativo en pantalla y PDF.
+   */
+  minAnswered?: number;
+  /**
    * Línea de contexto opcional mostrada antes del instrumento (en AlarmScreen).
    * Ej.: instrucción de estimación para actividades que el paciente no realiza.
    */
@@ -252,10 +279,10 @@ export type TestDefinition = {
 
 export type RedFlag = { id: string; label: string };
 
-/** questionId → value elegido. */
-export type AnswerMap = Record<string, number>;
+/** questionId → value elegido; `null` = el paciente marcó "No aplica". */
+export type AnswerMap = Record<string, number | null>;
 
-export type BreakdownItem = { shortLabel: string; value: number };
+export type BreakdownItem = { shortLabel: string; value: number | null };
 
 export type EvaluationResult = {
   test: TestDefinition;
@@ -268,6 +295,13 @@ export type EvaluationResult = {
   raw: number;
   /** Nivel funcional por la tabla; NUNCA cambia por flags. */
   level: NonUrgentLevel;
+  /** Ítems con respuesta puntuable (los "No aplica" no cuentan). */
+  answeredCount: number;
+  /**
+   * true cuando no quedó ningún ítem puntuable: score, interval y level no
+   * significan nada y no deben mostrarse.
+   */
+  unscorable: boolean;
   answers: AnswerMap;
   flags: string[];
   /** Nivel de alerta derivado de los flags (independiente del score). */

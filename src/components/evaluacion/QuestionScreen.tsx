@@ -4,6 +4,9 @@ import { useRef, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import type { TestQuestion } from "@/lib/evaluacion/types";
 
+/** Opción "No aplica" del FAAM: la respuesta es null y el ítem sale del cálculo. */
+const NA = "na" as const;
+
 type QuestionScreenProps = {
   question: TestQuestion;
   index: number;
@@ -11,7 +14,8 @@ type QuestionScreenProps = {
   /** Sustantivo del ítem capitalizado ("Pregunta" / "Frase"). */
   nounLabel: string;
   timeLabel: string;
-  onAnswer: (value: number) => void;
+  /** `null` = el paciente marcó "No aplica". */
+  onAnswer: (value: number | null) => void;
   onBack: () => void;
 };
 
@@ -24,14 +28,17 @@ export default function QuestionScreen({
   onAnswer,
   onBack,
 }: QuestionScreenProps) {
-  const [picked, setPicked] = useState<number | null>(null);
+  const [picked, setPicked] = useState<number | typeof NA | null>(null);
   const timer = useRef<number | null>(null);
 
-  function choose(value: number) {
+  function choose(value: number | typeof NA) {
     if (picked !== null) return;
     setPicked(value);
     // Marca visual breve y auto-avance.
-    timer.current = window.setTimeout(() => onAnswer(value), 150);
+    timer.current = window.setTimeout(
+      () => onAnswer(value === NA ? null : value),
+      150
+    );
   }
 
   return (
@@ -90,26 +97,43 @@ export default function QuestionScreen({
           )}
         </div>
       ) : (
-        <ul className="mt-6 space-y-3">
-          {(question.options ?? []).map((opt) => {
-            const active = picked === opt.value;
-            return (
-              <li key={opt.value}>
-                <button
-                  type="button"
-                  onClick={() => choose(opt.value)}
-                  className={`w-full rounded-2xl border p-4 text-left font-body text-lg font-medium transition duration-150 active:scale-[0.99] ${
-                    active
-                      ? "border-accent bg-primary-soft text-primary"
-                      : "border-ink/15 bg-background text-ink hover:border-accent hover:bg-primary-soft"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <>
+          <ul className="mt-6 space-y-3">
+            {(question.options ?? []).map((opt) => {
+              const active = picked === opt.value;
+              return (
+                <li key={opt.value}>
+                  <button
+                    type="button"
+                    onClick={() => choose(opt.value)}
+                    className={`w-full rounded-2xl border p-4 text-left font-body text-lg font-medium transition duration-150 active:scale-[0.99] ${
+                      active
+                        ? "border-accent bg-primary-soft text-primary"
+                        : "border-ink/15 bg-background text-ink hover:border-accent hover:bg-primary-soft"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Salida discreta: nunca compite con las cinco opciones puntuables. */}
+          {question.allowNA && (
+            <button
+              type="button"
+              onClick={() => choose(NA)}
+              className={`mt-4 w-full rounded-xl border border-dashed p-3 text-left font-body text-sm transition duration-150 active:scale-[0.99] ${
+                picked === NA
+                  ? "border-accent bg-primary-soft text-primary"
+                  : "border-ink/25 bg-transparent text-ink/60 hover:border-accent hover:text-accent"
+              }`}
+            >
+              No aplica — está limitada por otra causa, no por mi tobillo o pie
+            </button>
+          )}
+        </>
       )}
     </div>
   );

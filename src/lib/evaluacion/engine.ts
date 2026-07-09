@@ -5,6 +5,7 @@ import type {
   AnswerMap,
   DomainId,
   DomainPhrases,
+  DomainState,
   EvaluationResult,
   FuncState,
   NonUrgentLevel,
@@ -15,7 +16,7 @@ import type {
   TestDefinition,
 } from "./types";
 
-export type { FuncState } from "./types";
+export type { DomainState, FuncState } from "./types";
 
 /** Flag de urgencia (hoy solo: trauma sin poder apoyar el pie). */
 export const URGENT_TRAUMA_FLAG = "urgente-trauma";
@@ -28,7 +29,11 @@ export const TRAUMA_FLAG = "trauma";
  * y se listan en "Marcaste:" con su `flagLabel`, junto a la alarma universal.
  * El déficit AGUDO tiene su propio flag urgente y no vive aquí.
  */
-export const CAUTION_FLAGS = new Set(["mielopatia", "deficit-dorsal"]);
+export const CAUTION_FLAGS = new Set([
+  "mielopatia",
+  "deficit-dorsal",
+  "inflamacion-aguda",
+]);
 
 /** Cortes por defecto del nivel funcional cuando el scoring no define `levels`. */
 const DEFAULT_LEVELS: ScoringLevels = { leveMax: 30, moderadaMax: 60 };
@@ -168,19 +173,58 @@ function mean(values: number[]): number {
     : 0;
 }
 
+/** Valor puntuable de un ítem; undefined si no se respondió o marcó "No aplica". */
+function scored(answers: AnswerMap, id: string): number | undefined {
+  const v = answers[id];
+  return typeof v === "number" ? v : undefined;
+}
+
 /**
- * Deriva raw (suma de todos los ítems), interval (salud 0-100) y score (índice
- * de limitación 0-100) según la forma de scoring.
+ * Deriva raw (suma de los ítems respondidos), interval (salud 0-100), score
+ * (índice de limitación 0-100) y el conteo de respondidos según la forma de
+ * scoring.
  * - table/linear ('higher-is-better'): score = 100 − interval.
- * - weighted-subscales / comi ('higher-is-worse'): score directo, SIN inversión;
- *   interval = 100 − score.
+ * - linear-adaptive / weighted-subscales / comi ('higher-is-worse'): score
+ *   directo, SIN inversión; interval = 100 − score.
+ * `unscorable` solo puede ser true en 'linear-adaptive' (todos los ítems "No
+ * aplica"): ahí score/interval/level no significan nada.
  */
 function computeScore(
   scoring: Scoring,
   answers: AnswerMap,
   questions: TestDefinition["questions"]
-): { raw: number; interval: number; score: number } {
-  const raw = questions.reduce((sum, q) => sum + (answers[q.id] ?? 0), 0);
+): {
+  raw: number;
+  interval: number;
+  score: number;
+  answeredCount: number;
+  unscorable: boolean;
+} {
+  const values = questions
+    .map((q) => scored(answers, q.id))
+    .filter((v): v is number => v !== undefined);
+  const answeredCount = values.length;
+  const raw = values.reduce((sum, v) => sum + v, 0);
+
+  if (scoring.kind === "linear-adaptive") {
+    if (answeredCount === 0) {
+      return { raw: 0, interval: 0, score: 0, answeredCount: 0, unscorable: true };
+    }
+    const score = Math.round(
+      (raw / (scoring.perItemMax * answeredCount)) * 100
+    );
+    return {
+      raw,
+      interval: 100 - score,
+      score,
+      answeredCount,
+      unscorable: false,
+    };
+  }
+
+  const withCount = <T extends { raw: number; interval: number; score: number }>(
+    r: T
+  ) => ({ ...r, answeredCount, unscorable: false });
 
   if (scoring.kind === "comi") {
     const v = (id: string) => answers[id] ?? 0;
@@ -196,23 +240,23 @@ function computeScore(
         disability,
       ]) * 10
     );
-    return { raw, interval: 100 - score, score };
+    return withCount({ raw, interval: 100 - score, score });
   }
 
   if (scoring.kind === "weighted-subscales") {
     const scoreRaw = scoring.subscales.reduce((acc, sub) => {
-      const sum = sub.itemIds.reduce((s, id) => s + (answers[id] ?? 0), 0);
+      const sum = sub.itemIds.reduce((s, id) => s + (scored(answers, id) ?? 0), 0);
       return acc + (sum / sub.maxRaw) * sub.weight * 100;
     }, 0);
     const score = Math.round(scoreRaw);
-    return { raw, interval: 100 - score, score };
+    return withCount({ raw, interval: 100 - score, score });
   }
 
   const interval =
     scoring.kind === "linear"
       ? 100 - (raw / scoring.maxRaw) * 100
       : scoring.table[raw] ?? 0;
-  return { raw, interval, score: Math.round(100 - interval) };
+  return withCount({ raw, interval, score: Math.round(100 - interval) });
 }
 
 /** Folio "EV-" + yyMM + "-" + 4 dígitos aleatorios (ej. EV-2607-4831). */
@@ -230,6 +274,8 @@ type MessageInput = {
   level: NonUrgentLevel;
   score: number;
   alertLevel: AlertLevel;
+  /** Sin ítems puntuables: el mensaje no puede citar score ni nivel. */
+  unscorable?: boolean;
   /**
    * 'qr' = mensaje del QR/Link del PDF (sin acentos). 'qr-short' = recorte de
    * densidad cuando el QR supera la versión 5.
@@ -278,6 +324,9 @@ export function buildWhatsAppMessage(input: MessageInput): string {
   }
   if (input.alertLevel === "urgente") {
     return `Hola Dr. Ancona, mi evaluación de ${input.zoneLabel} detectó datos de alarma (folio ${input.folio}). Acudiré a urgencias; le aviso de mi caso.`;
+  }
+  if (input.unscorable) {
+    return `Hola Dr. Ancona, respondí la evaluación de ${input.zoneLabel} (folio ${input.folio}), pero marqué todas las actividades como no aplicables y no obtuve resultado. Quiero agendar una valoración.`;
   }
   const base = `Hola Dr. Ancona, completé la evaluación de ${input.zoneLabel} (folio ${input.folio}). Resultado: limitación ${input.level}, ${input.score}/100. Quiero agendar una valoración.`;
   if (input.alertLevel === "precaucion") {
@@ -391,22 +440,43 @@ export function getMarkedItems(
 /* ===================== SEMÁFORO FUNCIONAL POR DOMINIO ===================== */
 
 /**
- * Paleta EXCLUSIVA del semáforo funcional (4 matices). No reutilizar los tokens
- * ámbar/coral del resto del sitio. Par fondo-suave / color-intenso.
+ * Paleta EXCLUSIVA del semáforo funcional (4 matices + el gris neutro de 'na').
+ * No reutilizar los tokens ámbar/coral del resto del sitio. Par fondo-suave /
+ * color-intenso.
  */
-export const FUNC_COLORS: Record<FuncState, { bg: string; strong: string }> = {
+export const FUNC_COLORS: Record<DomainState, { bg: string; strong: string }> = {
   verde: { bg: "#EAF4EF", strong: "#2E7D5B" },
   amarillo: { bg: "#FDF7DC", strong: "#E3B505" },
   naranja: { bg: "#FBEFE5", strong: "#D96C2C" },
   rojo: { bg: "#F9EAE8", strong: "#C0453A" },
+  na: { bg: "#F1F4F6", strong: "#94A3B2" },
 };
 
-export const FUNC_STATE_LABELS: Record<FuncState, string> = {
+export const FUNC_STATE_LABELS: Record<DomainState, string> = {
   verde: "Sin dificultad importante",
   amarillo: "Con dificultad leve",
   naranja: "Con dificultad considerable",
   rojo: "Muy limitada hoy",
+  na: "No aplica en tu caso",
 };
+
+/** Frase de la tarjeta gris: el dominio entero salió del cálculo. */
+export const DOMAIN_NA_PHRASE =
+  "Indicaste que estas actividades están limitadas por otra causa.";
+
+/** Mensaje cuando el paciente marcó "No aplica" en TODOS los ítems. */
+export const UNSCORABLE_MESSAGE =
+  "No pudimos calcular tu resultado: marcaste todas las actividades como no aplicables.";
+
+/**
+ * Nota bajo el medidor cuando el resultado se calculó con menos ítems de los
+ * que el instrumento exige (`minAnswered`). Fuente única: pantalla y PDF.
+ */
+export function getPartialAnswersNote(result: EvaluationResult): string | null {
+  const min = result.test.minAnswered;
+  if (!min || result.unscorable || result.answeredCount >= min) return null;
+  return `Resultado orientativo: calculado con ${result.answeredCount} de ${result.test.questions.length} actividades (el resto las marcaste como no aplicables).`;
+}
 
 /** Línea global cuando los tres dominios salen verdes. */
 export const FUNC_ALL_GREEN_LINE =
@@ -424,7 +494,8 @@ export type DomainResult = {
   id: DomainId;
   label: string;
   examples: string;
-  state: FuncState;
+  /** 'na' cuando todos los ítems del dominio se marcaron "No aplica". */
+  state: DomainState;
   /** true si el gradiente funcional elevó el estado por encima del bruto. */
   elevated: boolean;
   /** Hasta 2 paráfrasis de los ítems más afectados del dominio. Vacío si elevated. */
@@ -432,6 +503,15 @@ export type DomainResult = {
   /** Frase completa de la matriz (con ejemplos); misma en pantalla y PDF. */
   fullPhrase: string;
 };
+
+/**
+ * true si el semáforo salió íntegramente verde. Los dominios 'na' no cuentan:
+ * no se sabe nada de ellos, así que ni confirman ni desmienten la línea global.
+ */
+export function allDomainsGreen(domains: DomainResult[]): boolean {
+  const scored = domains.filter((d) => d.state !== "na");
+  return scored.length > 0 && scored.every((d) => d.state === "verde");
+}
 
 const STATE_ORDER: Record<FuncState, number> = {
   verde: 0,
@@ -524,10 +604,15 @@ function elevatedFullPhrase(state: FuncState): string {
  * de mayor valor (≥ t1). 'checklist' (Sí/No): estado por proporción de
  * marcadas; mirrors = hasta 2 marcadas en orden.
  *
+ * Los ítems marcados "No aplica" quedan fuera del agregado. Un dominio sin
+ * ningún ítem respondido no tiene estado: sale 'na' (tarjeta gris neutra).
+ *
  * Gradiente funcional (opt-out con applyGradient:false): tras los estados
  * brutos se eleva cada dominio al estado del anterior, en el orden del arreglo
- * `domains` (ligeras → demandantes), nunca a la inversa. Los tests de
- * dimensiones lo desactivan: sus dominios no se ordenan por exigencia.
+ * `domains` (ligeras → demandantes), nunca a la inversa. Los dominios 'na' se
+ * saltan: no reciben elevación ni la propagan, y el gradiente encadena entre
+ * los que sí tienen estado. Los tests de dimensiones lo desactivan: sus
+ * dominios no se ordenan por exigencia.
  */
 export function computeDomains(
   test: TestDefinition,
@@ -542,12 +627,20 @@ export function computeDomains(
   const [tVerde, tAmarillo, tNaranja] = test.domainThresholds ?? [1, 2, 3];
   const phrases = test.domainPhrases ?? DOMAIN_PHRASES;
 
-  // 1. Estado bruto + mirrors por dominio (lógica por test intacta).
+  // 1. Estado bruto + mirrors por dominio (lógica por test intacta). Los ítems
+  //    marcados "No aplica" no entran; sin ninguno respondido el dominio es 'na'.
   const raw = domains.map((domain) => {
     const items = domain.itemIds
       .map((id) => byId.get(id))
       .filter((q): q is NonNullable<typeof q> => Boolean(q))
-      .map((q) => ({ q, value: answers[q.id] ?? 0 }));
+      .map((q) => ({ q, value: scored(answers, q.id) }))
+      .filter((it): it is { q: TestDefinition["questions"][number]; value: number } =>
+        it.value !== undefined
+      );
+
+    if (items.length === 0) {
+      return { domain, rawState: "na" as const, mirrors: [] as string[] };
+    }
 
     let rawState: FuncState;
     let mirrorItems: typeof items;
@@ -594,11 +687,12 @@ export function computeDomains(
     return { domain, rawState, mirrors };
   });
 
-  // 2. Gradiente funcional: máximo acumulado en el orden del arreglo.
+  // 2. Gradiente funcional: máximo acumulado en el orden del arreglo. Los 'na'
+  //    no participan — el acumulado los atraviesa sin alterarse.
   const applyGradient = test.applyGradient !== false;
   let running: FuncState = "verde";
-  const finalStates = raw.map(({ rawState }) => {
-    if (!applyGradient) return rawState;
+  const finalStates: DomainState[] = raw.map(({ rawState }) => {
+    if (rawState === "na" || !applyGradient) return rawState;
     running = maxState(running, rawState);
     return running;
   });
@@ -606,12 +700,24 @@ export function computeDomains(
   // 3. Construir resultados con estado final + elevated + frases.
   return raw.map(({ domain, rawState, mirrors }, i) => {
     const state = finalStates[i];
-    const elevated = STATE_ORDER[state] > STATE_ORDER[rawState];
-    const usedMirrors = elevated ? [] : mirrors;
-    return {
+    const base = {
       id: domain.id,
       label: domain.label,
       examples: domain.examples,
+    };
+    if (state === "na" || rawState === "na") {
+      return {
+        ...base,
+        state: "na" as const,
+        elevated: false,
+        mirrors: [],
+        fullPhrase: DOMAIN_NA_PHRASE,
+      };
+    }
+    const elevated = STATE_ORDER[state] > STATE_ORDER[rawState];
+    const usedMirrors = elevated ? [] : mirrors;
+    return {
+      ...base,
       state,
       elevated,
       mirrors: usedMirrors,
@@ -733,6 +839,19 @@ const EVALUATION_PLANS: Record<
       trauma: "Descartaré una fractura por la caída que mencionaste",
     },
   },
+  tobillo: {
+    base: [
+      "Exploraré tu tobillo y tu pie: movilidad, puntos de dolor y estabilidad de los ligamentos",
+      "Revisaré tu apoyo y tu forma de caminar",
+      "Valoraré estudios de imagen si tu caso los requiere",
+    ],
+    byFlag: {
+      trauma:
+        "Descartaré una fractura o una lesión de ligamentos por la torcedura que mencionaste",
+      "inflamacion-aguda":
+        "Estudiaré la causa de la inflamación — hay varias posibles y distinguirlas cambia por completo el tratamiento",
+    },
+  },
 };
 
 /** Bullets de "Qué debe evaluarse en tu caso": base por zona + condicionales por flag. */
@@ -788,6 +907,11 @@ const WARNING_SIGNS: Record<string, string[]> = {
     "Dedos fríos, pálidos o amoratados",
     "Fiebre con hinchazón de la muñeca o la mano",
   ],
+  tobillo: [
+    "Deformidad visible tras una torcedura o golpe",
+    "Dedos fríos, pálidos o amoratados",
+    "Fiebre con el tobillo o el pie caliente e hinchado",
+  ],
 };
 
 /** Bullets de "Señales para no esperar tu cita" por zona. */
@@ -804,7 +928,7 @@ export function computeResult(
   answers: AnswerMap,
   flags: string[]
 ): EvaluationResult {
-  const { raw, interval, score } = computeScore(
+  const { raw, interval, score, answeredCount, unscorable } = computeScore(
     test.scoring,
     answers,
     test.questions
@@ -827,7 +951,7 @@ export function computeResult(
 
   const breakdown = test.questions.map((q) => ({
     shortLabel: q.shortLabel,
-    value: answers[q.id] ?? 0,
+    value: scored(answers, q.id) ?? null,
   }));
 
   const base = {
@@ -838,6 +962,8 @@ export function computeResult(
     interval,
     raw,
     level,
+    answeredCount,
+    unscorable,
     answers,
     flags,
     alertLevel,
@@ -854,6 +980,7 @@ export function computeResult(
       level: base.level,
       score: base.score,
       alertLevel: base.alertLevel,
+      unscorable: base.unscorable,
     }),
   };
 }

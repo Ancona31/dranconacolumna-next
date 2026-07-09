@@ -128,21 +128,6 @@ html.js .reveal.revealed {
   animation: eval-screen-in 200ms ease-out;
 }
 
-@keyframes eval-sheet-in {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.eval-sheet {
-  animation: eval-sheet-in 200ms ease-out;
-}
-
 /* Respeto global a prefers-reduced-motion: neutraliza animaciones y
    transiciones (incluye Reveal, drawer, botones y page-enter). */
 @media (prefers-reduced-motion: reduce) {
