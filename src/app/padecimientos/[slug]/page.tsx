@@ -79,6 +79,10 @@ export default async function PadecimientoSlugPage({
   const whatsappLink = buildWhatsAppLink(
     `Hola Dr. Ancona, leí sobre ${p.nombre} y quiero una valoración.`
   );
+  // Sin zona (padecimientos paraguas) el test arranca en el mapa corporal.
+  const evaluacionHref = p.testZone
+    ? `/evaluacion?zona=${p.testZone}`
+    : "/evaluacion";
 
   return (
     <>
@@ -270,7 +274,7 @@ export default async function PadecimientoSlugPage({
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
-                href={`/evaluacion?zona=${p.testZone}`}
+                href={evaluacionHref}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-4 font-body text-base font-semibold text-primary transition duration-150 hover:opacity-90 active:scale-[0.985]"
               >
                 {p.testCtaLabel}

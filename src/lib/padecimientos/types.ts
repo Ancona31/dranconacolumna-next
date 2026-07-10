@@ -34,8 +34,12 @@ export type Padecimiento = {
   /** Párrafos en primera persona, voz del doctor. */
   comoLoTrato: string[];
   faq: PadecimientoFaq[];
-  /** Zona del test al que apunta el CTA final. */
-  testZone: BodyZoneId;
+  /**
+   * Zona del test al que apunta el CTA final. Se omite en los padecimientos
+   * paraguas —familias de lesiones sin zona única—: entonces el CTA lleva al
+   * mapa corporal completo para que el paciente señale dónde le duele.
+   */
+  testZone?: BodyZoneId;
   /**
    * Pregunta del CTA final, sin el sufijo " — gratis y sin registro." que
    * agrega la plantilla. Va completa en datos —y no interpolada con el nombre
