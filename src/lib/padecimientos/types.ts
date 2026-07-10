@@ -1,0 +1,40 @@
+import type { BodyZoneId } from "@/components/home/BodyFigureSVG";
+
+/** Un paso de la escalera terapéutica, del conservador al quirúrgico. */
+export type TratamientoPaso = {
+  titulo: string;
+  texto: string;
+};
+
+export type PadecimientoFaq = {
+  pregunta: string;
+  respuesta: string;
+};
+
+/**
+ * Contenido completo de una página de padecimiento. Los archivos de datos viven
+ * en esta carpeta y se registran en index.ts; la plantilla de
+ * /padecimientos/[slug] los renderiza sin lógica propia por padecimiento.
+ */
+export type Padecimiento = {
+  /** Debe coincidir con el slug en @/lib/conditions. */
+  slug: string;
+  nombre: string;
+  grupo: "columna" | "ortopedia";
+  metaTitle: string;
+  metaDescription: string;
+  /** Párrafos de apertura, debajo del H1. */
+  definicion: string[];
+  sintomas: string[];
+  cuandoPreocuparse: {
+    intro?: string;
+    señales: string[];
+  };
+  tratamiento: TratamientoPaso[];
+  /** Párrafos en primera persona, voz del doctor. */
+  comoLoTrato: string[];
+  faq: PadecimientoFaq[];
+  /** Zona del test al que apunta el CTA final. */
+  testZone: BodyZoneId;
+  testCtaLabel: string;
+};

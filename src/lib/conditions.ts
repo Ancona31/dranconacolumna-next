@@ -1,7 +1,23 @@
 /** Padecimientos que trata el doctor. Slugs reutilizables en /padecimientos/[slug]. */
 
+/** Slugs válidos de padecimiento. Fuente única para rutas y registro de contenido. */
+export type ConditionSlug =
+  | "hernia-de-disco"
+  | "ciatica"
+  | "canal-lumbar-estrecho"
+  | "vertebra-desplazada"
+  | "desviacion-de-columna"
+  | "fractura-de-columna"
+  | "dolor-de-cuello"
+  | "fracturas-y-esguinces"
+  | "dolor-de-hombro"
+  | "dolor-de-rodilla"
+  | "dolor-de-cadera"
+  | "tunel-del-carpo"
+  | "lesiones-deportivas";
+
 export type Condition = {
-  slug: string;
+  slug: ConditionSlug;
   nombre: string;
   detalle?: string;
   grupo: "columna" | "ortopedia";

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CONDITIONS, CONDITION_GROUPS } from "@/lib/conditions";
+import { PADECIMIENTOS_CON_CONTENIDO } from "@/lib/padecimientos";
 
 export const metadata: Metadata = { title: "Padecimientos" };
 
@@ -20,30 +21,40 @@ export default function PadecimientosPage() {
                 {group.label}
               </h2>
               <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
-                {items.map((c) => (
-                  <Link
-                    key={c.slug}
-                    href={`/padecimientos/${c.slug}`}
-                    className="group flex items-start justify-between gap-2 rounded-2xl border border-ink/10 bg-background p-5 transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
-                  >
-                    <span className="flex flex-col">
-                      <span className="font-heading text-base font-semibold text-ink">
-                        {c.nombre}
-                      </span>
-                      {c.detalle && (
-                        <span className="mt-1 font-body text-xs text-ink/50">
-                          {c.detalle}
-                        </span>
-                      )}
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="font-body text-accent transition-transform group-hover:translate-x-0.5"
+                {items.map((c) => {
+                  // Las que ya tienen página completa se distinguen sin decirlo.
+                  const conContenido = PADECIMIENTOS_CON_CONTENIDO.has(c.slug);
+                  return (
+                    <Link
+                      key={c.slug}
+                      href={`/padecimientos/${c.slug}`}
+                      className={`group flex items-start justify-between gap-2 rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-md ${
+                        conContenido
+                          ? "border-accent/30 bg-primary-soft/40"
+                          : "border-ink/10 bg-background"
+                      }`}
                     >
-                      →
-                    </span>
-                  </Link>
-                ))}
+                      <span className="flex flex-col">
+                        <span className="font-heading text-base font-semibold text-ink">
+                          {c.nombre}
+                        </span>
+                        {c.detalle && (
+                          <span className="mt-1 font-body text-xs text-ink/50">
+                            {c.detalle}
+                          </span>
+                        )}
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className={`font-body transition-transform group-hover:translate-x-0.5 ${
+                          conContenido ? "text-accent" : "text-accent/50"
+                        }`}
+                      >
+                        →
+                      </span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           );
