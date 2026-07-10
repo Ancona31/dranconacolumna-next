@@ -65,5 +65,7 @@ export const herniaDeDisco: Padecimiento = {
     },
   ],
   testZone: "espalda-baja",
+  testCtaQuestion:
+    "Averigua qué tan afectada está tu espalda en menos de 3 minutos",
   testCtaLabel: "Evalúa tu espalda gratis",
 };

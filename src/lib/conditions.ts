@@ -51,6 +51,7 @@ export const CONDITIONS: Condition[] = [
     grupo: "columna",
   },
   {
+    // Slug canónico en singular; H1 y nombre en plural ('Fracturas de columna').
     slug: "fractura-de-columna",
     nombre: "Fracturas de columna",
     detalle: "incluye aplastamientos por osteoporosis",

@@ -65,5 +65,7 @@ export const canalLumbarEstrecho: Padecimiento = {
     },
   ],
   testZone: "espalda-baja",
+  testCtaQuestion:
+    "Averigua cuánto está limitando tu marcha este problema en menos de 3 minutos",
   testCtaLabel: "Evalúa tu espalda gratis",
 };

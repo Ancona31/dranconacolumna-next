@@ -2,6 +2,9 @@ import type { ConditionSlug } from "@/lib/conditions";
 import type { Padecimiento } from "./types";
 import { canalLumbarEstrecho } from "./canal-lumbar-estrecho";
 import { ciatica } from "./ciatica";
+import { desviacionDeColumna } from "./desviacion-de-columna";
+import { dolorDeCuello } from "./dolor-de-cuello";
+import { fracturaDeColumna } from "./fractura-de-columna";
 import { herniaDeDisco } from "./hernia-de-disco";
 import { vertebraDesplazada } from "./vertebra-desplazada";
 
@@ -16,6 +19,9 @@ export const PADECIMIENTOS: Partial<Record<ConditionSlug, Padecimiento>> = {
   ciatica: ciatica,
   "canal-lumbar-estrecho": canalLumbarEstrecho,
   "vertebra-desplazada": vertebraDesplazada,
+  "desviacion-de-columna": desviacionDeColumna,
+  "fractura-de-columna": fracturaDeColumna,
+  "dolor-de-cuello": dolorDeCuello,
 };
 
 export function getPadecimiento(slug: string): Padecimiento | undefined {

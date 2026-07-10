@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AlertTriangle, Check } from "lucide-react";
-import type { BodyZoneId } from "@/components/home/BodyFigureSVG";
 import Placeholder from "@/components/Placeholder";
 import ButtonLink from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
@@ -18,19 +17,6 @@ type Params = { slug: string };
 const GRUPO_LABEL: Record<Padecimiento["grupo"], string> = {
   columna: "Columna",
   ortopedia: "Ortopedia y traumatología",
-};
-
-// Nombre de la zona tal como se lee dentro de una frase ("tu espalda baja").
-const ZONA_LABEL: Record<BodyZoneId, string> = {
-  cuello: "cuello",
-  "espalda-alta": "espalda alta",
-  "espalda-baja": "espalda baja",
-  hombro: "hombro",
-  codo: "codo",
-  muneca: "muñeca",
-  cadera: "cadera",
-  rodilla: "rodilla",
-  tobillo: "tobillo",
 };
 
 export async function generateMetadata({
@@ -90,7 +76,6 @@ export default async function PadecimientoSlugPage({
 
   if (!p) return <Placeholder title={slug} phase={3} />;
 
-  const zona = ZONA_LABEL[p.testZone];
   const whatsappLink = buildWhatsAppLink(
     `Hola Dr. Ancona, leí sobre ${p.nombre} y quiero una valoración.`
   );
@@ -281,8 +266,7 @@ export default async function PadecimientoSlugPage({
               ¿Este dolor te suena conocido?
             </h2>
             <p className="mx-auto mt-4 max-w-xl font-body text-white/80">
-              Averigua qué tan afectada está tu {zona} en menos de 3 minutos —
-              gratis y sin registro.
+              {p.testCtaQuestion} — gratis y sin registro.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link

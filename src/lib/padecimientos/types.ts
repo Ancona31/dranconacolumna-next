@@ -36,5 +36,11 @@ export type Padecimiento = {
   faq: PadecimientoFaq[];
   /** Zona del test al que apunta el CTA final. */
   testZone: BodyZoneId;
+  /**
+   * Pregunta del CTA final, sin el sufijo " — gratis y sin registro." que
+   * agrega la plantilla. Va completa en datos —y no interpolada con el nombre
+   * de la zona— porque la concordancia de género varía por padecimiento.
+   */
+  testCtaQuestion: string;
   testCtaLabel: string;
 };
