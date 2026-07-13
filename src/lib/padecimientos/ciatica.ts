@@ -8,6 +8,7 @@ export const ciatica: Padecimiento = {
     "Ciática: por qué duele y cómo se trata en Mérida | Dr. Angel Ancona",
   metaDescription:
     "Dolor que corre de la espalda baja a la pierna: eso es la ciática. Conoce sus causas, señales de alarma y tratamientos. Evalúa tu caso gratis en minutos.",
+  zonaChip: "Zona lumbar",
   definicion: [
     "El nervio ciático nace en tu espalda baja y viaja por la parte de atrás de cada pierna. Cuando algo lo comprime o lo irrita en su origen, el dolor 'viaja' por su trayecto — eso es la ciática.",
     "Aquí lo importante: la ciática no es un diagnóstico, es un síntoma. Detrás siempre hay una causa — una hernia, un canal estrecho, una inflamación — y el trabajo médico es encontrarla.",
@@ -43,6 +44,8 @@ export const ciatica: Padecimiento = {
         "Reservada para cuando hay compresión importante del nervio que no responde, o debilidad que avanza. La técnica depende de la causa — y con frecuencia puede ser de mínima invasión.",
     },
   ],
+  citaDoctor:
+    "Con la ciática no persigo el dolor: persigo la causa. La mayoría de mis pacientes con ciática nunca pisa un quirófano.",
   comoLoTrato: [
     "Con la ciática no persigo el dolor: persigo la causa. La exploración física me dice qué nervio está comprometido y a qué nivel; la imagen — cuando el caso la amerita — confirma el porqué.",
     "Con la causa en la mano, el plan es tuyo y a tu medida: la mayoría de mis pacientes con ciática nunca pisa un quirófano. Y si tu caso es de los que sí, te lo diré con honestidad y con opciones.",

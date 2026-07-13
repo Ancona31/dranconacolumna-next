@@ -8,6 +8,7 @@ export const fracturaDeColumna: Padecimiento = {
     "Fractura de columna y aplastamiento vertebral | Dr. Angel Ancona · Mérida",
   metaDescription:
     "Dolor de espalda súbito tras una caída — o sin golpe aparente en huesos con osteoporosis. Conoce las fracturas vertebrales y su tratamiento, del corsé al cemento óseo.",
+  zonaChip: "Columna dorsal y lumbar",
   definicion: [
     "Una vértebra puede fracturarse de dos maneras muy distintas: por un golpe fuerte — un accidente, una caída de altura — o por compresión en un hueso debilitado por osteoporosis, donde a veces basta un esfuerzo trivial: cargar una bolsa, un tropiezo, hasta un estornudo.",
     "Las fracturas por osteoporosis son la epidemia silenciosa de la columna: muchas se confunden con 'dolor de espalda normal' y se diagnostican tarde. Detectarlas a tiempo cambia todo — incluido el acceso a tratamientos de mínima invasión que alivian en horas.",
@@ -44,6 +45,8 @@ export const fracturaDeColumna: Padecimiento = {
         "Para fracturas inestables o con compromiso de los nervios: fijar el segmento con tornillos — según el caso, colocados por vía percutánea de mínima invasión.",
     },
   ],
+  citaDoctor:
+    "Tratar la fractura sin tratar el hueso es dejar la puerta abierta a la siguiente. Aquí atendemos las dos.",
   comoLoTrato: [
     "Ante una fractura vertebral respondo tres preguntas: ¿es estable o inestable?, ¿está comprimiendo nervios?, y ¿qué tan reciente es? Esas respuestas — de la exploración y la imagen — separan a quien solo necesita corsé y vigilancia de quien se beneficia del cemento o de una fijación.",
     "Y hay una cuarta pregunta que muchos olvidan: ¿por qué se fracturó este hueso? Si la respuesta es osteoporosis, tratar la fractura sin tratar el hueso es dejar la puerta abierta a la siguiente. Esa parte también la coordinamos.",

@@ -3,7 +3,7 @@ import HeroBodyMap from "@/components/home/HeroBodyMap";
 import TrustBar from "@/components/home/TrustBar";
 import HowItWorks from "@/components/home/HowItWorks";
 import Differentiators from "@/components/home/Differentiators";
-import ConditionsGrid from "@/components/home/ConditionsGrid";
+import ConditionsBodyMap from "@/components/home/ConditionsBodyMap";
 import AboutDoctor from "@/components/home/AboutDoctor";
 import GoogleReviews from "@/components/home/GoogleReviews";
 import InsuranceBar from "@/components/home/InsuranceBar";
@@ -26,7 +26,7 @@ export default function HomePage() {
       <TrustBar />
       <HowItWorks />
       <Differentiators />
-      <ConditionsGrid />
+      <ConditionsBodyMap />
       <AboutDoctor />
       <GoogleReviews reviews={PLACEHOLDER_REVIEWS} />
       <InsuranceBar />

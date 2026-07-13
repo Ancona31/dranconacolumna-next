@@ -45,6 +45,8 @@ export const fracturasYEsguinces: Padecimiento = {
         "Fracturas desplazadas, inestables o articulares: se reducen y fijan con material de osteosíntesis para que el hueso sane en su posición exacta. Como traumatólogo, es el corazón de mi especialidad — y operar bien la primera vez es la mejor prevención de secuelas.",
     },
   ],
+  citaDoctor:
+    "Mi trabajo no termina cuando el hueso pega — termina cuando vuelves a usar tu extremidad sin pensar en ella.",
   comoLoTrato: [
     "El trauma es la mitad de mi apellido profesional: traumatólogo. Atiendo fracturas y esguinces de urgencia con un principio simple — clasificar bien para tratar exacto: radiografías en las proyecciones correctas, clasificación de la lesión y un plan proporcional, del vendaje funcional a la cirugía de fijación.",
     "Y le doy a la rehabilitación el peso que merece: el yeso o la cirugía son la mitad del tratamiento; recuperar movilidad, fuerza y confianza es la otra mitad. Mi trabajo no termina cuando el hueso pega — termina cuando vuelves a usar tu extremidad sin pensar en ella.",

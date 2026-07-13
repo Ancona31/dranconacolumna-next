@@ -8,6 +8,7 @@ export const dolorDeRodilla: Padecimiento = {
     "Dolor de rodilla: meniscos, ligamentos y desgaste | Dr. Angel Ancona · Mérida",
   metaDescription:
     "¿Rodilla que duele al subir escaleras, se hincha o se traba? Conoce las causas — meniscos, ligamentos, artrosis — y evalúa tu rodilla gratis en minutos.",
+  zonaChip: "Rodilla",
   definicion: [
     "La rodilla carga tu peso en cada paso y lo multiplica al subir, bajar y ponerte en cuclillas. Por eso concentra dos mundos de problemas: las lesiones — meniscos y ligamentos, típicas de torceduras y deporte — y el desgaste del cartílago, la artrosis, que llega con los años y el uso.",
     "Saber en cuál de los dos mundos está tu rodilla cambia todo el plan: una lesión mecánica joven no se trata igual que un desgaste. Y ambos tienen hoy más opciones que nunca antes de llegar a una prótesis.",
@@ -43,6 +44,8 @@ export const dolorDeRodilla: Padecimiento = {
         "Para lesiones mecánicas que lo ameritan — meniscos que se traban, ligamentos rotos en pacientes activos — la artroscopia repara por incisiones pequeñas. Y cuando el desgaste ya consumió la articulación, la prótesis devuelve la vida que el dolor quitó — pero es el último escalón, no el primero.",
     },
   ],
+  citaDoctor:
+    "La rodilla perdona poco los atajos — y premia mucho el músculo fuerte.",
   comoLoTrato: [
     "Con la rodilla, mi exploración empieza por la pregunta correcta: ¿esto es mecánico o es desgaste? Las maniobras de meniscos y ligamentos, el patrón del dolor y — cuando hace falta — la imagen, responden. Es la diferencia entre reparar una pieza y cuidar la articulación completa.",
     "Mi filosofía con la rodilla es escalonada: se agota lo conservador antes de infiltrar, se infiltra con criterio antes de operar, y se opera lo que la evidencia dice que se beneficia de cirugía. La rodilla perdona poco los atajos — y premia mucho el músculo fuerte.",

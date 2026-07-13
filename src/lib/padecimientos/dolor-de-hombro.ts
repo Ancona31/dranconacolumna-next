@@ -7,6 +7,7 @@ export const dolorDeHombro: Padecimiento = {
   metaTitle: "Dolor de hombro y manguito rotador | Dr. Angel Ancona · Mérida",
   metaDescription:
     "¿Dolor al levantar el brazo o al dormir de ese lado? Conoce las causas del dolor de hombro — del manguito rotador al hombro congelado — y evalúa tu caso gratis.",
+  zonaChip: "Hombro",
   definicion: [
     "El hombro es la articulación más móvil de tu cuerpo — y esa libertad tiene precio: depende de un grupo de tendones, el manguito rotador, que trabaja en cada movimiento del brazo y con los años (o los esfuerzos) se inflama, se desgasta o se rompe.",
     "La buena noticia: la mayoría de los dolores de hombro se resuelven sin cirugía. La clave está en ponerle nombre al problema — tendinitis, ruptura, hombro congelado, desgaste — porque cada uno se trata distinto.",
@@ -42,6 +43,8 @@ export const dolorDeHombro: Padecimiento = {
         "Para rupturas del manguito que lo ameritan, inestabilidad o casos que no respondieron: reparación por artroscopia, con incisiones pequeñas. La decisión depende del tamaño de la ruptura, tu edad y tu demanda física.",
     },
   ],
+  citaDoctor:
+    "Un tendón roto que espera demasiado se vuelve difícil de reparar. Mi trabajo es decirte con claridad en qué grupo estás.",
   comoLoTrato: [
     "Mi exploración del hombro busca separar tres cosas que se confunden todo el tiempo: el dolor que viene de los tendones, el que viene de la articulación y el que en realidad baja desde el cuello. Las maniobras específicas del manguito me dicen cuál tendón sufre y cuánto — y el ultrasonido o la resonancia confirman lo que la mano ya encontró.",
     "Con el diagnóstico puesto, soy directo: las tendinitis y la mayoría de las rupturas parciales se rehabilitan; las rupturas completas en pacientes activos suelen beneficiarse de reparar a tiempo — porque un tendón roto que espera demasiado se retrae y se vuelve difícil de reparar. Te diré con claridad en qué grupo estás.",

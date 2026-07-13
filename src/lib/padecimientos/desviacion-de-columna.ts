@@ -8,6 +8,7 @@ export const desviacionDeColumna: Padecimiento = {
     "Escoliosis (desviación de columna): qué hacer | Dr. Angel Ancona · Mérida",
   metaDescription:
     "¿Hombros disparejos o una curva en la espalda? Conoce la escoliosis en adolescentes y adultos, cuándo vigilar y cuándo tratar. Evalúa tu caso gratis.",
+  zonaChip: "Zona lumbar",
   definicion: [
     "Vista de frente, la columna debe ser una línea recta. En la escoliosis dibuja una curva hacia un lado — a veces con rotación de las vértebras — y el cuerpo lo delata: un hombro más alto, la cadera dispareja, la ropa que cae chueca.",
     "Hay dos historias distintas con el mismo nombre: la escoliosis del adolescente, que aparece durante el crecimiento y casi nunca duele; y la del adulto, que viene del desgaste y sí suele doler. Se vigilan y se tratan diferente.",
@@ -45,6 +46,8 @@ export const desviacionDeColumna: Padecimiento = {
         "Reservada para curvas grandes o que progresan pese a todo, o cuando comprometen la función. Corrige y fija la curva con instrumentación. Es cirugía mayor — y por eso la indicación debe ser impecable.",
     },
   ],
+  citaDoctor:
+    "Con números en la mano, la escoliosis deja de ser de miedos y pasa a ser de decisiones.",
   comoLoTrato: [
     "Lo primero que hago con una escoliosis es ponerle números: cuántos grados mide la curva, cuánta rotación tiene y — en adolescentes — cuánto crecimiento le queda al esqueleto. Con esos tres datos la conversación deja de ser de miedos y pasa a ser de decisiones.",
     "En el adolescente, mi trabajo es proteger el crecimiento: vigilar de cerca y frenar a tiempo si la curva corre. En el adulto, mi objetivo es tu función y tu dolor — no perseguir la curva perfecta en la radiografía. Opero la minoría: los casos donde los números y los síntomas lo exigen.",

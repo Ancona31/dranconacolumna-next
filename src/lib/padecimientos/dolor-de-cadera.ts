@@ -8,6 +8,7 @@ export const dolorDeCadera: Padecimiento = {
     "Dolor de cadera e ingle: causas y tratamiento | Dr. Angel Ancona · Mérida",
   metaDescription:
     "Dolor en la ingle al caminar, rigidez al ponerte los zapatos: así avisa la cadera. Conoce las causas del dolor de cadera y evalúa tu caso gratis.",
+  zonaChip: "Cadera",
   definicion: [
     "La cadera esconde bien su dolor: la articulación verdadera duele en la INGLE — no en el costado, como muchos creen. El dolor lateral suele venir de los tendones y bursas de alrededor; el de la ingle, de la articulación misma. Son problemas distintos que se confunden a diario.",
     "Del desgaste articular (artrosis) a las tendinitis y bursitis, pasando por los pellizcamientos en pacientes jóvenes y deportistas: la cadera tiene un catálogo amplio, y el tratamiento correcto empieza por ubicar de dónde viene exactamente tu dolor.",
@@ -43,6 +44,8 @@ export const dolorDeCadera: Padecimiento = {
         "La prótesis de cadera es de las cirugías más exitosas de toda la medicina — transforma vidas cuando el desgaste es avanzado. Pero es el final del camino, no el atajo: se llega a ella cuando la articulación ya dio todo lo que podía dar.",
     },
   ],
+  citaDoctor:
+    "Hay caderas para cuidar por años, y caderas donde posponer la prótesis solo pospone la vida. Te diré con honestidad cuál es la tuya.",
   comoLoTrato: [
     "Lo primero que resuelvo con tu cadera es la pregunta del mapa: ¿tu dolor es articular (la ingle), tendinoso (el costado) o viene referido de la columna lumbar? Se explora distinto, se estudia distinto y se trata distinto — y es el error de origen más frecuente que veo en caderas mal tratadas.",
     "Si es la articulación y hay desgaste, te diré con números en qué punto está: hay caderas para cuidar por años con manejo conservador, y hay caderas donde posponer la prótesis solo pospone la vida. Mi trabajo es decirte con honestidad cuál es la tuya — y acompañarte en cualquiera de los dos caminos.",

@@ -8,6 +8,7 @@ export const tunelDelCarpo: Padecimiento = {
     "Túnel del carpo: hormigueo en las manos | Dr. Angel Ancona · Mérida",
   metaDescription:
     "¿Se te duermen las manos por la noche o al sostener el celular? Puede ser túnel del carpo. Conoce las señales, el tratamiento y evalúa tu mano gratis.",
+  zonaChip: "Muñeca y mano",
   definicion: [
     "Por la cara de la palma de tu muñeca pasa un túnel estrecho, y por él viaja el nervio mediano — el que da sensibilidad al pulgar, índice y medio. Cuando el túnel se inflama o se estrecha, el nervio queda apretado: eso es el síndrome del túnel del carpo.",
     "Su tarjeta de presentación es inconfundible: hormigueo y adormecimiento de esos dedos que te despierta por la noche y te hace sacudir la mano para 'revivirla'. Detectado a tiempo, es de los problemas más agradecidos de tratar; ignorado por años, puede dejar daño permanente.",
@@ -43,6 +44,8 @@ export const tunelDelCarpo: Padecimiento = {
         "Cuando los síntomas persisten o ya hay datos de daño del nervio: abrir el techo del túnel para liberar al mediano. Es una cirugía corta, ambulatoria y con excelentes resultados — el punto es no llegar tarde.",
     },
   ],
+  citaDoctor:
+    "El nervio comprimido avisa años antes de dañarse. Si tus manos te despiertan por la noche, no lo normalices.",
   comoLoTrato: [
     "El túnel del carpo se diagnostica primero con las manos y la historia: tus síntomas nocturnos y las maniobras de provocación suelen decirlo casi todo. La electromiografía — el estudio del nervio — la pido para confirmar y para medir cuánto está sufriendo el mediano: ese dato decide si vamos por lo conservador o directo a liberar.",
     "Mi mensaje central con este padecimiento es el tiempo: el nervio comprimido avisa años antes de dañarse. Tratado a tiempo, la recuperación es la regla; con atrofia establecida, lo que se perdió es difícil de recuperar. Si tus manos te despiertan por la noche, no lo normalices.",

@@ -44,6 +44,7 @@ export const lesionesDeportivas: Padecimiento = {
         "Rupturas completas de ligamentos o tendones en deportistas activos, lesiones que no responden: reparación — con frecuencia artroscópica — seguida del mismo camino de rehabilitación, ahora con el tejido reparado.",
     },
   ],
+  citaDoctor: "Se vuelve por criterios, no por calendario.",
   comoLoTrato: [
     "Con el deportista hablo dos idiomas: el clínico y el de tu deporte. Me importa el diagnóstico exacto — qué estructura, qué grado — y me importa igual tu calendario: qué torneo viene, qué posición juegas, cuántos años llevas en esto. El plan sale de cruzar ambos.",
     "Y soy claro con el regreso: se vuelve por criterios, no por calendario. Fuerza comparable al lado sano, gesto sin dolor, confianza recuperada. Regresar una semana tarde es frustrante; regresar dos semanas temprano puede costarte la temporada — o la articulación.",

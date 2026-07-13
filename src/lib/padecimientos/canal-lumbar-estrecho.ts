@@ -8,6 +8,7 @@ export const canalLumbarEstrecho: Padecimiento = {
     "Canal lumbar estrecho: dolor al caminar | Dr. Angel Ancona · Mérida",
   metaDescription:
     "¿El dolor de piernas te obliga a detenerte al caminar y cede al sentarte? Puede ser canal lumbar estrecho. Conoce el padecimiento y evalúa tu caso gratis.",
+  zonaChip: "Zona lumbar",
   definicion: [
     "Por dentro de tu columna corre un túnel que protege a los nervios que bajan a tus piernas. Con los años, ese túnel puede estrecharse — artrosis, discos desgastados, ligamentos engrosados — y los nervios viajan apretados.",
     "Su sello es muy característico: dolor, pesadez o calambres en las piernas al caminar, que te obligan a detenerte… y que se alivian al sentarte o inclinarte hacia adelante.",
@@ -43,6 +44,8 @@ export const canalLumbarEstrecho: Padecimiento = {
         "Cuando la distancia que caminas se vuelve incompatible con tu vida, la cirugía abre espacio a los nervios. Según el caso, puede realizarse con técnicas de mínima invasión y respetando la estabilidad de tu columna.",
     },
   ],
+  citaDoctor:
+    "Mi objetivo con el canal estrecho es devolverte distancia: que el cuerpo no le quede chico a tus planes.",
   comoLoTrato: [
     "El dato que más me importa de tu caso es uno que tú conoces perfectamente: cuántos metros o minutos caminas antes de que las piernas te obliguen a parar. Ese número — junto con la exploración y la resonancia — define qué tan apretados están tus nervios y qué tratamiento te corresponde.",
     "Mi objetivo con el canal estrecho es devolverte distancia: que el cuerpo no le quede chico a tus planes. La cirugía es una herramienta para eso, no un destino inevitable.",

@@ -8,6 +8,7 @@ export const dolorDeCuello: Padecimiento = {
     "Dolor de cuello (cervicalgia): causas y tratamiento | Dr. Angel Ancona · Mérida",
   metaDescription:
     "Del cuello rígido por estrés al dolor que baja al brazo: conoce las causas de la cervicalgia, cuándo preocuparse y cómo se trata. Evalúa tu cuello gratis.",
+  zonaChip: "Zona cervical",
   definicion: [
     "El cuello es la parte más móvil de tu columna — y por eso, la que más factura cobra por las posturas sostenidas, el estrés y el desgaste. La mayoría de los dolores de cuello son musculares o articulares y se resuelven bien.",
     "Pero por el cuello también pasan los nervios de tus brazos y la médula espinal. Cuando el dolor baja al brazo, o cuando las manos empiezan a fallar, el cuello merece algo más que una pomada: merece diagnóstico.",
@@ -44,6 +45,8 @@ export const dolorDeCuello: Padecimiento = {
         "Reservada para hernias cervicales con compresión importante del nervio que no respondieron, o para compresión de la médula. Con frecuencia se realiza por vía anterior, con incisiones pequeñas y estancias cortas.",
     },
   ],
+  citaDoctor:
+    "La mayoría de los dolores de cuello no necesita ni cirugía ni resonancia: necesita el diagnóstico correcto.",
   comoLoTrato: [
     "Con el cuello, mi exploración busca responder de dónde viene el dolor: ¿del músculo, de las articulaciones o de un nervio comprimido? Son tres problemas distintos con tres tratamientos distintos — y confundirlos es la razón por la que tanta cervicalgia se cronifica.",
     "La mayoría de mis pacientes con dolor de cuello nunca necesita cirugía ni resonancia: necesita el diagnóstico correcto y un plan bien dirigido. Y los pocos casos quirúrgicos — los de compresión real — se benefician enormemente de detectarse a tiempo, antes de que el nervio o la médula paguen el precio.",

@@ -8,6 +8,7 @@ export const vertebraDesplazada: Padecimiento = {
     "Vértebra desplazada (espondilolistesis) | Dr. Angel Ancona · Mérida",
   metaDescription:
     "Una vértebra que se desliza sobre otra puede causar dolor lumbar y de piernas. Conoce la espondilolistesis, sus grados y tratamientos. Evalúate gratis.",
+  zonaChip: "Zona lumbar",
   definicion: [
     "La espondilolistesis significa que una vértebra se deslizó hacia adelante sobre la que está debajo. Puede ocurrir por desgaste de las articulaciones (lo más común en adultos) o por un defecto en el hueso que viene de la juventud.",
     "Aquí va una buena noticia de entrada: muchas vértebras desplazadas no duelen y nunca darán problemas. Cuando duelen, el manejo correcto empieza por medir el deslizamiento — no por asustarse con la palabra.",
@@ -43,6 +44,8 @@ export const vertebraDesplazada: Padecimiento = {
         "Cuando hay inestabilidad demostrada, progresión o compresión de nervios que no responde. Fija el segmento que se desliza; según el caso, con instrumentación percutánea de mínima invasión.",
     },
   ],
+  citaDoctor:
+    "Se opera la inestabilidad y la compresión — no la imagen ni el susto.",
   comoLoTrato: [
     "Lo primero es clasificar tu caso: cuánto se deslizó la vértebra (el grado), si se mueve con tus movimientos (la estabilidad) y si está comprimiendo nervios. Esas tres respuestas — que salen de la exploración y de radiografías dinámicas — definen todo lo demás.",
     "Mi criterio quirúrgico aquí es conservador: se opera la inestabilidad y la compresión, no la imagen ni el susto. La mayoría de mis pacientes con espondilolistesis se maneja sin cirugía, con seguimiento medido.",
