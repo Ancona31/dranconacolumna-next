@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import { AlertTriangle, Check } from "lucide-react";
-import Placeholder from "@/components/Placeholder";
 import ButtonLink from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import HeroZoneFigure from "@/components/padecimientos/HeroZoneFigure";
@@ -12,10 +12,20 @@ import {
   CEDULA_PROFESIONAL,
   DOCTOR_FULL_NAME,
 } from "@/lib/config";
-import { getPadecimiento, type Padecimiento } from "@/lib/padecimientos";
+import {
+  getPadecimiento,
+  PADECIMIENTOS,
+  type Padecimiento,
+} from "@/lib/padecimientos";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 type Params = { slug: string };
+
+// Solo los slugs reales del registro se pre-generan; cualquier otro cae en
+// notFound() y responde 404 en vez de indexar una página fantasma.
+export function generateStaticParams(): Params[] {
+  return Object.keys(PADECIMIENTOS).map((slug) => ({ slug }));
+}
 
 const GRUPO_LABEL: Record<Padecimiento["grupo"], string> = {
   columna: "Columna",
@@ -36,7 +46,8 @@ export async function generateMetadata({
   const { slug } = await params;
   const p = getPadecimiento(slug);
 
-  if (!p) return { title: `Padecimiento: ${slug}` };
+  // Slug inexistente: no fabricamos metadata; notFound() en la página manda.
+  if (!p) return {};
 
   return {
     // absolute: el metaTitle ya trae la marca; evita duplicar el template.
@@ -83,7 +94,8 @@ export default async function PadecimientoSlugPage({
   const { slug } = await params;
   const p = getPadecimiento(slug);
 
-  if (!p) return <Placeholder title={slug} phase={3} />;
+  // Con el catálogo completo, un slug ausente es una URL inválida: 404 real.
+  if (!p) notFound();
 
   const whatsappLink = buildWhatsAppLink(
     `Hola Dr. Ancona, leí sobre ${p.nombre} y quiero una valoración.`
