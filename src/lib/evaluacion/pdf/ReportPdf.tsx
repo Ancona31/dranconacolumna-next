@@ -33,7 +33,6 @@ import {
   getPartialAnswersNote,
   getRecommendation,
   getRecommendationColors,
-  getQrWhatsAppLink,
   getSemaphoreTitle,
   getWarningSigns,
   nivelDefinitions,
@@ -46,12 +45,15 @@ import {
   CEDULA_PROFESIONAL,
   CEDULA_ESPECIALIDAD,
 } from "@/lib/config";
-import QRCode from "qrcode";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 import QrSvg from "@/lib/evaluacion/pdf/QrSvg";
 
-// Presupuesto de densidad: si el QR del mensaje completo supera la versión 5
-// (37x37 módulos), se recorta a la forma corta. QrSvg usa ECC 'L'.
-const QR_MAX_VERSION = 5;
+// Enlace de agendamiento FIJO y corto: mensaje mínimo → QR poco denso y de
+// lectura confiable. Mismo destino para el QR y el <Link> clicable del bloque.
+// Ya no se codifica folio/score/ventana (eso hacía el QR denso y frágil).
+const SCHEDULE_WA_LINK = buildWhatsAppLink(
+  "Hola Dr. Ancona, quiero agendar una consulta."
+);
 
 // TODO: si se agregan /public/fonts/*.ttf, registrar aquí Plus Jakarta Sans
 // (bold, títulos) e Inter (regular/semibold) con Font.register. Por ahora se
@@ -405,9 +407,11 @@ function CtaBlock({ waLink, urgent }: { waLink: string; urgent: boolean }) {
       </View>
       <View style={{ alignItems: "center" }}>
         <Link src={waLink}>
+          {/* size incluye la quiet zone (4 módulos). Con el enlace fijo (v6,
+              41×41) el símbolo escaneable queda en ~130pt de lado. */}
           <QrSvg
             value={waLink}
-            size={112}
+            size={156}
             fg={QR_STYLE.fg}
             bgPlate={QR_STYLE.bgPlate}
           />
@@ -661,15 +665,6 @@ export default function ReportPdf({
 }) {
   const level = LEVELS[result.level];
   const rec = getRecommendation(result.level, result.alertLevel);
-  // Fuente única del enlace para QR y ambos <Link>; recorta por densidad.
-  const fullLink = getQrWhatsAppLink(result);
-  const fullVersion = QRCode.create(fullLink, {
-    errorCorrectionLevel: "L",
-  }).version;
-  const qrValue =
-    fullVersion > QR_MAX_VERSION
-      ? getQrWhatsAppLink(result, { short: true })
-      : fullLink;
   const fecha = result.createdAt.toLocaleString("es-MX", {
     dateStyle: "long",
     timeStyle: "short",
@@ -849,7 +844,7 @@ export default function ReportPdf({
           <View wrap={false}>
             <RecommendationBlock rec={rec} />
             <CtaBlock
-              waLink={qrValue}
+              waLink={SCHEDULE_WA_LINK}
               urgent={result.alertLevel === "urgente"}
             />
             <Legal citation={result.test.instrumentCitation} />

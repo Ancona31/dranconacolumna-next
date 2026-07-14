@@ -46,7 +46,37 @@ import {
 } from "@/lib/evaluacion/engine";
 import { BODY_PATH, BODY_ZONES } from "@/components/home/BodyFigureSVG";
 import PdfDownload from "@/components/evaluacion/PdfDownload";
+import ShareButton from "@/components/share/ShareButton";
 import { trackEvent } from "@/lib/analytics";
+import { SITE_URL } from "@/lib/config";
+
+// Compartir el enlace a la evaluación (no el PDF): que otra persona haga su
+// test. Mismo bloque en el reporte scorable y en el no-scorable.
+const EVAL_SHARE = {
+  url: `${SITE_URL}/evaluacion`,
+  title: "Evaluación clínica gratuita — Dr. Angel Ancona",
+  text: "Hice esta evaluación de mi dolor y me dio un reporte en minutos. Haz la tuya gratis:",
+} as const;
+
+function ShareEvaluation() {
+  return (
+    <div className="mt-6 rounded-xl border border-primary/15 bg-primary-soft p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
+      <p className="font-body text-sm text-ink/70">
+        ¿Conoces a alguien con dolor? Comparte la evaluación gratuita.
+      </p>
+      <div className="mt-3 sm:mt-0 sm:shrink-0">
+        <ShareButton
+          url={EVAL_SHARE.url}
+          title={EVAL_SHARE.title}
+          text={EVAL_SHARE.text}
+          variant="card"
+          origen="reporte"
+          label="Compartir esta evaluación"
+        />
+      </div>
+    </div>
+  );
+}
 
 const BANNER_STYLES = {
   precaucion: { box: "border-warning bg-warning/10", title: "text-warning" },
@@ -276,6 +306,9 @@ function UnscorableScreen({ result }: { result: EvaluationResult }) {
           ? "Avísanos de tu caso por WhatsApp"
           : "Escríbenos para agendar tu valoración"}
       </a>
+
+      {/* Compartir la evaluación (secundario: no compite con el CTA de WhatsApp). */}
+      <ShareEvaluation />
 
       <p className="mt-6 font-body text-xs text-ink/45">
         Esta evaluación es orientativa y no sustituye una consulta médica. Tus
@@ -509,6 +542,9 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
         )}
         <PdfDownload result={result} />
       </div>
+
+      {/* Compartir la evaluación (secundario: no compite con el CTA de WhatsApp). */}
+      <ShareEvaluation />
 
       <p className="mt-6 font-body text-xs text-ink/45">
         Esta evaluación es orientativa y no sustituye una consulta médica. Tus

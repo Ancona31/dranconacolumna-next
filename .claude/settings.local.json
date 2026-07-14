@@ -9,7 +9,18 @@
       "Bash(MSYS_NO_PATHCONV=1 wsl.exe *)",
       "PowerShell(wsl -d Ubuntu -- bash -lc \"cd /home/ancoa/proyectos/dranconacolumna-next && npm run lint\")",
       "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && npm run lint 2>&1\")",
-      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && npm run build 2>&1\")"
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && npm run build 2>&1\")",
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && rm -f scratch-qr-check.cjs scratch-qr-preview.png && npm run lint 2>&1 && echo '---BUILD---' && npm run build 2>&1\")",
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && node scratch-render.cjs\")",
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && node scratch-svg.cjs\")",
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && \\(npm ls jsqr >/dev/null 2>&1 || npm i --no-save jsqr >/dev/null 2>&1\\); node scratch-decode.cjs\")",
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && rm -f scratch-render.cjs scratch-svg.cjs scratch-decode.cjs scratch-qr.pdf scratch-qr.svg scratch-qr.png && npm run lint 2>&1 && echo '---BUILD---' && npm run build 2>&1 | tail -5 && git status --porcelain\")",
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && rm -f scratch-svg.cjs scratch-qr.svg scratch-qr.png && npm run lint 2>&1 && echo '---BUILD---' && npm run build 2>&1 | tail -4 && echo '---STATUS---' && git status --porcelain\")",
+      "Bash(cd \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\ancoa\\\\proyectos\\\\dranconacolumna-next\")",
+      "Bash(node -e \"const l=require\\('./node_modules/lucide-react'\\); ['Share2','Facebook','Mail','Copy','Check','MessageCircle','Link','Link2','X'].forEach\\(n=>console.log\\(n, typeof l[n]\\)\\)\")",
+      "Bash(node -e \"const l=require\\('./node_modules/lucide-react'\\); ['ThumbsUp','Users','Globe','ExternalLink','Share','Send','AtSign','Clipboard','ClipboardCheck','Link2'].forEach\\(n=>console.log\\(n, typeof l[n]\\)\\)\")",
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && npm run lint 2>&1 && echo '---BUILD---' && npm run build 2>&1 | tail -12\")",
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && git status --porcelain\")"
     ]
   }
 }

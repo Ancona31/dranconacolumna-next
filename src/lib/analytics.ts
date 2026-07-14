@@ -9,6 +9,14 @@ type Nivel = "leve" | "moderada" | "severa" | "urgente";
 /** Nivel de alerta independiente del score. */
 type Alerta = "none" | "precaucion" | "urgente";
 
+/** Método por el que se compartió contenido (ShareButton). */
+export type ShareMetodo =
+  | "nativo"
+  | "whatsapp"
+  | "facebook"
+  | "correo"
+  | "copiar";
+
 /** Ubicación desde donde se disparó un click de WhatsApp. */
 export type WhatsAppOrigen =
   | "header"
@@ -31,6 +39,7 @@ type EventParams = {
   evaluacion_completada: { zona: string; nivel: Nivel; alerta: Alerta };
   reporte_pdf_descargado: { zona: string; nivel: Nivel };
   click_whatsapp: { origen: WhatsAppOrigen };
+  contenido_compartido: { origen: string; metodo: ShareMetodo };
 };
 
 declare global {

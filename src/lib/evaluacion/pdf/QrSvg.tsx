@@ -1,27 +1,37 @@
 import React from "react";
 import QRCode from "qrcode";
-import { Svg, Rect, Circle } from "@react-pdf/renderer";
+import { Svg, Rect } from "@react-pdf/renderer";
 
 type QrSvgProps = {
   value: string;
   /** Lado del QR en pt/px, incluyendo la quiet zone. */
   size: number;
-  /** Color de módulos y patrones. */
-  fg: string;
+  /**
+   * Ignorado. El QR se fuerza a NEGRO PURO (#000000): las cámaras físicas leen
+   * peor cualquier color de marca por menor contraste. Se conserva en la API
+   * por compatibilidad con quien invoca (ReportPdf lo sigue pasando).
+   */
+  fg?: string;
   /** Placa de fondo clara detrás del QR + quiet zone. */
   bgPlate?: boolean;
 };
 
-const QUIET = 2; // celdas de margen (quiet zone), DENTRO de la placa
+const QUIET = 4; // celdas de margen (quiet zone), DENTRO de la placa. El
+// estándar QR pide ≥4 módulos de silencio para lectura confiable.
 const PLATE_RADIUS = 10; // rx generoso de la placa (pt)
+// Negro puro sobre blanco: máximo contraste, el estándar universal que
+// cualquier cámara de celular lee al instante. Se prioriza legibilidad sobre
+// la estética de marca en este elemento.
+const MODULE_COLOR = "#000000";
 
 /**
- * QR vectorial nativo para react-pdf: módulos de datos como puntos redondos y
- * finder patterns dibujados a mano (anillo + núcleo redondeados). Color
- * parametrizado. Nada de imágenes rasterizadas.
+ * QR vectorial nativo para react-pdf: QR clásico NEGRO sobre blanco. Módulos de
+ * datos como cuadrados sólidos que se tocan (sin gap ni border-radius) y finder
+ * patterns como cuadrados rectos (7×7 → 5×5 blanco → 3×3), respetando la razón
+ * 1:1:3:1:1 que buscan las cámaras. Nada de imágenes rasterizadas. ECC 'M'.
  */
-export default function QrSvg({ value, size, fg, bgPlate = false }: QrSvgProps) {
-  const qr = QRCode.create(value, { errorCorrectionLevel: "L" });
+export default function QrSvg({ value, size, bgPlate = false }: QrSvgProps) {
+  const qr = QRCode.create(value, { errorCorrectionLevel: "M" });
   const count = qr.modules.size;
   const data = qr.modules.data;
 
@@ -41,49 +51,61 @@ export default function QrSvg({ value, size, fg, bgPlate = false }: QrSvgProps) 
   // Se construye un arreglo plano de primitivos (sin Fragments dentro del Svg).
   const shapes: React.ReactElement[] = [];
 
-  // Módulos de datos como puntos redondos (excluye finders y quiet zone).
+  // Módulos de datos como cuadrados sólidos que se tocan (excluye finders y
+  // quiet zone). Se suma un hairline al lado para eliminar costuras de
+  // antialiasing entre módulos adyacentes y garantizar contraste continuo.
+  const seam = cell * 0.03;
   for (let r = 0; r < count; r++) {
     for (let c = 0; c < count; c++) {
       if (!data[r * count + c]) continue;
       if (inFinder(r, c)) continue;
       shapes.push(
-        <Circle
+        <Rect
           key={`d-${r}-${c}`}
-          cx={off + (c + 0.5) * cell}
-          cy={off + (r + 0.5) * cell}
-          r={cell * 0.42}
-          fill={fg}
+          x={off + c * cell}
+          y={off + r * cell}
+          width={cell + seam}
+          height={cell + seam}
+          fill={MODULE_COLOR}
         />
       );
     }
   }
 
-  // Finder patterns dibujados a mano: anillo exterior + núcleo, redondeados.
+  // Finder patterns (ojos) como cuadrados rectos, iguales a un QR clásico:
+  // 7×7 sólido oscuro → 5×5 blanco → 3×3 sólido oscuro. Sin radio: prioridad
+  // al contraste y a la razón 1:1:3:1:1 que las cámaras detectan al instante.
   finders.forEach(([fr, fc], i) => {
+    const fx = off + fc * cell;
+    const fy = off + fr * cell;
     shapes.push(
       <Rect
         key={`fo-${i}`}
-        x={off + fc * cell}
-        y={off + fr * cell}
+        x={fx}
+        y={fy}
         width={7 * cell}
         height={7 * cell}
-        rx={2.2 * cell}
-        ry={2.2 * cell}
-        stroke={fg}
-        strokeWidth={cell}
-        fill="none"
+        fill={MODULE_COLOR}
       />
     );
     shapes.push(
       <Rect
-        key={`fi-${i}`}
-        x={off + (fc + 2) * cell}
-        y={off + (fr + 2) * cell}
+        key={`fw-${i}`}
+        x={fx + cell}
+        y={fy + cell}
+        width={5 * cell}
+        height={5 * cell}
+        fill="#FFFFFF"
+      />
+    );
+    shapes.push(
+      <Rect
+        key={`fc-${i}`}
+        x={fx + 2 * cell}
+        y={fy + 2 * cell}
         width={3 * cell}
         height={3 * cell}
-        rx={1.1 * cell}
-        ry={1.1 * cell}
-        fill={fg}
+        fill={MODULE_COLOR}
       />
     );
   });

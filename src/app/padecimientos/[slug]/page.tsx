@@ -8,10 +8,12 @@ import Reveal from "@/components/ui/Reveal";
 import HeroZoneFigure from "@/components/padecimientos/HeroZoneFigure";
 import StickyCtaBar from "@/components/padecimientos/StickyCtaBar";
 import WhatsAppLink from "@/components/analytics/WhatsAppLink";
+import ShareButton from "@/components/share/ShareButton";
 import {
   CEDULA_ESPECIALIDAD,
   CEDULA_PROFESIONAL,
   DOCTOR_FULL_NAME,
+  SITE_URL,
 } from "@/lib/config";
 import {
   getPadecimiento,
@@ -379,6 +381,19 @@ export default async function PadecimientoSlugPage({
                 </details>
               </Reveal>
             ))}
+          </div>
+
+          {/* Compartir discreto: cerca del final del contenido, antes del CTA. */}
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-6">
+            <p className="font-body text-sm text-ink/60">
+              ¿Puede servirle a alguien más?
+            </p>
+            <ShareButton
+              url={`${SITE_URL}/padecimientos/${slug}`}
+              title={`${p.nombre} — Dr. Angel Ancona`}
+              text={`Información sobre ${p.nombre} que puede servirte:`}
+              origen="padecimiento"
+            />
           </div>
         </div>
       </section>
