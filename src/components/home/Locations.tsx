@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Clock, Phone, MessageCircle } from "lucide-react";
+import { MapPin, Clock, Phone, MessageCircle, Navigation } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { SEDES, type Sede } from "@/lib/sedes";
@@ -60,6 +60,16 @@ function SedeCard({ sede }: { sede: Sede }) {
           <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
           Agendar por WhatsApp
         </WhatsAppLink>
+
+        <a
+          href={sede.mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-1.5 font-body text-sm font-semibold text-accent hover:underline"
+        >
+          <Navigation className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+          Cómo llegar →
+        </a>
       </div>
     </div>
   );
@@ -88,7 +98,7 @@ export default function Locations() {
             href="/contacto"
             className="inline-flex font-body text-sm font-semibold text-accent hover:underline"
           >
-            Ver información de contacto →
+            Ver ubicación y datos de contacto →
           </Link>
         </div>
       </div>

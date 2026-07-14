@@ -47,14 +47,14 @@ export const SEDES: Sede[] = [
     cp: "97156",
     telefono: "9994957916",
     telefonoDisplay: "999 495 79 16",
-    lat: 20.97999454975812,
-    lng: -89.57208930345675,
+    lat: 20.97978962216484,
+    lng: -89.57207645354667,
     horario: "Lunes a viernes, 9:00 a 11:00 h",
     horarioCorto: "Mañanas · Lun a Vie",
     opens: "09:00",
     closes: "11:00",
     mapsUrl:
-      "https://www.google.com/maps/search/?api=1&query=20.97999454975812,-89.57208930345675",
+      "https://www.google.com/maps/search/?api=1&query=20.97978962216484,-89.57207645354667",
     origen: "sede_merida",
   },
   {
