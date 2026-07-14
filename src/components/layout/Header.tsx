@@ -5,17 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { MAIN_NAV, WHATSAPP_DEFAULT_MESSAGE } from "@/lib/nav";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { trackEvent } from "@/lib/analytics";
-import { TAGLINE } from "@/lib/config";
+import type { UiStrings } from "@/lib/i18n/types";
 
-function Logo() {
+function Logo({ alt, tagline }: { alt: string; tagline: string }) {
   return (
     <Link href="/" className="flex items-center gap-2.5">
       <Image
         src="/logo.png"
-        alt="Logotipo Dr. Angel Ancona — columna vertebral"
+        alt={alt}
         width={527}
         height={512}
         priority
@@ -26,14 +25,14 @@ function Logo() {
           Dr. Angel Ancona
         </span>
         <span className="font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70">
-          {TAGLINE}
+          {tagline}
         </span>
       </span>
     </Link>
   );
 }
 
-export default function Header() {
+export default function Header({ strings }: { strings: UiStrings }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
@@ -43,7 +42,7 @@ export default function Header() {
   const [mounted, setMounted] = useState(false);
   const [entered, setEntered] = useState(false);
 
-  const whatsappLink = buildWhatsAppLink(WHATSAPP_DEFAULT_MESSAGE);
+  const whatsappLink = buildWhatsAppLink(strings.whatsappDefaultMessage);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -102,11 +101,11 @@ export default function Header() {
         }`}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-          <Logo />
+          <Logo alt={strings.header.logoAlt} tagline={strings.tagline} />
 
           {/* Navegación de escritorio */}
           <nav className="hidden items-center gap-6 md:flex">
-            {MAIN_NAV.map((item) => {
+            {strings.nav.map((item) => {
               const active = isActive(item.href);
               return (
                 <Link
@@ -128,7 +127,7 @@ export default function Header() {
               onClick={() => trackEvent("click_whatsapp", { origen: "header" })}
               className="rounded-full bg-whatsapp px-4 py-2 text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
             >
-              WhatsApp
+              {strings.header.whatsappLabel}
             </a>
           </nav>
 
@@ -141,11 +140,11 @@ export default function Header() {
               onClick={() => trackEvent("click_whatsapp", { origen: "header" })}
               className="rounded-full bg-whatsapp px-3 py-1.5 text-xs font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
             >
-              WhatsApp
+              {strings.header.whatsappLabel}
             </a>
             <button
               type="button"
-              aria-label={mounted ? "Cerrar menú" : "Abrir menú"}
+              aria-label={mounted ? strings.header.closeMenu : strings.header.openMenu}
               aria-expanded={mounted}
               onClick={toggleDrawer}
               className="relative flex h-9 w-9 items-center justify-center rounded-md border border-ink/15 text-ink"
@@ -183,7 +182,7 @@ export default function Header() {
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Menú"
+            aria-label={strings.header.menuLabel}
             onTransitionEnd={(e) => {
               if (e.propertyName === "transform" && !entered) {
                 setMounted(false);
@@ -196,7 +195,7 @@ export default function Header() {
             }`}
           >
             <nav className="flex flex-col p-4">
-              {MAIN_NAV.map((item) => (
+              {strings.nav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -216,7 +215,7 @@ export default function Header() {
                 }}
                 className="mt-4 rounded-full bg-whatsapp px-4 py-3 text-center text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
               >
-                WhatsApp
+                {strings.header.whatsappLabel}
               </a>
             </nav>
           </div>

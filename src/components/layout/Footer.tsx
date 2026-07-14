@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MAIN_NAV } from "@/lib/nav";
+import type { UiStrings } from "@/lib/i18n/types";
 import {
   DOCTOR_FULL_NAME,
   CEDULA_PROFESIONAL,
@@ -9,12 +9,12 @@ import {
   CONTACT_EMAIL,
 } from "@/lib/config";
 
-export default function Footer() {
+export default function Footer({ strings }: { strings: UiStrings }) {
   return (
     <footer className="bg-primary text-white/90">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <nav className="flex flex-wrap gap-x-6 gap-y-3">
-          {MAIN_NAV.map((item) => (
+          {strings.nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -29,7 +29,7 @@ export default function Footer() {
           <span className="mb-3 inline-flex rounded-full bg-[var(--color-background)] p-1.5">
             <Image
               src="/logo.png"
-              alt="Logotipo Dr. Angel Ancona — columna vertebral"
+              alt={strings.footer.logoAlt}
               width={527}
               height={512}
               className="h-12 w-auto"
@@ -37,7 +37,8 @@ export default function Footer() {
           </span>
           <p className="font-semibold text-white">{DOCTOR_FULL_NAME}</p>
           <p>
-            Céd. Prof. {CEDULA_PROFESIONAL} · Céd. Esp. {CEDULA_ESPECIALIDAD}
+            {strings.footer.cedulaProf} {CEDULA_PROFESIONAL} ·{" "}
+            {strings.footer.cedulaEsp} {CEDULA_ESPECIALIDAD}
           </p>
           <p>{CERTIFICACION}</p>
           <p>
@@ -52,15 +53,12 @@ export default function Footer() {
 
         <div className="mt-6 flex flex-col gap-2 text-sm">
           <Link
-            href="/aviso-de-privacidad"
+            href={strings.footer.privacyHref}
             className="text-white/90 underline underline-offset-4 transition-colors hover:text-white"
           >
-            Aviso de privacidad
+            {strings.footer.privacyLabel}
           </Link>
-          <p className="italic text-white/70">
-            Las evaluaciones de este sitio son orientativas y no sustituyen una
-            consulta médica.
-          </p>
+          <p className="italic text-white/70">{strings.footer.disclaimer}</p>
         </div>
       </div>
     </footer>
