@@ -24,7 +24,8 @@
       "Bash(npm run *)",
       "Bash(git add *)",
       "Bash(git commit -q -m 'F1.1: route group \\(es\\) — mueve todas las rutas ES a src/app/\\(es\\)/ *)",
-      "Bash(git commit -q -m 'F1.2-4,6: dos root layouts, capa i18n de strings y árbol EN mínimo *)"
+      "Bash(git commit -q -m 'F1.2-4,6: dos root layouts, capa i18n de strings y árbol EN mínimo *)",
+      "Bash(git commit -q -m 'F1.5: selector de idioma ES ⇄ EN + slug-map tipado *)"
     ]
   }
 }

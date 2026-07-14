@@ -7,7 +7,8 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { trackEvent } from "@/lib/analytics";
-import type { UiStrings } from "@/lib/i18n/types";
+import type { Locale, UiStrings } from "@/lib/i18n/types";
+import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 
 function Logo({ alt, tagline }: { alt: string; tagline: string }) {
   return (
@@ -32,7 +33,13 @@ function Logo({ alt, tagline }: { alt: string; tagline: string }) {
   );
 }
 
-export default function Header({ strings }: { strings: UiStrings }) {
+export default function Header({
+  locale,
+  strings,
+}: {
+  locale: Locale;
+  strings: UiStrings;
+}) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
@@ -120,6 +127,7 @@ export default function Header({ strings }: { strings: UiStrings }) {
                 </Link>
               );
             })}
+            <LanguageSwitcher locale={locale} />
             <a
               href={whatsappLink}
               target="_blank"
@@ -205,6 +213,11 @@ export default function Header({ strings }: { strings: UiStrings }) {
                   {item.label}
                 </Link>
               ))}
+              {/* Cambiar de idioma cruza root layouts (recarga completa), así
+                  que el drawer se reinicia solo; no hace falta cerrarlo aquí. */}
+              <div className="mt-4">
+                <LanguageSwitcher locale={locale} />
+              </div>
               <a
                 href={whatsappLink}
                 target="_blank"

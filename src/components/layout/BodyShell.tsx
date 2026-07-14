@@ -30,7 +30,7 @@ export default function BodyShell({
           __html: "document.documentElement.classList.add('js');",
         }}
       />
-      <Header strings={strings} />
+      <Header locale={locale} strings={strings} />
       <main className="flex-1">{children}</main>
       <Footer strings={strings} />
       <MobileActionBar strings={strings} />
