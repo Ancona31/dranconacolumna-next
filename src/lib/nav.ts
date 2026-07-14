@@ -10,6 +10,7 @@ export const MAIN_NAV: NavItem[] = [
   { label: "Padecimientos", href: "/padecimientos" },
   { label: "Cirugía de columna", href: "/cirugia-de-columna" },
   { label: "Sobre mí", href: "/sobre-mi" },
+  { label: "Contacto", href: "/contacto" },
 ];
 
 /** Mensaje por defecto para el contacto por WhatsApp. */

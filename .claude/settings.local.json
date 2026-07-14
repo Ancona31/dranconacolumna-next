@@ -4,7 +4,8 @@
       "Bash(wsl.exe *)",
       "PowerShell(npm run *)",
       "Bash(MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' wsl.exe -d Ubuntu -- bash /home/ancoa/proyectos/dranconacolumna-next/.claude-build-check.sh)",
-      "Bash(MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu -- rm -f /home/ancoa/proyectos/dranconacolumna-next/.claude-build-check.sh)"
+      "Bash(MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu -- rm -f /home/ancoa/proyectos/dranconacolumna-next/.claude-build-check.sh)",
+      "Bash(MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu -- rm -f /home/ancoa/proyectos/dranconacolumna-next/src/lib/locations.ts)"
     ]
   }
 }

@@ -23,12 +23,6 @@ export default function Footer() {
               {item.label}
             </Link>
           ))}
-          <Link
-            href="/contacto"
-            className="font-body text-sm text-white/90 transition-colors hover:text-white"
-          >
-            Contacto
-          </Link>
         </nav>
 
         <div className="mt-8 space-y-1 border-t border-white/15 pt-8 font-body text-sm text-white/80">
