@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
-import "./globals.css";
+import "@/app/globals.css";
 import { SITE_NAME, SITE_URL, GA_MEASUREMENT_ID } from "@/lib/config";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";

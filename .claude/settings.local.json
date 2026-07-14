@@ -20,7 +20,10 @@
       "Bash(node -e \"const l=require\\('./node_modules/lucide-react'\\); ['Share2','Facebook','Mail','Copy','Check','MessageCircle','Link','Link2','X'].forEach\\(n=>console.log\\(n, typeof l[n]\\)\\)\")",
       "Bash(node -e \"const l=require\\('./node_modules/lucide-react'\\); ['ThumbsUp','Users','Globe','ExternalLink','Share','Send','AtSign','Clipboard','ClipboardCheck','Link2'].forEach\\(n=>console.log\\(n, typeof l[n]\\)\\)\")",
       "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && npm run lint 2>&1 && echo '---BUILD---' && npm run build 2>&1 | tail -12\")",
-      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && git status --porcelain\")"
+      "PowerShell(wsl.exe -d Ubuntu bash -ic \"cd /home/ancoa/proyectos/dranconacolumna-next && git status --porcelain\")",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m 'F1.1: route group \\(es\\) — mueve todas las rutas ES a src/app/\\(es\\)/ *)"
     ]
   }
 }
