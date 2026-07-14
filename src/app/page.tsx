@@ -8,7 +8,6 @@ import AboutDoctor from "@/components/home/AboutDoctor";
 import GoogleReviews from "@/components/home/GoogleReviews";
 import InsuranceBar from "@/components/home/InsuranceBar";
 import Locations from "@/components/home/Locations";
-import { PLACEHOLDER_REVIEWS } from "@/lib/reviews-placeholder";
 
 export const metadata: Metadata = {
   title: {
@@ -28,7 +27,7 @@ export default function HomePage() {
       <Differentiators />
       <ConditionsBodyMap />
       <AboutDoctor />
-      <GoogleReviews reviews={PLACEHOLDER_REVIEWS} />
+      <GoogleReviews />
       <InsuranceBar />
       <Locations />
     </>

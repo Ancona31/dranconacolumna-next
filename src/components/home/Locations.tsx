@@ -77,7 +77,7 @@ function SedeCard({ sede }: { sede: Sede }) {
 
 export default function Locations() {
   return (
-    <section className="bg-primary-soft">
+    <section className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <Reveal>
           <h2 className="text-center font-heading text-3xl font-bold text-primary">
