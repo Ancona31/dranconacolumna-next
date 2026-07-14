@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GraduationCap, BadgeCheck } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
-import ButtonLink from "@/components/ui/Button";
 import Image from "next/image";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import WhatsAppLink from "@/components/analytics/WhatsAppLink";
 import {
   DOCTOR_FULL_NAME,
   CEDULA_PROFESIONAL,
@@ -184,14 +184,13 @@ export default function SobreMiPage() {
               >
                 Hacer mi evaluación
               </Link>
-              <ButtonLink
+              <WhatsAppLink
                 href={whatsappLink}
-                variant="whatsapp"
-                size="lg"
-                external
+                origen="sobre_mi"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-7 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
               >
                 Escribir por WhatsApp
-              </ButtonLink>
+              </WhatsAppLink>
             </div>
           </Reveal>
         </div>

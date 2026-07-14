@@ -9,6 +9,9 @@ export const SITE_NAME =
 /** Dominio canónico, sin slash final. Fuente única para sitemap y robots. */
 export const SITE_URL = "https://www.dranconacolumna.com";
 
+/** Measurement ID de Google Analytics 4. Vacío = analítica desactivada. */
+export const GA_MEASUREMENT_ID = "G-T5VGBCGJC6";
+
 export const TAGLINE = "ORTOPEDIA · TRAUMATOLOGÍA · COLUMNA";
 
 export const DOCTOR_FULL_NAME = "Dr. Angel M. Ancona Pérez";

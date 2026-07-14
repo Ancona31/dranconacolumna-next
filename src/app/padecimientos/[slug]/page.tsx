@@ -7,6 +7,7 @@ import ButtonLink from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import HeroZoneFigure from "@/components/padecimientos/HeroZoneFigure";
 import StickyCtaBar from "@/components/padecimientos/StickyCtaBar";
+import WhatsAppLink from "@/components/analytics/WhatsAppLink";
 import {
   CEDULA_ESPECIALIDAD,
   CEDULA_PROFESIONAL,
@@ -166,14 +167,13 @@ export default async function PadecimientoSlugPage({
                 </ButtonLink>
                 <p className="mt-3 font-body text-sm text-ink/60">
                   2 minutos · gratis · sin registro ·{" "}
-                  <a
+                  <WhatsAppLink
                     href={whatsappLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    origen="padecimiento_cta"
                     className="font-semibold text-accent hover:underline"
                   >
                     o escríbeme por WhatsApp
-                  </a>
+                  </WhatsAppLink>
                 </p>
               </div>
             </Reveal>
@@ -400,14 +400,13 @@ export default async function PadecimientoSlugPage({
               >
                 {p.testCtaLabel}
               </Link>
-              <ButtonLink
+              <WhatsAppLink
                 href={whatsappLink}
-                variant="whatsapp"
-                size="lg"
-                external
+                origen="padecimiento_cta"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-7 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
               >
                 Escribir por WhatsApp
-              </ButtonLink>
+              </WhatsAppLink>
             </div>
           </Reveal>
         </div>

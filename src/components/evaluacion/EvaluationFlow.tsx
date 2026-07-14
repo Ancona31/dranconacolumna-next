@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { BodyZoneId } from "@/components/home/BodyFigureSVG";
+import { trackEvent } from "@/lib/analytics";
 import type {
   AnswerMap,
   EvaluationResult,
@@ -47,6 +48,15 @@ export default function EvaluationFlow({
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [result, setResult] = useState<EvaluationResult | null>(null);
 
+  // Entrada por deep-link (?zona=): el flujo arranca solo, sin pasar por el
+  // ZonePicker, así que el inicio se registra aquí al montar.
+  useEffect(() => {
+    if (startTest) {
+      trackEvent("evaluacion_iniciada", { zona: startTest.zoneId });
+    }
+    // Solo al montar: startTest se fija una vez desde initialZone.
+  }, [startTest]);
+
   function reset() {
     setStep("zona");
     setTest(null);
@@ -60,6 +70,7 @@ export default function EvaluationFlow({
   function handleZoneSelect(zoneId: BodyZoneId) {
     const t = TESTS[zoneId];
     if (!t) return;
+    trackEvent("evaluacion_iniciada", { zona: zoneId });
     setTest(t);
     setAlarmFlags([]);
     setTriageFlags([]);

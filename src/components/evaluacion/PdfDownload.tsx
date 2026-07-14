@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Download } from "lucide-react";
 import type { EvaluationResult } from "@/lib/evaluacion/types";
 import { getResultWhatsAppLink } from "@/lib/evaluacion/engine";
+import { trackEvent } from "@/lib/analytics";
 
 export default function PdfDownload({ result }: { result: EvaluationResult }) {
   const [open, setOpen] = useState(false);
@@ -40,6 +41,10 @@ export default function PdfDownload({ result }: { result: EvaluationResult }) {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      trackEvent("reporte_pdf_descargado", {
+        zona: result.test.zoneId,
+        nivel: result.alertLevel === "urgente" ? "urgente" : result.level,
+      });
     } finally {
       setBusy(false);
     }

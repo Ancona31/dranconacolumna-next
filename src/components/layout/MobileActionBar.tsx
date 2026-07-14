@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { WHATSAPP_DEFAULT_MESSAGE } from "@/lib/nav";
 import { getPadecimiento } from "@/lib/padecimientos";
+import { trackEvent } from "@/lib/analytics";
 
 export default function MobileActionBar() {
   const pathname = usePathname();
@@ -31,6 +32,7 @@ export default function MobileActionBar() {
         href={whatsappLink}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackEvent("click_whatsapp", { origen: "mobile_bar" })}
         className="flex-1 bg-whatsapp py-4 text-center font-body text-sm font-semibold text-white transition duration-150 active:scale-[0.985]"
       >
         WhatsApp

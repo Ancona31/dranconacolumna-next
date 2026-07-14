@@ -3,6 +3,7 @@ import PhotoPlaceholder from "@/components/ui/PhotoPlaceholder";
 import Reveal from "@/components/ui/Reveal";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { LOCATIONS } from "@/lib/locations";
+import WhatsAppLink from "@/components/analytics/WhatsAppLink";
 
 export default function Locations() {
   return (
@@ -19,6 +20,7 @@ export default function Locations() {
             const link = buildWhatsAppLink(
               `Hola Dr. Ancona, quiero agendar una valoración en ${loc.ciudad}.`
             );
+            const origen = loc.ciudad === "Umán" ? "sede_uman" : "sede_merida";
             return (
               <Reveal key={loc.ciudad} delay={i * 80} className="flex">
                 <div className="flex flex-1 flex-col rounded-2xl border border-primary/10 bg-background p-6">
@@ -34,14 +36,13 @@ export default function Locations() {
                     {loc.direccion}
                   </p>
                   <p className="font-body text-sm text-ink/70">{loc.horario}</p>
-                  <a
+                  <WhatsAppLink
                     href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-5 w-full rounded-full bg-whatsapp py-3 text-center font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
+                    origen={origen}
+                    className="mt-5 block w-full rounded-full bg-whatsapp py-3 text-center font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
                   >
                     Agendar en {loc.ciudad}
-                  </a>
+                  </WhatsAppLink>
                 </div>
               </Reveal>
             );

@@ -4,6 +4,7 @@ import ButtonLink from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { WHATSAPP_DEFAULT_MESSAGE } from "@/lib/nav";
+import WhatsAppLink from "@/components/analytics/WhatsAppLink";
 
 export default function HeroBodyMap() {
   const whatsappLink = buildWhatsAppLink(WHATSAPP_DEFAULT_MESSAGE);
@@ -32,14 +33,13 @@ export default function HeroBodyMap() {
             Evaluación diseñada por el Dr. Angel Ancona — ortopedista y
             traumatólogo, especialista en cirugía de columna.
           </p>
-          <a
+          <WhatsAppLink
             href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
+            origen="hero"
             className="mt-2 inline-block font-body text-sm text-accent underline underline-offset-4 hover:opacity-80"
           >
             Prefiero agendar directamente
-          </a>
+          </WhatsAppLink>
         </Reveal>
 
         {/* Figura (autocontenida: puntos y halos los dibuja el SVG). Sin chip:

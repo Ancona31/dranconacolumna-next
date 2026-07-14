@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
-import { SITE_NAME, SITE_URL } from "@/lib/config";
+import { SITE_NAME, SITE_URL, GA_MEASUREMENT_ID } from "@/lib/config";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MobileActionBar from "@/components/layout/MobileActionBar";
 import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -75,6 +76,10 @@ export default function RootLayout({
         <Footer />
         <MobileActionBar />
         <WhatsAppFloat />
+        {/* GA solo en producción y con ID: el dev server no ensucia métricas. */}
+        {process.env.NODE_ENV === "production" && GA_MEASUREMENT_ID && (
+          <GoogleAnalytics />
+        )}
       </body>
     </html>
   );

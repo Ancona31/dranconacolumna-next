@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Microscope, Wrench, Syringe, Monitor } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
-import ButtonLink from "@/components/ui/Button";
 import Image from "next/image";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import WhatsAppLink from "@/components/analytics/WhatsAppLink";
 
 export const metadata: Metadata = {
   title: "Cirugía de columna en Mérida — mínima invasión",
@@ -171,14 +171,13 @@ export default function CirugiaDeColumnaPage() {
               >
                 Hacer mi evaluación
               </Link>
-              <ButtonLink
+              <WhatsAppLink
                 href={whatsappLink}
-                variant="whatsapp"
-                size="lg"
-                external
+                origen="cirugia_cta"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-7 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
               >
                 Escribir por WhatsApp
-              </ButtonLink>
+              </WhatsAppLink>
             </div>
           </Reveal>
         </div>

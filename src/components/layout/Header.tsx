@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { MAIN_NAV, WHATSAPP_DEFAULT_MESSAGE } from "@/lib/nav";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { trackEvent } from "@/lib/analytics";
 import { TAGLINE } from "@/lib/config";
 
 function Logo() {
@@ -124,6 +125,7 @@ export default function Header() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent("click_whatsapp", { origen: "header" })}
               className="rounded-full bg-whatsapp px-4 py-2 text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
             >
               WhatsApp
@@ -136,6 +138,7 @@ export default function Header() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent("click_whatsapp", { origen: "header" })}
               className="rounded-full bg-whatsapp px-3 py-1.5 text-xs font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
             >
               WhatsApp
@@ -207,7 +210,10 @@ export default function Header() {
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={closeDrawer}
+                onClick={() => {
+                  trackEvent("click_whatsapp", { origen: "header" });
+                  closeDrawer();
+                }}
                 className="mt-4 rounded-full bg-whatsapp px-4 py-3 text-center text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
               >
                 WhatsApp

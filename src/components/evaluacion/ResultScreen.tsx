@@ -46,6 +46,7 @@ import {
 } from "@/lib/evaluacion/engine";
 import { BODY_PATH, BODY_ZONES } from "@/components/home/BodyFigureSVG";
 import PdfDownload from "@/components/evaluacion/PdfDownload";
+import { trackEvent } from "@/lib/analytics";
 
 const BANNER_STYLES = {
   precaucion: { box: "border-warning bg-warning/10", title: "text-warning" },
@@ -263,6 +264,11 @@ function UnscorableScreen({ result }: { result: EvaluationResult }) {
         href={getResultWhatsAppLink(result)}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() =>
+          trackEvent("click_whatsapp", {
+            origen: result.alertLevel === "urgente" ? "reporte_urgente" : "reporte",
+          })
+        }
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
       >
         <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
@@ -285,6 +291,16 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
     const id = requestAnimationFrame(() => setReady(true));
     return () => cancelAnimationFrame(id);
   }, []);
+
+  // Reporte mostrado: fin del embudo. Se registra en cuanto se monta el
+  // resultado (scorable o no).
+  useEffect(() => {
+    trackEvent("evaluacion_completada", {
+      zona: result.test.zoneId,
+      nivel: result.alertLevel === "urgente" ? "urgente" : result.level,
+      alerta: result.alertLevel,
+    });
+  }, [result]);
 
   if (result.unscorable) return <UnscorableScreen result={result} />;
 
@@ -472,6 +488,12 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
           href={whatsappLink}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() =>
+            trackEvent("click_whatsapp", {
+              origen:
+                result.alertLevel === "urgente" ? "reporte_urgente" : "reporte",
+            })
+          }
           className="flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
         >
           <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
