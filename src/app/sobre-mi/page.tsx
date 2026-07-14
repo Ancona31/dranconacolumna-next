@@ -83,12 +83,13 @@ export default function SobreMiPage() {
             </h2>
             <div className="mt-6 space-y-5 font-body text-ink/75">
               <p>
-                La cirugía es la excepción, no la regla. La mayoría de los
-                problemas de columna y de las lesiones ortopédicas mejoran con
-                tratamiento conservador bien dirigido: medicamento, fisioterapia
-                y ajustes de actividad. Si te digo que necesitas cirugía, es
-                porque lo demás ya se agotó o porque esperar pone en riesgo tu
-                función.
+                Muchos problemas de columna y lesiones ortopédicas mejoran con
+                tratamiento conservador bien dirigido, y siempre es el punto de
+                partida. Pero cuando la cirugía es lo que tu caso necesita,
+                cuentas con un cirujano de columna con alta especialidad para
+                resolverlo. Si te digo que necesitas cirugía, es porque es la
+                mejor decisión para tu caso — y te lo explicaré con claridad, con
+                estudios en la mano.
               </p>
               <p>
                 Cuando operar es lo correcto, uso la técnica menos agresiva que

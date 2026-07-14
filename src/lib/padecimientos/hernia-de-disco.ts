@@ -9,7 +9,6 @@ export const herniaDeDisco: Padecimiento = {
   metaDescription:
     "¿Dolor que baja por la pierna? Conoce los síntomas de la hernia de disco, cuándo preocuparse y sus tratamientos — la mayoría no requiere cirugía. Evalúate gratis.",
   zonaChip: "Zona lumbar",
-  statChip: "8 de cada 10 mejoran sin cirugía",
   definicion: [
     "Entre cada vértebra hay un disco que amortigua tus movimientos. Cuando ese disco se desgasta o se desplaza de su lugar, puede presionar un nervio — y eso es lo que produce el dolor.",
     "Es una de las causas más frecuentes de dolor lumbar con dolor que baja a la pierna, y una de las más tratables: la mayoría de las hernias mejoran sin cirugía.",
@@ -46,7 +45,7 @@ export const herniaDeDisco: Padecimiento = {
     },
   ],
   citaDoctor:
-    "Mi prioridad es que no te operes si no lo necesitas. Y cuando la cirugía sí es la respuesta, la mínima invasión te regresa a tu vida en días, no meses.",
+    "Primero agotamos lo conservador, porque muchas hernias mejoran así. Pero cuando la cirugía es lo que tu caso necesita, mi alta especialidad en mínima invasión te regresa a tu vida en días, no en meses.",
   comoLoTrato: [
     "Mi primera tarea es confirmar que tu dolor de verdad viene de una hernia — no todo dolor que baja a la pierna lo es. Eso se resuelve con exploración física y, cuando el caso lo amerita, una resonancia.",
     "Si es hernia, empezamos por lo conservador: en mi consulta, operar es la excepción. Y cuando la cirugía sí es lo indicado, mi alta especialidad me permite ofrecerte técnicas de mínima invasión: incisiones milimétricas, alta el mismo día o en 24 horas en la mayoría de los casos, y de regreso a tu vida en semanas, no meses.",

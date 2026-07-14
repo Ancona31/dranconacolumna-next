@@ -45,7 +45,7 @@ export const ciatica: Padecimiento = {
     },
   ],
   citaDoctor:
-    "Con la ciática no persigo el dolor: persigo la causa. La mayoría de mis pacientes con ciática nunca pisa un quirófano.",
+    "Con la ciática no persigo el dolor: persigo la causa. Y una vez que la encuentro, te doy el plan correcto — desde el manejo conservador hasta la cirugía de mínima invasión cuando es lo que tu nervio necesita.",
   comoLoTrato: [
     "Con la ciática no persigo el dolor: persigo la causa. La exploración física me dice qué nervio está comprometido y a qué nivel; la imagen — cuando el caso la amerita — confirma el porqué.",
     "Con la causa en la mano, el plan es tuyo y a tu medida: la mayoría de mis pacientes con ciática nunca pisa un quirófano. Y si tu caso es de los que sí, te lo diré con honestidad y con opciones.",

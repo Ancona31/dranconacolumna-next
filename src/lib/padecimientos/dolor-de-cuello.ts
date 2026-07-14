@@ -46,7 +46,7 @@ export const dolorDeCuello: Padecimiento = {
     },
   ],
   citaDoctor:
-    "La mayoría de los dolores de cuello no necesita ni cirugía ni resonancia: necesita el diagnóstico correcto.",
+    "La mayoría de los dolores de cuello se resuelve con el diagnóstico correcto y un buen plan. Y para los casos que sí requieren cirugía cervical, la realizo con técnica especializada y la mayor seguridad para tus nervios.",
   comoLoTrato: [
     "Con el cuello, mi exploración busca responder de dónde viene el dolor: ¿del músculo, de las articulaciones o de un nervio comprimido? Son tres problemas distintos con tres tratamientos distintos — y confundirlos es la razón por la que tanta cervicalgia se cronifica.",
     "La mayoría de mis pacientes con dolor de cuello nunca necesita cirugía ni resonancia: necesita el diagnóstico correcto y un plan bien dirigido. Y los pocos casos quirúrgicos — los de compresión real — se benefician enormemente de detectarse a tiempo, antes de que el nervio o la médula paguen el precio.",

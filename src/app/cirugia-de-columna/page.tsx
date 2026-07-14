@@ -53,10 +53,11 @@ export default function CirugiaDeColumnaPage() {
               Cirugía de columna
             </h1>
             <p className="mt-5 max-w-3xl font-body text-lg text-ink/80">
-              La columna es mi alta especialidad: cervical, dorsal y lumbar. Y
-              aunque soy cirujano, la mayoría de los pacientes que llegan a mi
-              consulta por dolor de espalda no terminan en el quirófano —
-              terminan entendiendo qué tienen y con un plan que funciona.
+              La columna es mi alta especialidad: cervical, dorsal y lumbar. Mi
+              trabajo es identificar con precisión qué necesita tu caso — y
+              cuando la cirugía es la mejor opción para ti, la realizo con las
+              técnicas de mínima invasión más avanzadas: incisiones milimétricas,
+              menos dolor y una recuperación más rápida.
             </p>
           </Reveal>
           <Reveal delay={120}>
@@ -85,8 +86,9 @@ export default function CirugiaDeColumnaPage() {
               conservador bien llevado no fue suficiente, o cuando hay datos que
               no admiten espera: pérdida de fuerza progresiva, alteración de la
               sensibilidad que avanza, o compresión importante de un nervio.
-              Nunca es la primera opción por dolor solamente — y desconfía de
-              quien te la ofrezca así.
+              Rara vez es la primera opción por dolor solamente; primero se agota
+              el tratamiento conservador. Mi compromiso es indicarte cirugía
+              únicamente cuando de verdad es lo mejor para ti.
             </p>
           </Reveal>
         </div>
@@ -103,9 +105,10 @@ export default function CirugiaDeColumnaPage() {
               Mi formación de alta especialidad incluye técnicas de mínima
               invasión: operar a través de incisiones de uno a dos centímetros,
               respetando el músculo, con menos sangrado y recuperación más
-              rápida. No todos los casos son candidatos — y ser honesto en eso
-              es parte del trabajo. Cuando tu caso lo permite, estas son las
-              técnicas que uso:
+              rápida. No todos los casos son candidatos a mínima invasión, y
+              evaluar eso con precisión es parte de mi especialidad — para
+              ofrecerte siempre la técnica más adecuada a tu caso. Cuando tu caso
+              lo permite, estas son las técnicas que uso:
             </p>
           </Reveal>
 

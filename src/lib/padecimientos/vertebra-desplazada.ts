@@ -45,7 +45,7 @@ export const vertebraDesplazada: Padecimiento = {
     },
   ],
   citaDoctor:
-    "Se opera la inestabilidad y la compresión — no la imagen ni el susto.",
+    "Se opera lo que de verdad lo amerita: la inestabilidad y la compresión, no una imagen ni un susto. Ese criterio es el que te protege — y cuando la cirugía es necesaria, la hago con instrumentación de mínima invasión.",
   comoLoTrato: [
     "Lo primero es clasificar tu caso: cuánto se deslizó la vértebra (el grado), si se mueve con tus movimientos (la estabilidad) y si está comprimiendo nervios. Esas tres respuestas — que salen de la exploración y de radiografías dinámicas — definen todo lo demás.",
     "Mi criterio quirúrgico aquí es conservador: se opera la inestabilidad y la compresión, no la imagen ni el susto. La mayoría de mis pacientes con espondilolistesis se maneja sin cirugía, con seguimiento medido.",
