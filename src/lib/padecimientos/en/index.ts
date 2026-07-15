@@ -3,6 +3,7 @@ import { herniatedDisc } from "./herniated-disc";
 import { sciatica } from "./sciatica";
 import { lumbarSpinalStenosis } from "./lumbar-spinal-stenosis";
 import { slippedVertebra } from "./slipped-vertebra";
+import { scoliosis } from "./scoliosis";
 
 /**
  * Registro de padecimientos en inglés (FASE 2.B). Mismo tipo `Padecimiento` y
@@ -18,6 +19,7 @@ export const PADECIMIENTOS_EN: Record<string, Padecimiento> = {
   sciatica: sciatica,
   "lumbar-spinal-stenosis": lumbarSpinalStenosis,
   "slipped-vertebra": slippedVertebra,
+  scoliosis: scoliosis,
 };
 
 export function getPadecimientoEn(slug: string): Padecimiento | undefined {

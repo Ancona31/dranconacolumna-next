@@ -24,6 +24,11 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
     es: "/padecimientos/vertebra-desplazada",
     en: "/en/conditions/slipped-vertebra",
   },
+  // FASE 2.B lote 2 (columna dorsal/cervical). Quedan 6 sin par EN.
+  {
+    es: "/padecimientos/desviacion-de-columna",
+    en: "/en/conditions/scoliosis",
+  },
   // TODO F2.D: /padecimientos ↔ /en/conditions (índice) al terminar los 13.
   // TODO F3: /evaluacion ↔ /en/assessment.
 ];
