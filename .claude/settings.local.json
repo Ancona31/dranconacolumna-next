@@ -35,7 +35,8 @@
       "Bash(git commit -q -m 'docs: registrar deuda técnica globalNotFound *)",
       "Bash(/usr/bin/python3 /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/fulltext.py /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/b2-home.html /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/f2-home.html)",
       "Bash(/usr/bin/python3 -c ' *)",
-      "Bash(git commit -q -m 'F2A home: /en home completa + capa de contenido home por locale *)"
+      "Bash(git commit -q -m 'F2A home: /en home completa + capa de contenido home por locale *)",
+      "Bash(git commit -q -m 'F2A about: /en/about + contenido about por locale *)"
     ]
   }
 }
