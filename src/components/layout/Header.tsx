@@ -12,20 +12,22 @@ import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 
 function Logo({ alt, tagline }: { alt: string; tagline: string }) {
   return (
-    <Link href="/" className="flex items-center gap-2.5">
+    <Link href="/" className="flex min-w-0 items-center gap-2.5">
       <Image
         src="/logo.png"
         alt={alt}
         width={527}
         height={512}
         priority
-        className="h-10 w-auto md:h-11"
+        className="h-10 w-auto shrink-0 md:h-11"
       />
-      <span className="flex flex-col leading-none">
-        <span className="font-heading text-lg font-bold text-primary">
+      <span className="flex min-w-0 flex-col leading-none">
+        <span className="truncate font-heading text-lg font-bold text-primary">
           Dr. Angel Ancona
         </span>
-        <span className="font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70">
+        {/* La bajada se oculta en móvil para que el header quepa en una sola
+            línea junto al chip de idioma; reaparece desde sm. */}
+        <span className="hidden truncate font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70 sm:block">
           {tagline}
         </span>
       </span>
@@ -139,17 +141,12 @@ export default function Header({
             </a>
           </nav>
 
-          {/* Acciones móviles */}
-          <div className="flex items-center gap-2 md:hidden">
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackEvent("click_whatsapp", { origen: "header" })}
-              className="rounded-full bg-whatsapp px-3 py-1.5 text-xs font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
-            >
-              {strings.header.whatsappLabel}
-            </a>
+          {/* Acciones móviles. El chip de idioma es SIEMPRE visible en la barra
+              (no dentro del drawer). El botón de WhatsApp del top bar se retira
+              en móvil para dar espacio: sigue disponible en la barra inferior
+              fija (MobileActionBar) y en el drawer. */}
+          <div className="flex shrink-0 items-center gap-2 md:hidden">
+            <LanguageSwitcher locale={locale} />
             <button
               type="button"
               aria-label={mounted ? strings.header.closeMenu : strings.header.openMenu}
@@ -213,11 +210,6 @@ export default function Header({
                   {item.label}
                 </Link>
               ))}
-              {/* Cambiar de idioma cruza root layouts (recarga completa), así
-                  que el drawer se reinicia solo; no hace falta cerrarlo aquí. */}
-              <div className="mt-4">
-                <LanguageSwitcher locale={locale} />
-              </div>
               <a
                 href={whatsappLink}
                 target="_blank"

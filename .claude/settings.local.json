@@ -39,7 +39,11 @@
       "Bash(git commit -q -m 'F2A about: /en/about + contenido about por locale *)",
       "Bash(git commit -q -m 'F2A spine: /en/spine-surgery + contenido spine por locale *)",
       "Bash(git commit -q -m 'F2A contact: /en/contact + contenido contact por locale *)",
-      "Bash(git commit -q -m 'feat: banderas en selector de idioma *)"
+      "Bash(git commit -q -m 'feat: banderas en selector de idioma *)",
+      "Read(//Applications/Google Chrome.app/Contents/MacOS/**)",
+      "Read(//Users/ancona/Library/Caches/**)",
+      "Bash(/usr/bin/pkill -f \"remote-debugging-port\")",
+      "Bash(git commit -q -m 'fix: chip de idioma siempre visible en header móvil *)"
     ]
   }
 }
