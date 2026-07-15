@@ -105,8 +105,7 @@ const CONDITIONS_ES: ConditionsUi = {
 
 const CONDITIONS_EN: ConditionsUi = {
   breadcrumbLabel: "Conditions",
-  // TODO F2.D: enlazar a /en/conditions cuando exista el índice EN.
-  breadcrumbHref: "/en",
+  breadcrumbHref: "/en/conditions",
   groupLabel: { columna: "Spine", ortopedia: "General orthopedics" },
   symptomsH2: "Common symptoms",
   bridgeBefore:

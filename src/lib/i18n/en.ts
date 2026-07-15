@@ -11,8 +11,7 @@ export const en: UiStrings = {
   nav: [
     // TODO F3: /en/assessment cuando exista la evaluación en EN.
     { label: "Free Evaluation", href: "/evaluacion" },
-    // TODO F2.B: /en/conditions cuando exista el índice de padecimientos en EN.
-    { label: "Conditions", href: "/padecimientos" },
+    { label: "Conditions", href: "/en/conditions" },
     { label: "Spine Surgery", href: "/en/spine-surgery" },
     { label: "About Me", href: "/en/about" },
     { label: "Contact", href: "/en/contact" },

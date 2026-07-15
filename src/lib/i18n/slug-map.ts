@@ -34,7 +34,9 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
     en: "/en/conditions/spinal-fractures",
   },
   { es: "/padecimientos/dolor-de-cuello", en: "/en/conditions/neck-pain" },
-  // TODO F2.D: /padecimientos ↔ /en/conditions (índice) al terminar los 13.
+  // Índice de padecimientos (la lista completa; los 6 sin traducir enlazan a
+  // su página ES desde ConditionsBodyMap — TODO F2.C).
+  { es: "/padecimientos", en: "/en/conditions" },
   // TODO F3: /evaluacion ↔ /en/assessment.
 ];
 
