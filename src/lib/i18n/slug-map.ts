@@ -34,7 +34,7 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
     en: "/en/conditions/spinal-fractures",
   },
   { es: "/padecimientos/dolor-de-cuello", en: "/en/conditions/neck-pain" },
-  // FASE 2.C lote 1 (ortopedia: hombro, rodilla, cadera). Quedan 3 sin par EN.
+  // FASE 2.C lote 1 (ortopedia: hombro, rodilla, cadera).
   {
     es: "/padecimientos/dolor-de-hombro",
     en: "/en/conditions/shoulder-pain",
@@ -46,6 +46,10 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
   {
     es: "/padecimientos/fracturas-y-esguinces",
     en: "/en/conditions/fractures-sprains",
+  },
+  {
+    es: "/padecimientos/lesiones-deportivas",
+    en: "/en/conditions/sports-injuries",
   },
   // Índice de padecimientos (los 13 padecimientos ya tienen par EN).
   { es: "/padecimientos", en: "/en/conditions" },

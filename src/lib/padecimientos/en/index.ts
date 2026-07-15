@@ -11,15 +11,16 @@ import { kneePain } from "./knee-pain";
 import { hipPain } from "./hip-pain";
 import { carpalTunnel } from "./carpal-tunnel";
 import { fracturesSprains } from "./fractures-sprains";
+import { sportsInjuries } from "./sports-injuries";
 
 /**
- * Registro de padecimientos en inglés (FASE 2.B). Mismo tipo `Padecimiento` y
- * misma plantilla que el ES; el contenido es la traducción curada del brief.
+ * Registro de padecimientos en inglés (FASE 2.B–2.C). Mismo tipo `Padecimiento`
+ * y misma plantilla que el ES; el contenido es la traducción curada del brief.
  * Un slug presente aquí se renderiza con `ConditionTemplate` en
  * /en/conditions/[slug]; un slug ausente cae en notFound().
  *
- * Por ahora solo el lote 1 (4 padecimientos de zona lumbar); los demás se
- * agregan aquí conforme se traducen.
+ * Los 13 padecimientos ya están traducidos: el índice /en/conditions y
+ * ConditionsBodyMap enlazan 13/13 a su ruta EN.
  */
 export const PADECIMIENTOS_EN: Record<string, Padecimiento> = {
   "herniated-disc": herniatedDisc,
@@ -34,6 +35,7 @@ export const PADECIMIENTOS_EN: Record<string, Padecimiento> = {
   "hip-pain": hipPain,
   "carpal-tunnel": carpalTunnel,
   "fractures-sprains": fracturesSprains,
+  "sports-injuries": sportsInjuries,
 };
 
 export function getPadecimientoEn(slug: string): Padecimiento | undefined {
