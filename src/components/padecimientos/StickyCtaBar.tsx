@@ -9,6 +9,8 @@ type StickyCtaBarProps = {
   testCtaLabel: string;
   evaluacionHref: string;
   whatsappLink: string;
+  /** Recordatorio junto al nombre, ya traducido por locale. */
+  reminderText: string;
 };
 
 /**
@@ -22,6 +24,7 @@ export default function StickyCtaBar({
   testCtaLabel,
   evaluacionHref,
   whatsappLink,
+  reminderText,
 }: StickyCtaBarProps) {
   const [visible, setVisible] = useState(false);
   const [animate, setAnimate] = useState(true);
@@ -61,7 +64,7 @@ export default function StickyCtaBar({
         <p className="font-body text-sm text-ink/80">
           <span className="font-semibold text-primary">{nombre}</span>
           <span aria-hidden="true"> · </span>
-          Mide cuánto te está limitando — 2 min
+          {reminderText}
         </p>
         <div className="flex flex-none items-center gap-3">
           <Link

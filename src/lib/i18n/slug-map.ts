@@ -9,7 +9,22 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
   { es: "/sobre-mi", en: "/en/about" },
   { es: "/cirugia-de-columna", en: "/en/spine-surgery" },
   { es: "/contacto", en: "/en/contact" },
-  // TODO F2.B: /padecimientos ↔ /en/conditions (y sus slugs).
+  // Padecimientos EN — FASE 2.B lote 1 (los 4 de zona lumbar). Los 9 restantes
+  // aún no tienen par EN: el selector cae al home EN hasta traducirlos.
+  {
+    es: "/padecimientos/hernia-de-disco",
+    en: "/en/conditions/herniated-disc",
+  },
+  { es: "/padecimientos/ciatica", en: "/en/conditions/sciatica" },
+  {
+    es: "/padecimientos/canal-lumbar-estrecho",
+    en: "/en/conditions/lumbar-spinal-stenosis",
+  },
+  {
+    es: "/padecimientos/vertebra-desplazada",
+    en: "/en/conditions/slipped-vertebra",
+  },
+  // TODO F2.D: /padecimientos ↔ /en/conditions (índice) al terminar los 13.
   // TODO F3: /evaluacion ↔ /en/assessment.
 ];
 

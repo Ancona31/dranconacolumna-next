@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ConditionTemplate from "@/components/padecimientos/ConditionTemplate";
-import { getPadecimiento, PADECIMIENTOS } from "@/lib/padecimientos";
+import { getPadecimientoEn, PADECIMIENTOS_EN } from "@/lib/padecimientos/en";
 
 type Params = { slug: string };
 
-// Solo los slugs reales del registro se pre-generan; cualquier otro cae en
-// notFound() y responde 404 en vez de indexar una página fantasma.
+// Solo los slugs del registro EN se pre-generan; cualquier otro cae en
+// notFound() y responde 404 (la 404 en inglés del segmento (en)).
 export function generateStaticParams(): Params[] {
-  return Object.keys(PADECIMIENTOS).map((slug) => ({ slug }));
+  return Object.keys(PADECIMIENTOS_EN).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -17,9 +17,10 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const p = getPadecimiento(slug);
+  const p = getPadecimientoEn(slug);
 
   // Slug inexistente: no fabricamos metadata; notFound() en la página manda.
+  // (El noindex EN lo hereda del layout (en) mientras dure la FASE.)
   if (!p) return {};
 
   return {
@@ -29,16 +30,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function PadecimientoSlugPage({
+export default async function ConditionSlugPage({
   params,
 }: {
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const p = getPadecimiento(slug);
+  const p = getPadecimientoEn(slug);
 
-  // Con el catálogo completo, un slug ausente es una URL inválida: 404 real.
+  // Slug ausente del registro EN: URL inválida, 404 real en inglés.
   if (!p) notFound();
 
-  return <ConditionTemplate p={p} locale="es" />;
+  return <ConditionTemplate p={p} locale="en" />;
 }
