@@ -33,6 +33,7 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
     es: "/padecimientos/fractura-de-columna",
     en: "/en/conditions/spinal-fractures",
   },
+  { es: "/padecimientos/dolor-de-cuello", en: "/en/conditions/neck-pain" },
   // TODO F2.D: /padecimientos ↔ /en/conditions (índice) al terminar los 13.
   // TODO F3: /evaluacion ↔ /en/assessment.
 ];
