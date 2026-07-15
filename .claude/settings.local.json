@@ -38,7 +38,8 @@
       "Bash(git commit -q -m 'F2A home: /en home completa + capa de contenido home por locale *)",
       "Bash(git commit -q -m 'F2A about: /en/about + contenido about por locale *)",
       "Bash(git commit -q -m 'F2A spine: /en/spine-surgery + contenido spine por locale *)",
-      "Bash(git commit -q -m 'F2A contact: /en/contact + contenido contact por locale *)"
+      "Bash(git commit -q -m 'F2A contact: /en/contact + contenido contact por locale *)",
+      "Bash(git commit -q -m 'feat: banderas en selector de idioma *)"
     ]
   }
 }
