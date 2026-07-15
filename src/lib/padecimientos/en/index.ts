@@ -9,6 +9,7 @@ import { neckPain } from "./neck-pain";
 import { shoulderPain } from "./shoulder-pain";
 import { kneePain } from "./knee-pain";
 import { hipPain } from "./hip-pain";
+import { carpalTunnel } from "./carpal-tunnel";
 
 /**
  * Registro de padecimientos en inglés (FASE 2.B). Mismo tipo `Padecimiento` y
@@ -30,6 +31,7 @@ export const PADECIMIENTOS_EN: Record<string, Padecimiento> = {
   "shoulder-pain": shoulderPain,
   "knee-pain": kneePain,
   "hip-pain": hipPain,
+  "carpal-tunnel": carpalTunnel,
 };
 
 export function getPadecimientoEn(slug: string): Padecimiento | undefined {
