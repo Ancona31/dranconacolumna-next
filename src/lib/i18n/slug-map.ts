@@ -34,6 +34,11 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
     en: "/en/conditions/spinal-fractures",
   },
   { es: "/padecimientos/dolor-de-cuello", en: "/en/conditions/neck-pain" },
+  // FASE 2.C lote 1 (ortopedia: hombro, rodilla, cadera). Quedan 3 sin par EN.
+  {
+    es: "/padecimientos/dolor-de-hombro",
+    en: "/en/conditions/shoulder-pain",
+  },
   // Índice de padecimientos (la lista completa; los 6 sin traducir enlazan a
   // su página ES desde ConditionsBodyMap — TODO F2.C).
   { es: "/padecimientos", en: "/en/conditions" },
