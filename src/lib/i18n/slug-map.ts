@@ -1,11 +1,17 @@
 import type { Locale } from "./types";
 
 /**
- * Pares de rutas equivalentes entre idiomas. De momento solo el home
- * (/ ↔ /en); la estructura está lista para crecer conforme se traduzcan
+ * Pares de rutas equivalentes entre idiomas. Crece conforme se traducen
  * páginas: basta con añadir entradas aquí.
  */
-const PAIRS: ReadonlyArray<{ es: string; en: string }> = [{ es: "/", en: "/en" }];
+const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
+  { es: "/", en: "/en" },
+  { es: "/sobre-mi", en: "/en/about" },
+  { es: "/cirugia-de-columna", en: "/en/spine-surgery" },
+  { es: "/contacto", en: "/en/contact" },
+  // TODO F2.B: /padecimientos ↔ /en/conditions (y sus slugs).
+  // TODO F3: /evaluacion ↔ /en/assessment.
+];
 
 const ES_TO_EN = new Map(PAIRS.map((p) => [p.es, p.en] as const));
 const EN_TO_ES = new Map(PAIRS.map((p) => [p.en, p.es] as const));
@@ -16,9 +22,20 @@ const HOME: Record<Locale, string> = { es: "/", en: "/en" };
 /**
  * Devuelve la ruta equivalente en el otro idioma para `pathname`, partiendo
  * del locale actual `from`. Si aún no existe equivalente, cae al home del
- * idioma destino.
+ * idioma destino. Lo usa el selector de idioma.
  */
 export function getAlternatePath(pathname: string, from: Locale): string {
   if (from === "es") return ES_TO_EN.get(pathname) ?? HOME.en;
   return EN_TO_ES.get(pathname) ?? HOME.es;
+}
+
+/**
+ * Dada la ruta canónica en español `esPath`, devuelve la ruta a usar en
+ * `locale`. Para "es" es la misma; para "en" es su equivalente traducido si
+ * existe, o la propia ruta ES como reserva (páginas EN aún no creadas —
+ * TODO F2.B/F3). Lo usan los enlaces internos de las páginas.
+ */
+export function routeFor(esPath: string, locale: Locale): string {
+  if (locale === "es") return esPath;
+  return ES_TO_EN.get(esPath) ?? esPath;
 }

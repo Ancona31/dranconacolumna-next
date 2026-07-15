@@ -1,21 +1,29 @@
 import type { Metadata } from "next";
+import HeroBodyMap from "@/components/home/HeroBodyMap";
+import TrustBar from "@/components/home/TrustBar";
+import HowItWorks from "@/components/home/HowItWorks";
+import Differentiators from "@/components/home/Differentiators";
+import ConditionsBodyMap from "@/components/home/ConditionsBodyMap";
+import AboutDoctor from "@/components/home/AboutDoctor";
+import GoogleReviews from "@/components/home/GoogleReviews";
+import InsuranceBar from "@/components/home/InsuranceBar";
+import Locations from "@/components/home/Locations";
+import { getHomeContent } from "@/lib/i18n/pages/home";
 
-export const metadata: Metadata = { title: "Where does it hurt?" };
+export const metadata: Metadata = getHomeContent("en").metadata;
 
-export default function EnHome() {
+export default function EnHomePage() {
   return (
-    <section className="bg-background">
-      <div className="mx-auto flex max-w-3xl flex-col items-center px-4 py-24 text-center md:py-32">
-        <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
-          Orthopedics · Traumatology · Spine
-        </p>
-        <h1 className="mt-3 font-heading text-4xl font-extrabold text-primary sm:text-5xl">
-          Where does it hurt?
-        </h1>
-        <p className="mt-4 max-w-md font-body text-lg text-ink/70">
-          English version coming soon.
-        </p>
-      </div>
-    </section>
+    <>
+      <HeroBodyMap locale="en" />
+      <TrustBar locale="en" />
+      <HowItWorks locale="en" />
+      <Differentiators locale="en" />
+      <ConditionsBodyMap locale="en" />
+      <AboutDoctor locale="en" />
+      <GoogleReviews locale="en" />
+      <InsuranceBar locale="en" />
+      <Locations locale="en" />
+    </>
   );
 }

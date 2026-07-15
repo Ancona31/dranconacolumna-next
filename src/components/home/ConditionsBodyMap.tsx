@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Reveal from "@/components/ui/Reveal";
 import { BODY_PATH } from "@/components/home/BodyFigureSVG";
-import { CONDITIONS, CONDITION_GROUPS, type Condition } from "@/lib/conditions";
+import { CONDITIONS, type Condition, type ConditionSlug } from "@/lib/conditions";
+import type { Locale } from "@/lib/i18n/types";
+import { getHomeContent } from "@/lib/i18n/pages/home";
+import { routeFor } from "@/lib/i18n/slug-map";
 
 type ConditionsBodyMapProps = {
+  locale: Locale;
   /** Nivel del encabezado: "h1" en el índice, "h2" como sección de la home. */
   headingAs?: "h1" | "h2";
 };
@@ -18,7 +22,7 @@ type MapNode = {
   n: string;
   cx: number;
   cy: number;
-  slug: string;
+  slug: ConditionSlug;
   nombre: string;
 };
 
@@ -29,8 +33,10 @@ type FigureCrop = "full" | "torso";
 const TORSO_BOUNDS = { minX: 20, maxX: 200, minY: 10, maxY: 330 };
 
 export default function ConditionsBodyMap({
+  locale,
   headingAs = "h2",
 }: ConditionsBodyMapProps) {
+  const cc = getHomeContent(locale).conditions;
   const router = useRouter();
   const [active, setActive] = useState<string | null>(null);
   const [reduced, setReduced] = useState(false);
@@ -43,30 +49,36 @@ export default function ConditionsBodyMap({
     return () => mq.removeEventListener("change", sync);
   }, []);
 
+  const nombreOf = (slug: Condition["slug"]) => cc.items[slug].nombre;
+  const detalleOf = (slug: Condition["slug"]) => cc.items[slug].detalle;
+  const hrefOf = (slug: Condition["slug"]) =>
+    routeFor(`/padecimientos/${slug}`, locale);
+  const evaluacionHref = routeFor("/evaluacion", locale);
+
   // Un nodo por número, en el orden de aparición; su destino es el primer
-  // padecimiento que lo usa.
-  const nodes = useMemo<MapNode[]>(() => {
-    const out: MapNode[] = [];
+  // padecimiento que lo usa. (Sin useMemo manual: el React Compiler lo
+  // optimiza y la memoización manual con dependencia `cc` no se preservaba.)
+  const nodes: MapNode[] = [];
+  {
     const seen = new Set<string>();
     for (const c of CONDITIONS) {
       if (c.node && !seen.has(c.node.n)) {
         seen.add(c.node.n);
-        out.push({
+        nodes.push({
           n: c.node.n,
           cx: c.node.cx,
           cy: c.node.cy,
           slug: c.slug,
-          nombre: c.nombre,
+          nombre: cc.items[c.slug].nombre,
         });
       }
     }
-    return out;
-  }, []);
+  }
 
   const columna = CONDITIONS.filter((c) => c.grupo === "columna");
   const ortopedia = CONDITIONS.filter((c) => c.grupo === "ortopedia");
   const grupoLabel = (id: Condition["grupo"]) =>
-    CONDITION_GROUPS.find((g) => g.id === id)?.label ?? "";
+    id === "columna" ? cc.groupSpine : cc.groupOrtho;
 
   const Heading = headingAs;
 
@@ -93,7 +105,7 @@ export default function ConditionsBodyMap({
         viewBox={viewBox}
         className="h-auto w-full"
         role="img"
-        aria-label="Silueta del cuerpo con las zonas de cada padecimiento"
+        aria-label={cc.figureAria}
       >
         <path
           d={BODY_PATH}
@@ -103,7 +115,7 @@ export default function ConditionsBodyMap({
 
         {figureNodes.map((node) => {
           const isActive = node.n === active;
-          const go = () => router.push(`/padecimientos/${node.slug}`);
+          const go = () => router.push(hrefOf(node.slug));
           // En el torso, la zona lumbar (3) conserva su halo de dolor estático.
           const painHalo = isTorso && node.n === "3";
           return (
@@ -111,7 +123,7 @@ export default function ConditionsBodyMap({
               key={node.n}
               role="link"
               tabIndex={0}
-              aria-label={`Ir a padecimientos de esta zona (${node.nombre})`}
+              aria-label={`${cc.zoneAriaBefore} (${node.nombre})`}
               onMouseEnter={() => setActive(node.n)}
               onMouseLeave={() => setActive(null)}
               onFocus={() => setActive(node.n)}
@@ -182,10 +194,11 @@ export default function ConditionsBodyMap({
   const renderCard = (c: Condition) => {
     const highlighted = c.node ? c.node.n === active : false;
     const simbolo = c.node ? c.node.n : "±";
+    const detalle = detalleOf(c.slug);
     return (
       <Link
         key={c.slug}
-        href={`/padecimientos/${c.slug}`}
+        href={hrefOf(c.slug)}
         onMouseEnter={() => setActive(c.node?.n ?? null)}
         onMouseLeave={() => setActive(null)}
         onFocus={() => setActive(c.node?.n ?? null)}
@@ -206,11 +219,11 @@ export default function ConditionsBodyMap({
         </span>
         <span className="flex flex-col">
           <span className="font-heading text-base font-semibold text-ink">
-            {c.nombre}
+            {nombreOf(c.slug)}
           </span>
-          {c.detalle && (
+          {detalle && (
             <span className="mt-0.5 font-body text-xs text-ink/50">
-              {c.detalle}
+              {detalle}
             </span>
           )}
         </span>
@@ -229,10 +242,11 @@ export default function ConditionsBodyMap({
     const highlighted = c.node ? c.node.n === active : false;
     const simbolo = c.node ? c.node.n : "±";
     const chipBg = c.grupo === "columna" ? "bg-primary" : "bg-accent";
+    const detalle = detalleOf(c.slug);
     return (
       <Link
         key={c.slug}
-        href={`/padecimientos/${c.slug}`}
+        href={hrefOf(c.slug)}
         onMouseEnter={() => setActive(c.node?.n ?? null)}
         onMouseLeave={() => setActive(null)}
         onFocus={() => setActive(c.node?.n ?? null)}
@@ -249,11 +263,11 @@ export default function ConditionsBodyMap({
         </span>
         <span className="flex flex-col">
           <span className="font-heading text-[15px] font-semibold text-ink">
-            {c.nombre}
+            {nombreOf(c.slug)}
           </span>
-          {c.detalle && (
+          {detalle && (
             <span className="mt-0.5 font-body text-[12.5px] text-ink/60">
-              {c.detalle}
+              {detalle}
             </span>
           )}
         </span>
@@ -272,21 +286,20 @@ export default function ConditionsBodyMap({
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <Reveal>
           <Heading className="font-heading text-[26px] font-bold text-primary text-center md:text-left md:text-4xl">
-            Padecimientos que trato
+            {cc.h2}
           </Heading>
           {/* Subtítulo móvil: corto y centrado. */}
           <p className="mx-auto mt-3 max-w-[300px] text-center font-body text-sm text-ink/70 md:hidden">
-            Cada padecimiento está ligado a su zona en el cuerpo.
+            {cc.subMobile}
           </p>
           {/* Subtítulo desktop: con enlace a la evaluación. */}
           <p className="mt-3 hidden max-w-2xl font-body text-ink/70 md:block">
-            Cada padecimiento está ligado a su zona en el cuerpo. ¿No encuentras
-            el tuyo?{" "}
+            {cc.subDesktopPre}
             <Link
-              href="/evaluacion"
+              href={evaluacionHref}
               className="font-semibold text-accent hover:underline"
             >
-              Empieza por la evaluación
+              {cc.subDesktopLink}
             </Link>
             .
           </p>
@@ -316,11 +329,11 @@ export default function ConditionsBodyMap({
 
               {/* Cierre: puerta a la evaluación para quien no se ubica. */}
               <Link
-                href="/evaluacion"
+                href={evaluacionHref}
                 className="flex items-center gap-3 rounded-2xl border border-accent bg-primary-soft p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:shadow-md"
               >
                 <span className="font-heading text-base font-semibold text-primary">
-                  ¿No encuentras tu dolor? Haz la evaluación gratuita
+                  {cc.ctaCard}
                 </span>
                 <span
                   aria-hidden="true"
@@ -339,7 +352,7 @@ export default function ConditionsBodyMap({
           <div className="mt-8 flex flex-col items-center">
             <div className="w-[150px]">{renderFigure("torso")}</div>
             <p className="mt-3 text-center font-body text-xs text-ink/55">
-              7 = Rodilla · ± = varias zonas
+              {cc.legendMobile}
             </p>
           </div>
 
@@ -365,10 +378,10 @@ export default function ConditionsBodyMap({
 
           {/* CTA punteado a ancho completo. */}
           <Link
-            href="/evaluacion"
+            href={evaluacionHref}
             className="mt-6 flex items-center justify-center rounded-xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft px-4 py-[15px] text-center font-body text-[14px] font-semibold text-accent transition duration-150 ease-out hover:border-accent"
           >
-            ¿No encuentras tu dolor? Haz la evaluación gratuita →
+            {cc.ctaMobile}
           </Link>
         </div>
       </div>

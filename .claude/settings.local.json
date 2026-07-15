@@ -25,7 +25,17 @@
       "Bash(git add *)",
       "Bash(git commit -q -m 'F1.1: route group \\(es\\) — mueve todas las rutas ES a src/app/\\(es\\)/ *)",
       "Bash(git commit -q -m 'F1.2-4,6: dos root layouts, capa i18n de strings y árbol EN mínimo *)",
-      "Bash(git commit -q -m 'F1.5: selector de idioma ES ⇄ EN + slug-map tipado *)"
+      "Bash(git commit -q -m 'F1.5: selector de idioma ES ⇄ EN + slug-map tipado *)",
+      "Bash(command -v python3)",
+      "Bash(/usr/bin/python3 /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/normdiff.py /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/base-home.html /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/cur-home.html)",
+      "Bash(/usr/bin/grep -oE 'Céd. Prof.[^<]*\\(<[^>]*>[^<]*\\)*Céd. Esp.[^<]*' /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/base-home.html)",
+      "Bash(/usr/bin/pkill -f \"next-server\")",
+      "Bash(/usr/bin/pkill -f \"next start\")",
+      "Bash(xargs kill -9)",
+      "Bash(git commit -q -m 'docs: registrar deuda técnica globalNotFound *)",
+      "Bash(/usr/bin/python3 /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/fulltext.py /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/b2-home.html /private/tmp/claude-501/-Users-ancona-Desktop-dranconacolumna-next/7b7c5f81-8dec-4815-8224-dfa185ccf245/scratchpad/f2-home.html)",
+      "Bash(/usr/bin/python3 -c ' *)",
+      "Bash(git commit -q -m 'F2A home: /en home completa + capa de contenido home por locale *)"
     ]
   }
 }

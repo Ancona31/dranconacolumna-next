@@ -2,8 +2,13 @@ import Image from "next/image";
 import ButtonLink from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import { DOCTOR_FULL_NAME } from "@/lib/config";
+import type { Locale } from "@/lib/i18n/types";
+import { getHomeContent } from "@/lib/i18n/pages/home";
+import { routeFor } from "@/lib/i18n/slug-map";
 
-export default function AboutDoctor() {
+export default function AboutDoctor({ locale }: { locale: Locale }) {
+  const c = getHomeContent(locale).about;
+
   return (
     <section className="bg-primary-soft">
       <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 md:grid-cols-2 md:py-20">
@@ -23,16 +28,10 @@ export default function AboutDoctor() {
           <h2 className="font-heading text-3xl font-bold text-primary">
             {DOCTOR_FULL_NAME}
           </h2>
-          <p className="mt-4 font-body text-ink/80">
-            Ortopedista y traumatólogo con alta especialidad en cirugía de
-            columna. Atiendo todo el aparato musculoesquelético — de una
-            fractura a una cirugía compleja de columna — con las técnicas menos
-            invasivas disponibles, personalmente y en cada etapa: desde la
-            primera consulta hasta tu recuperación.
-          </p>
+          <p className="mt-4 font-body text-ink/80">{c.text}</p>
           <div className="mt-6">
-            <ButtonLink href="/sobre-mi" variant="outline">
-              Conóceme
+            <ButtonLink href={routeFor("/sobre-mi", locale)} variant="outline">
+              {c.cta}
               <span aria-hidden="true">→</span>
             </ButtonLink>
           </div>

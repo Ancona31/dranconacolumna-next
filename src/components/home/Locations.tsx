@@ -1,13 +1,28 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { MapPin, Clock, Phone, MessageCircle, Navigation } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { SEDES, type Sede } from "@/lib/sedes";
 import WhatsAppLink from "@/components/analytics/WhatsAppLink";
+import type { Locale } from "@/lib/i18n/types";
+import { waMessage } from "@/lib/i18n";
+import { getHomeContent } from "@/lib/i18n/pages/home";
+import { getSedesCopy, type SedesCopy } from "@/lib/i18n/content/sedes";
+import { routeFor } from "@/lib/i18n/slug-map";
 
-function SedeCard({ sede }: { sede: Sede }) {
+function SedeCard({
+  sede,
+  copy,
+  locale,
+}: {
+  sede: Sede;
+  copy: SedesCopy;
+  locale: Locale;
+}) {
+  const sc = copy.byId[sede.id];
   const whatsappLink = buildWhatsAppLink(
-    `Hola Dr. Ancona, quiero agendar una consulta en ${sede.nombre}.`
+    waMessage(locale, `Hola Dr. Ancona, quiero agendar una consulta en ${sede.nombre}.`)
   );
 
   return (
@@ -17,7 +32,7 @@ function SedeCard({ sede }: { sede: Sede }) {
           {sede.nombre}
         </h3>
         <span className="inline-flex items-center rounded-full bg-primary-soft px-3 py-1 font-body text-xs font-semibold text-primary ring-1 ring-primary/15">
-          {sede.horarioCorto}
+          {sc.horarioCorto}
         </span>
       </div>
 
@@ -28,9 +43,12 @@ function SedeCard({ sede }: { sede: Sede }) {
           aria-hidden="true"
         />
         <span>
-          {sede.direccion}
-          <br />
-          {sede.ciudad} · C.P. {sede.cp}
+          {sc.addressLines.map((line, idx) => (
+            <Fragment key={idx}>
+              {idx > 0 && <br />}
+              {line}
+            </Fragment>
+          ))}
         </span>
       </p>
 
@@ -40,7 +58,9 @@ function SedeCard({ sede }: { sede: Sede }) {
           strokeWidth={1.5}
           aria-hidden="true"
         />
-        <span>Consulta con cita previa · {sede.horario}</span>
+        <span>
+          {copy.bookingLabel} · {sc.horario}
+        </span>
       </p>
 
       <div className="mt-6 flex flex-1 flex-col justify-end gap-3">
@@ -49,7 +69,7 @@ function SedeCard({ sede }: { sede: Sede }) {
           className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-transparent px-5 py-3 font-body text-sm font-semibold text-primary transition duration-150 hover:bg-primary hover:text-white active:scale-[0.985]"
         >
           <Phone className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-          Llamar a la clínica
+          {copy.callButton}
         </a>
 
         <WhatsAppLink
@@ -58,7 +78,7 @@ function SedeCard({ sede }: { sede: Sede }) {
           className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-5 py-3 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
         >
           <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-          Agendar por WhatsApp
+          {copy.whatsappButton}
         </WhatsAppLink>
 
         <a
@@ -68,37 +88,40 @@ function SedeCard({ sede }: { sede: Sede }) {
           className="inline-flex items-center justify-center gap-1.5 font-body text-sm font-semibold text-accent hover:underline"
         >
           <Navigation className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-          Cómo llegar →
+          {copy.directionsLink}
         </a>
       </div>
     </div>
   );
 }
 
-export default function Locations() {
+export default function Locations({ locale }: { locale: Locale }) {
+  const c = getHomeContent(locale).locations;
+  const copy = getSedesCopy(locale);
+
   return (
     <section className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <Reveal>
           <h2 className="text-center font-heading text-3xl font-bold text-primary">
-            Dónde atiendo
+            {c.h2}
           </h2>
         </Reveal>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           {SEDES.map((sede, i) => (
             <Reveal key={sede.id} delay={i * 80} className="flex">
-              <SedeCard sede={sede} />
+              <SedeCard sede={sede} copy={copy} locale={locale} />
             </Reveal>
           ))}
         </div>
 
         <div className="mt-8 text-center">
           <Link
-            href="/contacto"
+            href={routeFor("/contacto", locale)}
             className="inline-flex font-body text-sm font-semibold text-accent hover:underline"
           >
-            Ver ubicación y datos de contacto →
+            {c.seeContact}
           </Link>
         </div>
       </div>

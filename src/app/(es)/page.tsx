@@ -8,28 +8,22 @@ import AboutDoctor from "@/components/home/AboutDoctor";
 import GoogleReviews from "@/components/home/GoogleReviews";
 import InsuranceBar from "@/components/home/InsuranceBar";
 import Locations from "@/components/home/Locations";
+import { getHomeContent } from "@/lib/i18n/pages/home";
 
-export const metadata: Metadata = {
-  title: {
-    absolute:
-      "Ortopedista y Traumatólogo en Mérida | Dr. Angel Ancona · Cirugía de Columna",
-  },
-  description:
-    "Ortopedista y traumatólogo en Mérida y Umán. Alta especialidad en cirugía de columna y técnicas de mínima invasión. Haz una evaluación gratuita de tu dolor y agenda tu valoración.",
-};
+export const metadata: Metadata = getHomeContent("es").metadata;
 
 export default function HomePage() {
   return (
     <>
-      <HeroBodyMap />
-      <TrustBar />
-      <HowItWorks />
-      <Differentiators />
-      <ConditionsBodyMap />
-      <AboutDoctor />
-      <GoogleReviews />
-      <InsuranceBar />
-      <Locations />
+      <HeroBodyMap locale="es" />
+      <TrustBar locale="es" />
+      <HowItWorks locale="es" />
+      <Differentiators locale="es" />
+      <ConditionsBodyMap locale="es" />
+      <AboutDoctor locale="es" />
+      <GoogleReviews locale="es" />
+      <InsuranceBar locale="es" />
+      <Locations locale="es" />
     </>
   );
 }

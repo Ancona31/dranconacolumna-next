@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Reveal from "@/components/ui/Reveal";
+import type { Locale } from "@/lib/i18n/types";
+import { getHomeContent } from "@/lib/i18n/pages/home";
 
 /** Aseguradoras con las que se trabaja. Logos en public/images/aseguradoras/. */
 const ASEGURADORAS: { nombre: string; archivo: string }[] = [
@@ -13,20 +15,22 @@ const ASEGURADORAS: { nombre: string; archivo: string }[] = [
   { nombre: "BBVA Seguros", archivo: "bbva.svg" },
 ];
 
-export default function InsuranceBar() {
+export default function InsuranceBar({ locale }: { locale: Locale }) {
+  const c = getHomeContent(locale).insurance;
+
   return (
     <section className="border-t border-ink/10 bg-primary-soft">
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <Reveal>
           <div className="text-center">
             <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              Cobertura
+              {c.eyebrow}
             </p>
             <h2 className="mt-2 font-heading text-4xl font-extrabold text-primary">
-              Trabajo con tu Seguro de Gastos Médicos Mayores
+              {c.h2}
             </h2>
             <p className="mx-auto mt-4 max-w-2xl font-body text-ink/70">
-              ¿Tienes seguro de gastos médicos? Te ayudo con el trámite.
+              {c.sub}
             </p>
           </div>
         </Reveal>

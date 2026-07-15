@@ -3,17 +3,19 @@ import type { UiStrings } from "./types";
 /**
  * Strings de UI en inglés.
  *
- * NOTA (FASE 1): salvo el home /en, las páginas en inglés todavía no existen.
- * Por eso los href internos de nav/footer/mobileBar apuntan de momento al home
- * /en. TODO F2+: apuntarlos a las rutas EN reales conforme se traduzcan.
+ * NOTA: las páginas EN de home, about, spine-surgery y contact ya existen; sus
+ * enlaces de nav apuntan a las rutas EN reales. Evaluación y padecimientos aún
+ * no tienen versión EN, así que esos dos apuntan a la ruta ES por ahora.
  */
 export const en: UiStrings = {
   nav: [
-    { label: "Free Evaluation", href: "/en" },
-    { label: "Conditions", href: "/en" },
-    { label: "Spine Surgery", href: "/en" },
-    { label: "About Me", href: "/en" },
-    { label: "Contact", href: "/en" },
+    // TODO F3: /en/assessment cuando exista la evaluación en EN.
+    { label: "Free Evaluation", href: "/evaluacion" },
+    // TODO F2.B: /en/conditions cuando exista el índice de padecimientos en EN.
+    { label: "Conditions", href: "/padecimientos" },
+    { label: "Spine Surgery", href: "/en/spine-surgery" },
+    { label: "About Me", href: "/en/about" },
+    { label: "Contact", href: "/en/contact" },
   ],
   tagline: "ORTHOPEDICS · TRAUMATOLOGY · SPINE",
   header: {

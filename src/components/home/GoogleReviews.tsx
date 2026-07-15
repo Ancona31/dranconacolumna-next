@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { REVIEWS, type Review } from "@/lib/reviews";
+import type { Locale } from "@/lib/i18n/types";
+import { getHomeContent } from "@/lib/i18n/pages/home";
 
 const GOOGLE_REVIEWS_URL = "https://share.google/F6JriyuEKHSREzTfi";
 
@@ -61,9 +63,15 @@ function Stars({ className = "h-4 w-4" }: { className?: string }) {
 function ReviewCard({
   review,
   borderColor,
+  cardLabel,
+  readMore,
+  readLess,
 }: {
   review: Review;
   borderColor: string;
+  cardLabel: string;
+  readMore: string;
+  readLess: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const isLong = review.text.length > TRUNCATE_AT;
@@ -90,9 +98,7 @@ function ReviewCard({
           <p className="truncate font-body text-[15px] font-semibold text-ink">
             {review.author}
           </p>
-          <p className="font-body text-xs text-ink/[0.55]">
-            Opinión en Google
-          </p>
+          <p className="font-body text-xs text-ink/[0.55]">{cardLabel}</p>
         </div>
         <GoogleG className="h-5 w-5 shrink-0 self-start" />
       </div>
@@ -109,7 +115,7 @@ function ReviewCard({
             onClick={() => setExpanded((v) => !v)}
             className="ml-1 font-body text-[13px] font-semibold text-accent hover:underline"
           >
-            {expanded ? "Leer menos" : "Leer más"}
+            {expanded ? readLess : readMore}
           </button>
         )}
       </p>
@@ -117,7 +123,8 @@ function ReviewCard({
   );
 }
 
-export default function GoogleReviews() {
+export default function GoogleReviews({ locale }: { locale: Locale }) {
+  const c = getHomeContent(locale).reviews;
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(3);
   const [cardWidth, setCardWidth] = useState(0);
@@ -180,22 +187,22 @@ export default function GoogleReviews() {
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              Opiniones en Google
+              {c.eyebrow}
             </p>
             <h2 className="mt-2 font-heading text-4xl font-extrabold text-primary">
-              Lo que dicen mis pacientes
+              {c.h2}
             </h2>
           </div>
 
           <div className="md:text-right">
             <div className="flex items-center gap-3 md:justify-end">
               <span className="font-heading text-[32px] font-bold leading-none text-primary">
-                5.0
+                {c.ratingNumber}
               </span>
               <Stars className="h-5 w-5" />
             </div>
             <p className="mt-2 font-body text-[13px] text-ink/60">
-              6 opiniones en Google · valoración verificada
+              {c.ratingCaption}
             </p>
           </div>
         </div>
@@ -237,6 +244,9 @@ export default function GoogleReviews() {
                     <ReviewCard
                       review={review}
                       borderColor={GOOGLE_COLORS[i % GOOGLE_COLORS.length]}
+                      cardLabel={c.cardLabel}
+                      readMore={c.readMore}
+                      readLess={c.readLess}
                     />
                   </li>
                 ))}
@@ -292,7 +302,7 @@ export default function GoogleReviews() {
             className="inline-flex items-center justify-center rounded-full px-[30px] py-[14px] font-body text-[15px] font-semibold text-white transition-opacity duration-150 hover:opacity-90"
             style={{ backgroundColor: "#0B3C5D" }}
           >
-            Ver todas las opiniones en Google →
+            {c.seeAll}
           </a>
         </div>
       </div>

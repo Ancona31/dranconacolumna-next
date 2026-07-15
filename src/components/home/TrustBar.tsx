@@ -1,17 +1,20 @@
 import { Star } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
-import {
-  CEDULA_PROFESIONAL,
-  CEDULA_ESPECIALIDAD,
-  CERTIFICACION,
-} from "@/lib/config";
+import { CEDULA_PROFESIONAL, CEDULA_ESPECIALIDAD } from "@/lib/config";
+import type { Locale } from "@/lib/i18n/types";
+import { getHomeContent } from "@/lib/i18n/pages/home";
 
-export default function TrustBar() {
+export default function TrustBar({ locale }: { locale: Locale }) {
+  const c = getHomeContent(locale).trust;
+
   const items = [
-    { key: "rating", node: <RatingItem /> },
-    { key: "cirugias", node: <span>+200 cirugías de columna</span> },
-    { key: "cedula", node: <CedulaItem /> },
-    { key: "cert", node: <span>{CERTIFICACION}</span> },
+    { key: "rating", node: <RatingItem label={c.rating} /> },
+    { key: "cirugias", node: <span>{c.surgeries}</span> },
+    {
+      key: "cedula",
+      node: <CedulaItem profLabel={c.cedulaProf} espLabel={c.cedulaEsp} />,
+    },
+    { key: "cert", node: <span>{c.certification}</span> },
   ];
 
   return (
@@ -44,7 +47,7 @@ export default function TrustBar() {
   );
 }
 
-function RatingItem() {
+function RatingItem({ label }: { label: string }) {
   return (
     <span className="flex items-center gap-1">
       <Star
@@ -52,19 +55,27 @@ function RatingItem() {
         strokeWidth={1.5}
         fill="currentColor"
       />
-      <span>4.9 en Google</span>
+      <span>{label}</span>
     </span>
   );
 }
 
-function CedulaItem() {
+function CedulaItem({
+  profLabel,
+  espLabel,
+}: {
+  profLabel: string;
+  espLabel: string;
+}) {
   return (
     <span>
       {/* Móvil (grid 2x2): solo la cédula de especialista para no saturar. */}
-      <span className="md:hidden">Céd. Esp. {CEDULA_ESPECIALIDAD}</span>
+      <span className="md:hidden">
+        {espLabel} {CEDULA_ESPECIALIDAD}
+      </span>
       {/* Desktop: ambas cédulas. */}
       <span className="hidden md:inline">
-        Céd. Prof. {CEDULA_PROFESIONAL} · Céd. Esp. {CEDULA_ESPECIALIDAD}
+        {profLabel} {CEDULA_PROFESIONAL} · {espLabel} {CEDULA_ESPECIALIDAD}
       </span>
     </span>
   );
