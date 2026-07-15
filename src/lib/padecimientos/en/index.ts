@@ -1,4 +1,5 @@
 import type { Padecimiento } from "../types";
+import { herniatedDisc } from "./herniated-disc";
 
 /**
  * Registro de padecimientos en inglés (FASE 2.B). Mismo tipo `Padecimiento` y
@@ -9,7 +10,9 @@ import type { Padecimiento } from "../types";
  * Por ahora solo el lote 1 (4 padecimientos de zona lumbar); los demás se
  * agregan aquí conforme se traducen.
  */
-export const PADECIMIENTOS_EN: Record<string, Padecimiento> = {};
+export const PADECIMIENTOS_EN: Record<string, Padecimiento> = {
+  "herniated-disc": herniatedDisc,
+};
 
 export function getPadecimientoEn(slug: string): Padecimiento | undefined {
   return PADECIMIENTOS_EN[slug];
