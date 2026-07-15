@@ -43,6 +43,10 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
   { es: "/padecimientos/dolor-de-cadera", en: "/en/conditions/hip-pain" },
   // FASE 2.C lote 2 (mano y paraguas: túnel, fracturas/esguinces, deportivas).
   { es: "/padecimientos/tunel-del-carpo", en: "/en/conditions/carpal-tunnel" },
+  {
+    es: "/padecimientos/fracturas-y-esguinces",
+    en: "/en/conditions/fractures-sprains",
+  },
   // Índice de padecimientos (los 13 padecimientos ya tienen par EN).
   { es: "/padecimientos", en: "/en/conditions" },
   // TODO F3: /evaluacion ↔ /en/assessment.
