@@ -29,6 +29,8 @@ export interface SedesCopy {
   mapsLink: string;
   /** Pie del botón de llamar en contacto ("Para información de la sede"). */
   forOfficeInfo: string;
+  /** Prefijo del title del iframe de mapa ("Mapa de" + nombre). */
+  mapTitlePrefix: string;
   byId: Record<Sede["id"], SedeCopy>;
 }
 
@@ -39,6 +41,7 @@ const SEDES_ES: SedesCopy = {
   directionsLink: "Cómo llegar →",
   mapsLink: "Ver en Google Maps →",
   forOfficeInfo: "Para información de la sede",
+  mapTitlePrefix: "Mapa de",
   byId: {
     merida: {
       addressLines: ["Esquina C. 34 × C. 13, Los Reyes", "Mérida, Yucatán · C.P. 97156"],
@@ -60,6 +63,7 @@ const SEDES_EN: SedesCopy = {
   directionsLink: "Get directions →",
   mapsLink: "View on Google Maps →",
   forOfficeInfo: "For office information",
+  mapTitlePrefix: "Map of",
   byId: {
     merida: {
       addressLines: ["Corner of Calle 34 and Calle 13, Los Reyes, Mérida, Yucatán 97156"],
