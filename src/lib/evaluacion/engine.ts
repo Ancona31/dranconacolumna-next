@@ -1,4 +1,6 @@
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import type { Locale } from "@/lib/i18n/types";
+import { getEngineCopy } from "./i18n";
 import { RED_FLAGS } from "./red-flags";
 import type {
   AlertLevel,
@@ -39,94 +41,41 @@ export const CAUTION_FLAGS = new Set([
 const DEFAULT_LEVELS: ScoringLevels = { leveMax: 30, moderadaMax: 60 };
 
 /**
- * Banner de urgencia por flag. Un flag presente en este mapa lleva el
- * alertLevel a 'urgente'; su texto sereno describe lo que el paciente indicó.
+ * Conjunto de flags que llevan el alertLevel a 'urgente'. Es LÓGICA, no texto:
+ * el mismo conjunto de claves en todos los locales. El texto de cada banner
+ * (título y cuerpo, más la variante por zona del trauma) vive en la copy
+ * transversal (getEngineCopy → urgentFlagBanners / urgentTraumaBannerByZone).
  */
-const URGENT_FLAG_BANNERS: Record<string, { title: string; body: string }> = {
-  "urgente-trauma": {
-    title: "Tu lesión necesita valoración hoy",
-    body: "Indicaste que tras un golpe o caída no puedes apoyar el pie. Eso debe revisarse presencialmente hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo; le servirá al médico que te atienda.",
-  },
-  "urgente-neurologico": {
-    title: "Tus respuestas incluyen datos que deben valorarse hoy",
-    body: "Indicaste debilidad que avanza, adormecimiento en la zona genital o dificultad nueva para controlar esfínteres. Esos datos requieren valoración presencial hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo.",
-  },
-  "urgente-neurologico-dorsal": {
-    title: "Tus respuestas incluyen datos que deben valorarse hoy",
-    body: "Indicaste debilidad o torpeza en las piernas de aparición súbita. Ese dato debe valorarse presencialmente hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo.",
-  },
-};
-
-/**
- * Banner de 'urgente-trauma' específico por zona: el texto por defecto ("no
- * puedes apoyar el pie") es correcto para miembro inferior; el miembro superior
- * lo sobrescribe con un texto acorde a la lesión que el paciente indicó.
- */
-const URGENT_TRAUMA_BANNER_BY_ZONE: Partial<
-  Record<string, { title: string; body: string }>
-> = {
-  hombro: {
-    title: "Tu lesión necesita valoración hoy",
-    body: "Indicaste que tras un golpe o caída tienes deformidad o no puedes mover el brazo o la mano afectada. Eso debe revisarse presencialmente hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo; le servirá al médico que te atienda.",
-  },
-  codo: {
-    title: "Tu lesión necesita valoración hoy",
-    body: "Indicaste que tras un golpe o caída tienes deformidad o no puedes mover el brazo o la mano afectada. Eso debe revisarse presencialmente hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo; le servirá al médico que te atienda.",
-  },
-  muneca: {
-    title: "Tu lesión necesita valoración hoy",
-    body: "Indicaste que tras un golpe o caída tienes deformidad o no puedes mover el brazo o la mano afectada. Eso debe revisarse presencialmente hoy mismo — acude a un servicio de urgencias. Lleva este reporte contigo; le servirá al médico que te atienda.",
-  },
-};
+const URGENT_FLAG_IDS = new Set([
+  "urgente-trauma",
+  "urgente-neurologico",
+  "urgente-neurologico-dorsal",
+]);
 
 /** Eyebrow del bloque de recomendación. Fuente única (pantalla y PDF). */
-export const RECOMMENDATION_EYEBROW = "VALORACIÓN RECOMENDADA";
+export const RECOMMENDATION_EYEBROW = getEngineCopy("es").recommendationEyebrow;
 
 /**
  * MATRIZ DE RECOMENDACIÓN, indexada por nivel funcional o —si hay alerta— por el
  * nivel de alerta, que lo sobrescribe. La ventana temporal es el protagonista;
  * el contexto la justifica. Sin invitación de contacto: esa vive ÚNICAMENTE en
  * el CTA final y en la firma de "qué debe evaluarse".
+ *
+ * Export de compatibilidad (locale por defecto 'es'); el texto se lee ahora de
+ * la copy transversal. Ver getRecommendation(level, alertLevel, locale).
  */
 export const RECOMMENDATIONS: Record<
   RecommendationKey,
   { window: string; context: string }
-> = {
-  leve: {
-    window: "Esta semana",
-    context:
-      "Tu resultado no muestra datos de urgencia. Una valoración médica te dará un diagnóstico claro y un plan.",
-  },
-  moderada: {
-    window: "En los próximos 3 días",
-    context: "Este nivel de limitación amerita valoración médica.",
-  },
-  severa: {
-    window: "En las próximas 24 a 48 horas",
-    context: "Tu resultado amerita valoración pronta.",
-  },
-  precaucion: {
-    window: "En las próximas 24 a 48 horas",
-    context:
-      "Además de tu nivel de limitación, los datos que marcaste ameritan valoración pronta.",
-  },
-  urgente: {
-    window: "Hoy mismo, en un servicio de urgencias",
-    context: "Lo indicado es valoración presencial.",
-  },
-};
+> = getEngineCopy("es").recommendations;
 
 /**
  * Definición del nivel de limitación (transversal a todos los tests). Fuente
  * ÚNICA: ResultScreen y ReportPdf la consumen; sin copias hardcodeadas.
+ * Export de compatibilidad ('es'); el texto vive en la copy transversal.
  */
-export const nivelDefinitions: Record<NonUrgentLevel, string> = {
-  leve: "Una limitación leve significa que puedes realizar la mayoría de tus actividades diarias y laborales, aunque con molestias ocasionales o al final del día.",
-  moderada:
-    "Una limitación moderada puede dificultar tus actividades de la vida diaria o laborales. Ten precaución si tu trabajo incluye cargar objetos pesados, o caminar por lugares peligrosos, estrechos o con desniveles.",
-  severa:
-    "Una limitación severa puede imposibilitar casi por completo las actividades básicas del día a día y puede hacer inseguro el trabajo físico. Evita esfuerzos importantes, cargas pesadas y superficies de riesgo hasta que un médico valore tu caso.",
-};
+export const nivelDefinitions: Record<NonUrgentLevel, string> =
+  getEngineCopy("es").nivelDefinitions;
 
 /**
  * Par de color por nivel para el badge de definición: fondo muy claro + color
@@ -294,43 +243,57 @@ function deburr(text: string): string {
  */
 function ventanaFromLevels(
   level: NonUrgentLevel,
-  alertLevel: AlertLevel
+  alertLevel: AlertLevel,
+  locale: Locale
 ): string {
-  if (alertLevel === "urgente") return "hoy mismo";
-  if (alertLevel === "precaucion") return "en 24 a 48 horas";
-  if (level === "severa") return "en 24 a 48 horas";
-  if (level === "moderada") return "en los proximos 3 dias";
-  return "esta semana";
+  const v = getEngineCopy(locale).whatsapp.ventanaCorta;
+  if (alertLevel === "urgente") return v.urgente;
+  if (alertLevel === "precaucion") return v.precaucion;
+  if (level === "severa") return v.severa;
+  if (level === "moderada") return v.moderada;
+  return v.leve;
 }
 
 /** Ventana de atención recomendada, derivada del resultado (sin duplicar texto). */
-export function getVentanaCorta(result: EvaluationResult): string {
-  return ventanaFromLevels(result.level, result.alertLevel);
+export function getVentanaCorta(
+  result: EvaluationResult,
+  locale: Locale = "es"
+): string {
+  return ventanaFromLevels(result.level, result.alertLevel, locale);
 }
 
 /** Mensaje de WhatsApp según nivel funcional y nivel de alerta. */
-export function buildWhatsAppMessage(input: MessageInput): string {
+export function buildWhatsAppMessage(
+  input: MessageInput,
+  locale: Locale = "es"
+): string {
+  const wa = getEngineCopy(locale).whatsapp;
   if (input.variant === "qr" || input.variant === "qr-short") {
-    const ventana = ventanaFromLevels(input.level, input.alertLevel);
+    const ventana = ventanaFromLevels(input.level, input.alertLevel, locale);
     if (input.variant === "qr-short") {
-      return `Quiero agendar una valoracion. ${input.folio}: ${input.score}/100, ${input.level}, valoracion ${ventana}.`;
+      return wa.qrShort(input.folio, input.score, input.level, ventana);
     }
     const zona = deburr(input.zoneLabel).toLowerCase();
-    let msg = `Quiero agendar una valoracion. Evaluacion de ${zona} ${input.folio}: ${input.score}/100, limitacion ${input.level}. Recomendacion del test: valoracion ${ventana}.`;
+    let msg = wa.qr(zona, input.folio, input.score, input.level, ventana);
     if (input.alertLevel === "urgente" || input.alertLevel === "precaucion") {
-      msg += " Marque datos de alarma.";
+      msg += wa.qrAlarmSuffix;
     }
     return msg;
   }
   if (input.alertLevel === "urgente") {
-    return `Hola Dr. Ancona, mi evaluación de ${input.zoneLabel} detectó datos de alarma (folio ${input.folio}). Acudiré a urgencias; le aviso de mi caso.`;
+    return wa.fullUrgente(input.zoneLabel, input.folio);
   }
   if (input.unscorable) {
-    return `Hola Dr. Ancona, respondí la evaluación de ${input.zoneLabel} (folio ${input.folio}), pero marqué todas las actividades como no aplicables y no obtuve resultado. Quiero agendar una valoración.`;
+    return wa.fullUnscorable(input.zoneLabel, input.folio);
   }
-  const base = `Hola Dr. Ancona, completé la evaluación de ${input.zoneLabel} (folio ${input.folio}). Resultado: limitación ${input.level}, ${input.score}/100. Quiero agendar una valoración.`;
+  const base = wa.fullBase(
+    input.zoneLabel,
+    input.folio,
+    input.level,
+    input.score
+  );
   if (input.alertLevel === "precaucion") {
-    return `${base} Marqué datos de alarma en el cuestionario.`;
+    return `${base}${wa.fullPrecaucionSuffix}`;
   }
   return base;
 }
@@ -346,17 +309,20 @@ export function getResultWhatsAppLink(result: EvaluationResult): string {
  */
 export function getQrWhatsAppLink(
   result: EvaluationResult,
-  opts?: { short?: boolean }
+  opts?: { short?: boolean; locale?: Locale }
 ): string {
   return buildWhatsAppLink(
-    buildWhatsAppMessage({
-      zoneLabel: result.zoneLabel,
-      folio: result.folio,
-      level: result.level,
-      score: result.score,
-      alertLevel: result.alertLevel,
-      variant: opts?.short ? "qr-short" : "qr",
-    })
+    buildWhatsAppMessage(
+      {
+        zoneLabel: result.zoneLabel,
+        folio: result.folio,
+        level: result.level,
+        score: result.score,
+        alertLevel: result.alertLevel,
+        variant: opts?.short ? "qr-short" : "qr",
+      },
+      opts?.locale ?? "es"
+    )
   );
 }
 
@@ -367,12 +333,14 @@ export function getQrWhatsAppLink(
  */
 export function getRecommendation(
   level: NonUrgentLevel,
-  alertLevel: AlertLevel
+  alertLevel: AlertLevel,
+  locale: Locale = "es"
 ): Recommendation {
+  const copy = getEngineCopy(locale);
   const key: RecommendationKey = alertLevel === "none" ? level : alertLevel;
   return {
-    label: RECOMMENDATION_EYEBROW,
-    ...RECOMMENDATIONS[key],
+    label: copy.recommendationEyebrow,
+    ...copy.recommendations[key],
     urgent: alertLevel === "urgente",
   };
 }
@@ -387,24 +355,27 @@ export type AlertBanner = {
  * Banner condicional. Tono sereno; jamás nombra causas ni enfermedades: en
  * precaución solo repite textualmente lo que el paciente marcó.
  */
-export function buildAlertBanner(result: EvaluationResult): AlertBanner | null {
+export function buildAlertBanner(
+  result: EvaluationResult,
+  locale: Locale = "es"
+): AlertBanner | null {
+  const copy = getEngineCopy(locale);
   if (result.alertLevel === "urgente") {
-    const flag = result.flags.find((f) => f in URGENT_FLAG_BANNERS);
+    const flag = result.flags.find((f) => URGENT_FLAG_IDS.has(f));
     // El trauma tiene texto por zona (miembro superior sobrescribe el default).
     const zoneBanner =
       flag === URGENT_TRAUMA_FLAG
-        ? URGENT_TRAUMA_BANNER_BY_ZONE[result.test.zoneId]
+        ? copy.urgentTraumaBannerByZone[result.test.zoneId]
         : undefined;
-    const banner = zoneBanner ?? URGENT_FLAG_BANNERS[flag ?? URGENT_TRAUMA_FLAG];
+    const banner =
+      zoneBanner ?? copy.urgentFlagBanners[flag ?? URGENT_TRAUMA_FLAG];
     return { tone: "urgente", title: banner.title, body: banner.body };
   }
   if (result.alertLevel === "precaucion") {
     return {
       tone: "precaucion",
-      title: "Datos que merecen valoración médica",
-      body: `Marcaste: ${result.alertMarks.join(
-        ", "
-      )}. Estos datos por sí solos no confirman ningún problema grave, pero sí ameritan que un médico los valore pronto para descartar causas que requieren tratamiento específico.`,
+      title: copy.cautionBannerTitle,
+      body: copy.cautionBannerBody(result.alertMarks.join(", ")),
     };
   }
   return null;
@@ -452,42 +423,43 @@ export const FUNC_COLORS: Record<DomainState, { bg: string; strong: string }> = 
   na: { bg: "#F1F4F6", strong: "#94A3B2" },
 };
 
-export const FUNC_STATE_LABELS: Record<DomainState, string> = {
-  verde: "Sin dificultad importante",
-  amarillo: "Con dificultad leve",
-  naranja: "Con dificultad considerable",
-  rojo: "Muy limitada hoy",
-  na: "No aplica en tu caso",
-};
+export const FUNC_STATE_LABELS: Record<DomainState, string> =
+  getEngineCopy("es").funcStateLabels;
 
 /** Frase de la tarjeta gris: el dominio entero salió del cálculo. */
-export const DOMAIN_NA_PHRASE =
-  "Indicaste que estas actividades están limitadas por otra causa.";
+export const DOMAIN_NA_PHRASE = getEngineCopy("es").domainNaPhrase;
 
 /** Mensaje cuando el paciente marcó "No aplica" en TODOS los ítems. */
-export const UNSCORABLE_MESSAGE =
-  "No pudimos calcular tu resultado: marcaste todas las actividades como no aplicables.";
+export const UNSCORABLE_MESSAGE = getEngineCopy("es").unscorableMessage;
 
 /**
  * Nota bajo el medidor cuando el resultado se calculó con menos ítems de los
  * que el instrumento exige (`minAnswered`). Fuente única: pantalla y PDF.
  */
-export function getPartialAnswersNote(result: EvaluationResult): string | null {
+export function getPartialAnswersNote(
+  result: EvaluationResult,
+  locale: Locale = "es"
+): string | null {
   const min = result.test.minAnswered;
   if (!min || result.unscorable || result.answeredCount >= min) return null;
-  return `Resultado orientativo: calculado con ${result.answeredCount} de ${result.test.questions.length} actividades (el resto las marcaste como no aplicables).`;
+  return getEngineCopy(locale).partialAnswersNote(
+    result.answeredCount,
+    result.test.questions.length
+  );
 }
 
 /** Línea global cuando los tres dominios salen verdes. */
-export const FUNC_ALL_GREEN_LINE =
-  "Tus respuestas no muestran limitación funcional. Si el dolor persiste a pesar de eso, también merece explicación.";
+export const FUNC_ALL_GREEN_LINE = getEngineCopy("es").funcAllGreenLine;
 
 /** Título de la sección del semáforo cuando el test no define el suyo. */
-export const DEFAULT_SEMAPHORE_TITLE = "Tu capacidad hoy, según tus respuestas";
+export const DEFAULT_SEMAPHORE_TITLE = getEngineCopy("es").defaultSemaphoreTitle;
 
 /** Título de la sección del semáforo. Fuente única para pantalla y PDF. */
-export function getSemaphoreTitle(test: TestDefinition): string {
-  return test.semaphoreTitle ?? DEFAULT_SEMAPHORE_TITLE;
+export function getSemaphoreTitle(
+  test: TestDefinition,
+  locale: Locale = "es"
+): string {
+  return test.semaphoreTitle ?? getEngineCopy(locale).defaultSemaphoreTitle;
 }
 
 export type DomainResult = {
@@ -523,79 +495,45 @@ function maxState(a: FuncState, b: FuncState): FuncState {
   return STATE_ORDER[a] >= STATE_ORDER[b] ? a : b;
 }
 
-/** Fragmento " — por ejemplo, {m1} y {m2}" según cuántas mirrors haya. */
-function exampleFragment(mirrors: string[]): string {
+/**
+ * Fragmento " — por ejemplo, {m1} y {m2}" según cuántas mirrors haya. El
+ * encabezado (`lead`) y el conector (`join`) son texto transversal (copy).
+ */
+function exampleFragment(
+  mirrors: string[],
+  lead: string,
+  join: string
+): string {
   if (mirrors.length === 0) return "";
-  if (mirrors.length === 1) return ` — por ejemplo, ${mirrors[0]}`;
-  return ` — por ejemplo, ${mirrors[0]} y ${mirrors[1]}`;
+  if (mirrors.length === 1) return `${lead}${mirrors[0]}`;
+  return `${lead}${mirrors[0]}${join}${mirrors[1]}`;
 }
 
 /**
- * Matriz global de 12 frases (estado × dominio) para la tríada funcional. Cada
- * dominio tiene voz propia en cada estado, así dos dominios en el mismo estado
- * nunca repiten texto. El marcador {ej} se sustituye por el fragmento de
- * ejemplos (verde nunca lo lleva). Un test con dimensiones propias la
- * sobrescribe con su `domainPhrases`.
+ * Frase de la matriz (propia del test o global) con los ejemplos incorporados.
+ * La matriz global 4×3 vive ahora en la copy transversal (getEngineCopy →
+ * domainPhrases); un test con dimensiones propias la sobrescribe con su
+ * `domainPhrases`. El marcador {ej} se sustituye por el fragmento de ejemplos.
  */
-const DOMAIN_PHRASES: DomainPhrases = {
-  verde: {
-    basicas:
-      "Lo esencial de tu día se mantiene sin dificultad importante. Cuida esa base: es tu punto de partida para recuperarte.",
-    moderadas:
-      "Tu movilidad cotidiana se conserva bien. Mantén la precaución para que siga así.",
-    demandantes:
-      "Los esfuerzos mayores todavía no te limitan de forma importante. Aun así, no te confíes: escucha a tu cuerpo.",
-  },
-  amarillo: {
-    basicas:
-      "Asoma una limitación en lo más elemental{ej}. Es leve, pero en este terreno cualquier señal temprana cuenta.",
-    moderadas:
-      "Tu movilidad diaria empieza a resentirse{ej}. Es una señal temprana que conviene no dejar crecer.",
-    demandantes:
-      "Los esfuerzos mayores empiezan a cobrarte factura{ej}. Modérate en este terreno.",
-  },
-  naranja: {
-    basicas:
-      "Lo esencial del día ya te exige un esfuerzo claro{ej}. Este dato pesa en tu evaluación: no lo normalices.",
-    moderadas:
-      "Tu movilidad cotidiana está claramente comprometida{ej}. Dosifica estas actividades.",
-    demandantes:
-      "Los esfuerzos mayores ya te generan dificultad franca{ej}. Redúcelos a lo indispensable.",
-  },
-  rojo: {
-    basicas:
-      "Las actividades más elementales están gravemente afectadas{ej}. Es el hallazgo de mayor peso en tu evaluación.",
-    moderadas:
-      "El impacto alcanza de lleno tu movilidad diaria{ej}. Limítala a lo estrictamente necesario.",
-    demandantes:
-      "Los esfuerzos mayores quedan fuera de tus posibilidades por ahora{ej}. Evítalos por completo hasta tener un diagnóstico.",
-  },
-};
-
-/** Frase de la matriz (propia del test o global) con los ejemplos incorporados. */
 function domainPhrase(
   state: FuncState,
   domainId: DomainId,
   mirrors: string[],
-  phrases: DomainPhrases
+  phrases: DomainPhrases,
+  lead: string,
+  join: string
 ): string {
   const phrase = phrases[state][domainId] ?? "";
-  return phrase.replace("{ej}", exampleFragment(mirrors));
+  return phrase.replace("{ej}", exampleFragment(mirrors, lead, join));
 }
 
 // Frases para dominios elevados por el gradiente (sin mirrors: el paciente no
-// marcó ítems propios ahí). Distintas entre sí; tienen prioridad sobre la matriz.
-function elevatedFullPhrase(state: FuncState): string {
-  switch (state) {
-    case "amarillo":
-      return "Tus actividades más ligeras ya muestran limitación — este terreno merece la misma precaución.";
-    case "naranja":
-      return "Por el nivel de limitación que muestran tus actividades más ligeras, este terreno te exigirá aún más: dosifícalo.";
-    case "rojo":
-      return "Por el nivel de limitación que muestran tus actividades más ligeras, este es el terreno con mayor riesgo de sobreesfuerzo — evítalo hasta tener un diagnóstico.";
-    case "verde":
-      return ""; // inalcanzable: la elevación nunca produce verde
-  }
+// marcó ítems propios ahí). Distintas entre sí; tienen prioridad sobre la
+// matriz. El texto vive en la copy transversal (elevatedPhrases); verde es
+// inalcanzable (la elevación nunca produce verde).
+function elevatedFullPhrase(state: FuncState, locale: Locale): string {
+  if (state === "verde") return "";
+  return getEngineCopy(locale).elevatedPhrases[state];
 }
 
 /**
@@ -616,8 +554,10 @@ function elevatedFullPhrase(state: FuncState): string {
  */
 export function computeDomains(
   test: TestDefinition,
-  answers: AnswerMap
+  answers: AnswerMap,
+  locale: Locale = "es"
 ): DomainResult[] {
+  const copy = getEngineCopy(locale);
   const domains = test.domains ?? [];
   const isChecklist = test.resultDisplay === "checklist";
   const byId = new Map(test.questions.map((q) => [q.id, q]));
@@ -625,7 +565,7 @@ export function computeDomains(
   // t1 es además el mínimo para que un ítem aporte su mirror. Default 0-4:
   // [1,2,3]; los tests de escala 0-10 usan [2.5, 5, 7.5]. Nunca asumen enteros.
   const [tVerde, tAmarillo, tNaranja] = test.domainThresholds ?? [1, 2, 3];
-  const phrases = test.domainPhrases ?? DOMAIN_PHRASES;
+  const phrases = test.domainPhrases ?? copy.domainPhrases;
 
   // 1. Estado bruto + mirrors por dominio (lógica por test intacta). Los ítems
   //    marcados "No aplica" no entran; sin ninguno respondido el dominio es 'na'.
@@ -711,7 +651,7 @@ export function computeDomains(
         state: "na" as const,
         elevated: false,
         mirrors: [],
-        fullPhrase: DOMAIN_NA_PHRASE,
+        fullPhrase: copy.domainNaPhrase,
       };
     }
     const elevated = STATE_ORDER[state] > STATE_ORDER[rawState];
@@ -722,141 +662,33 @@ export function computeDomains(
       elevated,
       mirrors: usedMirrors,
       fullPhrase: elevated
-        ? elevatedFullPhrase(state)
-        : domainPhrase(state, domain.id, usedMirrors, phrases),
+        ? elevatedFullPhrase(state, locale)
+        : domainPhrase(
+            state,
+            domain.id,
+            usedMirrors,
+            phrases,
+            copy.exampleLead,
+            copy.exampleJoin
+          ),
     };
   });
 }
 
 /* ============= "QUÉ DEBE EVALUARSE" Y "SEÑALES PARA NO ESPERAR" ============ */
 
-/** Firma comercial única permitida fuera del CTA. */
-export const EVALUATION_SIGNATURE =
-  "Esta es la valoración que realizo en consulta.";
+/** Firma comercial única permitida fuera del CTA. Export de compatibilidad ('es'). */
+export const EVALUATION_SIGNATURE = getEngineCopy("es").evaluationSignature;
 
-/** Cierre transversal de "Señales para no esperar tu cita". */
-export const WARNING_CLOSING =
-  "Si aparece cualquiera de estas señales, no esperes tu cita: busca valoración de inmediato. Lo más importante: no ignores lo que tu cuerpo te está diciendo.";
-
-const EVALUATION_PLANS: Record<
-  string,
-  { base: string[]; byFlag?: Record<string, string> }
-> = {
-  cuello: {
-    base: [
-      "Exploraré la movilidad de tu cuello y los movimientos que despiertan tu dolor",
-      "Revisaré la fuerza, los reflejos y la sensibilidad de tus brazos",
-      "Valoraré estudios de imagen si tu caso los requiere",
-    ],
-    byFlag: {
-      "radicular-cervical":
-        "Buscaré el origen exacto del dolor que baja por tu brazo",
-      mielopatia:
-        "Exploraré con detalle la función de tus manos, tus reflejos y tu marcha — los datos que marcaste son importantes y merecen una revisión neurológica cuidadosa.",
-      trauma: "Descartaré lesiones por el accidente que mencionaste",
-    },
-  },
-  "espalda-alta": {
-    base: [
-      "Exploraré tu columna dorsal y las posturas o movimientos que despiertan el dolor",
-      "Revisaré la fuerza y los reflejos de tus piernas",
-      "Valoraré estudios de imagen — en esta zona suelen ser especialmente útiles",
-    ],
-    byFlag: {
-      "banda-dorsal":
-        "Evaluaré el trayecto del dolor que rodea hacia tu pecho",
-      "deficit-dorsal":
-        "Exploraré a fondo la fuerza y los reflejos de tus piernas — ese dato guiará tu valoración.",
-      trauma: "Descartaré una fractura vertebral por el golpe que mencionaste",
-    },
-  },
-  "espalda-baja": {
-    base: [
-      "Revisaré cómo se mueve tu columna y qué movimientos despiertan tu dolor",
-      "Evaluaré la fuerza de tus piernas y cómo responden tus reflejos",
-      "Valoraré si tu caso necesita estudios de imagen y cuáles",
-    ],
-    byFlag: {
-      radicular: "Buscaré el origen exacto del dolor que baja por tu pierna",
-      claudicacion:
-        "Mediré cuánto puedes caminar antes de que el dolor te detenga — un dato clave en tu caso",
-    },
-  },
-  cadera: {
-    base: [
-      "Exploraré los movimientos de tu cadera para localizar el origen del dolor",
-      "Revisaré tu forma de caminar",
-      "Valoraré estudios de imagen si tu caso los requiere",
-    ],
-    byFlag: {
-      trauma: "Descartaré una lesión en el hueso por el golpe que mencionaste",
-    },
-  },
-  rodilla: {
-    base: [
-      "Exploraré tu rodilla con maniobras específicas de meniscos y ligamentos",
-      "Revisaré su estabilidad y su movilidad",
-      "Valoraré estudios de imagen si se requieren",
-    ],
-    byFlag: {
-      inestabilidad: "Buscaré la causa de que se trabe o se doble",
-      trauma: "Descartaré una lesión en el hueso por el golpe que mencionaste",
-    },
-  },
-  hombro: {
-    base: [
-      "Exploraré los movimientos de tu hombro con maniobras específicas del manguito rotador",
-      "Revisaré tu fuerza para elevar y rotar el brazo",
-      "Valoraré estudios de imagen si tu caso los requiere",
-    ],
-    byFlag: {
-      manguito:
-        "Pondré especial atención a la pérdida de fuerza que notaste tras el esfuerzo",
-      "origen-cervical":
-        "Revisaré también tu cuello: parte del dolor de hombro puede originarse ahí",
-      trauma: "Descartaré una lesión en el hueso por el golpe que mencionaste",
-    },
-  },
-  codo: {
-    base: [
-      "Exploraré la movilidad completa de tu codo y los puntos exactos donde duele",
-      "Evaluaré la fuerza de tu brazo y antebrazo",
-      "Valoraré estudios de imagen si se requieren",
-    ],
-    byFlag: {
-      cubital: "Revisaré el nervio que causa el hormigueo en tus dedos",
-      trauma: "Descartaré una lesión en el hueso por el golpe que mencionaste",
-    },
-  },
-  muneca: {
-    base: [
-      "Exploraré tu muñeca y tu mano: movilidad, fuerza de puño y puntos de dolor",
-      "Revisaré la función de tus nervios y tendones",
-      "Valoraré estudios de imagen si se requieren",
-    ],
-    byFlag: {
-      mediano: "Evaluaré el nervio que provoca el hormigueo nocturno",
-      trauma: "Descartaré una fractura por la caída que mencionaste",
-    },
-  },
-  tobillo: {
-    base: [
-      "Exploraré tu tobillo y tu pie: movilidad, puntos de dolor y estabilidad de los ligamentos",
-      "Revisaré tu apoyo y tu forma de caminar",
-      "Valoraré estudios de imagen si tu caso los requiere",
-    ],
-    byFlag: {
-      trauma:
-        "Descartaré una fractura o una lesión de ligamentos por la torcedura que mencionaste",
-      "inflamacion-aguda":
-        "Estudiaré la causa de la inflamación — hay varias posibles y distinguirlas cambia por completo el tratamiento",
-    },
-  },
-};
+/** Cierre transversal de "Señales para no esperar tu cita". Compat ('es'). */
+export const WARNING_CLOSING = getEngineCopy("es").warningClosing;
 
 /** Bullets de "Qué debe evaluarse en tu caso": base por zona + condicionales por flag. */
-export function getEvaluationPlan(result: EvaluationResult): string[] {
-  const plan = EVALUATION_PLANS[result.test.zoneId];
+export function getEvaluationPlan(
+  result: EvaluationResult,
+  locale: Locale = "es"
+): string[] {
+  const plan = getEngineCopy(locale).evaluationPlans[result.test.zoneId];
   if (!plan) return [];
   const extras = plan.byFlag
     ? Object.entries(plan.byFlag)
@@ -866,57 +698,12 @@ export function getEvaluationPlan(result: EvaluationResult): string[] {
   return [...plan.base, ...extras];
 }
 
-const WARNING_SIGNS: Record<string, string[]> = {
-  cuello: [
-    "Torpeza en las manos o inestabilidad que empeora rápidamente",
-    "Debilidad nueva en un brazo o una mano",
-    "Fiebre junto con el dolor de cuello",
-  ],
-  "espalda-alta": [
-    "Debilidad o torpeza nueva en las piernas",
-    "Dificultad nueva para controlar la orina o el excremento",
-    "Fiebre junto con el dolor de espalda",
-  ],
-  "espalda-baja": [
-    "Debilidad nueva o creciente en el pie o la pierna",
-    "Adormecimiento en la zona genital o dificultad nueva para controlar la orina o el excremento",
-    "Fiebre junto con el dolor de espalda",
-  ],
-  cadera: [
-    "Imposibilidad repentina de apoyar la pierna",
-    "Deformidad visible o acortamiento de la pierna tras un golpe",
-    "Fiebre junto con dolor de cadera",
-  ],
-  rodilla: [
-    "Imposibilidad de apoyar o de estirar la rodilla",
-    "Hinchazón súbita e importante",
-    "Fiebre con la rodilla caliente y enrojecida",
-  ],
-  hombro: [
-    "Deformidad visible del hombro tras un golpe o caída",
-    "Incapacidad total para mover el brazo",
-    "Fiebre con el hombro caliente e hinchado",
-  ],
-  codo: [
-    "Deformidad visible del codo",
-    "Imposibilidad de doblar o estirar el codo",
-    "Fiebre con el codo caliente e hinchado",
-  ],
-  muneca: [
-    "Deformidad visible tras una caída",
-    "Dedos fríos, pálidos o amoratados",
-    "Fiebre con hinchazón de la muñeca o la mano",
-  ],
-  tobillo: [
-    "Deformidad visible tras una torcedura o golpe",
-    "Dedos fríos, pálidos o amoratados",
-    "Fiebre con el tobillo o el pie caliente e hinchado",
-  ],
-};
-
 /** Bullets de "Señales para no esperar tu cita" por zona. */
-export function getWarningSigns(result: EvaluationResult): string[] {
-  return WARNING_SIGNS[result.test.zoneId] ?? [];
+export function getWarningSigns(
+  result: EvaluationResult,
+  locale: Locale = "es"
+): string[] {
+  return getEngineCopy(locale).warningSigns[result.test.zoneId] ?? [];
 }
 
 /**
@@ -926,7 +713,8 @@ export function getWarningSigns(result: EvaluationResult): string[] {
 export function computeResult(
   test: TestDefinition,
   answers: AnswerMap,
-  flags: string[]
+  flags: string[],
+  locale: Locale = "es"
 ): EvaluationResult {
   const { raw, interval, score, answeredCount, unscorable } = computeScore(
     test.scoring,
@@ -943,7 +731,7 @@ export function computeResult(
       .map((f) => test.flagLabels?.[f])
       .filter((label): label is string => Boolean(label)),
   ];
-  const alertLevel: AlertLevel = flags.some((f) => f in URGENT_FLAG_BANNERS)
+  const alertLevel: AlertLevel = flags.some((f) => URGENT_FLAG_IDS.has(f))
     ? "urgente"
     : alertMarks.length > 0
       ? "precaucion"
@@ -974,13 +762,16 @@ export function computeResult(
 
   return {
     ...base,
-    whatsappMessage: buildWhatsAppMessage({
-      zoneLabel: base.zoneLabel,
-      folio: base.folio,
-      level: base.level,
-      score: base.score,
-      alertLevel: base.alertLevel,
-      unscorable: base.unscorable,
-    }),
+    whatsappMessage: buildWhatsAppMessage(
+      {
+        zoneLabel: base.zoneLabel,
+        folio: base.folio,
+        level: base.level,
+        score: base.score,
+        alertLevel: base.alertLevel,
+        unscorable: base.unscorable,
+      },
+      locale
+    ),
   };
 }
