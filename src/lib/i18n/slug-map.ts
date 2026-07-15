@@ -29,6 +29,10 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
     es: "/padecimientos/desviacion-de-columna",
     en: "/en/conditions/scoliosis",
   },
+  {
+    es: "/padecimientos/fractura-de-columna",
+    en: "/en/conditions/spinal-fractures",
+  },
   // TODO F2.D: /padecimientos ↔ /en/conditions (índice) al terminar los 13.
   // TODO F3: /evaluacion ↔ /en/assessment.
 ];
