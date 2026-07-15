@@ -40,6 +40,7 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
     en: "/en/conditions/shoulder-pain",
   },
   { es: "/padecimientos/dolor-de-rodilla", en: "/en/conditions/knee-pain" },
+  { es: "/padecimientos/dolor-de-cadera", en: "/en/conditions/hip-pain" },
   // Índice de padecimientos (la lista completa; los 6 sin traducir enlazan a
   // su página ES desde ConditionsBodyMap — TODO F2.C).
   { es: "/padecimientos", en: "/en/conditions" },
