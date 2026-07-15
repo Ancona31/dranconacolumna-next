@@ -7,6 +7,7 @@ import { scoliosis } from "./scoliosis";
 import { spinalFractures } from "./spinal-fractures";
 import { neckPain } from "./neck-pain";
 import { shoulderPain } from "./shoulder-pain";
+import { kneePain } from "./knee-pain";
 
 /**
  * Registro de padecimientos en inglés (FASE 2.B). Mismo tipo `Padecimiento` y
@@ -26,6 +27,7 @@ export const PADECIMIENTOS_EN: Record<string, Padecimiento> = {
   "spinal-fractures": spinalFractures,
   "neck-pain": neckPain,
   "shoulder-pain": shoulderPain,
+  "knee-pain": kneePain,
 };
 
 export function getPadecimientoEn(slug: string): Padecimiento | undefined {
