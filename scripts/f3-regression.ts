@@ -37,7 +37,7 @@ import {
   getVentanaCorta,
   getWarningSigns,
 } from "@/lib/evaluacion/engine";
-import { AVAILABLE_ZONES, TESTS } from "@/lib/evaluacion/tests/index";
+import { AVAILABLE_ZONES, getTest } from "@/lib/evaluacion/tests/index";
 import type { AnswerMap, TestDefinition, TestQuestion } from "@/lib/evaluacion/types";
 
 /** Valor máximo puntuable de un ítem según su tipo. */
@@ -180,7 +180,7 @@ export function runHarness() {
   const zones = [...AVAILABLE_ZONES].sort();
   const out: Record<string, Record<string, unknown>> = {};
   for (const zone of zones) {
-    const test = TESTS[zone];
+    const test = getTest(zone, "es");
     if (!test) continue;
     const cases = casesFor(zone, test);
     out[zone] = {};
@@ -191,21 +191,27 @@ export function runHarness() {
   return out;
 }
 
-/** JSON con claves ordenadas recursivamente: el diff refleja solo cambios de valor. */
+/**
+ * JSON con claves ordenadas recursivamente: el diff refleja solo cambios de
+ * valor. La detección de ciclos es por CAMINO (ancestros), no global: dos
+ * referencias hermanas al mismo objeto (p. ej. un arreglo de opciones
+ * compartido entre preguntas, o la lista de señales reutilizada entre casos) se
+ * serializan completas — solo un ciclo real (un ancestro repetido) se corta.
+ */
 export function stableStringify(value: unknown): string {
-  const seen = new WeakSet();
-  const sort = (v: unknown): unknown => {
+  const sort = (v: unknown, ancestors: Set<object>): unknown => {
     if (v === null || typeof v !== "object") return v;
-    if (Array.isArray(v)) return v.map(sort);
-    if (seen.has(v)) return undefined;
-    seen.add(v);
+    if (ancestors.has(v as object)) return undefined; // ciclo real
+    const next = new Set(ancestors);
+    next.add(v as object);
+    if (Array.isArray(v)) return v.map((x) => sort(x, next));
     const obj = v as Record<string, unknown>;
     return Object.keys(obj)
       .sort()
       .reduce<Record<string, unknown>>((acc, k) => {
-        acc[k] = sort(obj[k]);
+        acc[k] = sort(obj[k], next);
         return acc;
       }, {});
   };
-  return JSON.stringify(sort(value), null, 2);
+  return JSON.stringify(sort(value, new Set()), null, 2);
 }

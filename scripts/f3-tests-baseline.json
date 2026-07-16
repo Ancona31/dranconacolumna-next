@@ -1,0 +1,3589 @@
+{
+  "cadera": {
+    "domains": [
+      {
+        "examples": "levantarte de una silla, estar sentado o acostado",
+        "id": "basicas",
+        "itemIds": [
+          "q3",
+          "q5",
+          "q6"
+        ],
+        "label": "Actividades básicas"
+      },
+      {
+        "examples": "subir y bajar escaleras",
+        "id": "moderadas",
+        "itemIds": [
+          "q1"
+        ],
+        "label": "Actividad moderada"
+      },
+      {
+        "examples": "caminar en terreno disparejo, agacharte al piso",
+        "id": "demandantes",
+        "itemIds": [
+          "q2",
+          "q4"
+        ],
+        "label": "Actividad demandante"
+      }
+    ],
+    "estimatedMinutes": 1,
+    "flagLabels": {
+      "trauma": "La molestia inició tras un golpe o caída"
+    },
+    "id": "cadera-hoos-jr",
+    "instrumentCitation": "HOOS-JR (Hip Disability and Osteoarthritis Outcome Score, Joint Replacement; Lyman et al., Clin Orthop Relat Res 2016). Traducción orientativa; instrumento © Hospital for Special Surgery, de uso libre.",
+    "instrumentName": "HOOS-JR",
+    "questions": [
+      {
+        "contextHeader": "Durante la última semana, ¿cuánto dolor de cadera has tenido al…",
+        "id": "q1",
+        "mirrorPhrase": "las escaleras despiertan tu dolor",
+        "options": [
+          {
+            "label": "Ninguno",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderado",
+            "value": 2
+          },
+          {
+            "label": "Severo",
+            "value": 3
+          },
+          {
+            "label": "Extremo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Dolor en escaleras",
+        "text": "…subir o bajar escaleras"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿cuánto dolor de cadera has tenido al…",
+        "id": "q2",
+        "mirrorPhrase": "el piso disparejo se volvió territorio incómodo",
+        "options": [
+          {
+            "label": "Ninguno",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderado",
+            "value": 2
+          },
+          {
+            "label": "Severo",
+            "value": 3
+          },
+          {
+            "label": "Extremo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Dolor en terreno irregular",
+        "text": "…caminar sobre una superficie irregular"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿qué tanta dificultad has tenido para…",
+        "id": "q3",
+        "mirrorPhrase": "incorporarte de un asiento se volvió un esfuerzo",
+        "options": [
+          {
+            "label": "Ninguna",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderada",
+            "value": 2
+          },
+          {
+            "label": "Severa",
+            "value": 3
+          },
+          {
+            "label": "Extrema",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Levantarte de una silla",
+        "text": "…levantarte desde una silla"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿qué tanta dificultad has tenido para…",
+        "id": "q4",
+        "mirrorPhrase": "agacharte por algo del suelo cuesta trabajo",
+        "options": [
+          {
+            "label": "Ninguna",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderada",
+            "value": 2
+          },
+          {
+            "label": "Severa",
+            "value": 3
+          },
+          {
+            "label": "Extrema",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Agacharte al piso",
+        "text": "…agacharte al piso o recoger un objeto"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿qué tanta dificultad has tenido para…",
+        "id": "q5",
+        "mirrorPhrase": "hasta el descanso en cama se ve afectado",
+        "options": [
+          {
+            "label": "Ninguna",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderada",
+            "value": 2
+          },
+          {
+            "label": "Severa",
+            "value": 3
+          },
+          {
+            "label": "Extrema",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Estar acostado",
+        "text": "…estar acostado en la cama (voltearte o mantener la postura de la cadera)"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿qué tanta dificultad has tenido para…",
+        "id": "q6",
+        "mirrorPhrase": "estar sentado mucho rato te incomoda",
+        "options": [
+          {
+            "label": "Ninguna",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderada",
+            "value": 2
+          },
+          {
+            "label": "Severa",
+            "value": 3
+          },
+          {
+            "label": "Extrema",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Permanecer sentado",
+        "text": "…permanecer sentado"
+      }
+    ],
+    "reportTexts": {
+      "leve": [
+        "Tu cadera te está avisando, pero el impacto en tu vida diaria todavía es bajo. Es el mejor momento para actuar: los problemas de cadera detectados temprano tienen más opciones y más simples.",
+        "Una valoración con exploración física te dirá con certeza qué lo está causando."
+      ],
+      "moderada": [
+        "Tu puntaje indica que el problema de tu cadera ya está limitando actividades de tu vida diaria de forma importante. Este patrón es frecuente en el desgaste articular y en algunas lesiones de cadera — pero distinguir cuál es tu caso requiere exploración física y, generalmente, estudios de imagen.",
+        "La buena noticia: identificarlo a tiempo amplía tus opciones. Una valoración te dará un diagnóstico con nombre y apellido, y un plan concreto."
+      ],
+      "severa": [
+        "Tu puntaje indica una limitación importante: tu cadera está condicionando gran parte de tu vida diaria. Un problema con este nivel de impacto necesita diagnóstico preciso pronto — cada semana sin él es una semana de opciones que se estrechan.",
+        "La valoración incluye exploración física y la solicitud de los estudios que tu caso requiera."
+      ]
+    },
+    "scoring": {
+      "kind": "table",
+      "table": [
+        100,
+        92.34,
+        85.257,
+        80.55,
+        76.776,
+        73.472,
+        70.426,
+        67.516,
+        64.664,
+        61.815,
+        58.93,
+        55.985,
+        52.965,
+        49.858,
+        46.652,
+        43.335,
+        39.902,
+        36.363,
+        32.735,
+        29.009,
+        25.103,
+        20.805,
+        15.633,
+        8.104,
+        0
+      ]
+    },
+    "triage": [
+      {
+        "id": "T1",
+        "options": [
+          {
+            "action": "goto:T2",
+            "label": "Sí"
+          },
+          {
+            "action": "continue",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tu molestia empezó por un golpe, caída o accidente reciente?"
+      },
+      {
+        "id": "T2",
+        "options": [
+          {
+            "action": "flag:trauma",
+            "label": "Sí"
+          },
+          {
+            "action": "flag:urgente-trauma",
+            "label": "No"
+          }
+        ],
+        "text": "¿Puedes apoyar el pie y caminar, aunque duela?"
+      }
+    ],
+    "zoneId": "cadera",
+    "zoneLabel": "Cadera"
+  },
+  "codo": {
+    "domainThresholds": [
+      2.5,
+      5,
+      7.5
+    ],
+    "domains": [
+      {
+        "examples": "comer, vestirte, el teléfono",
+        "id": "basicas",
+        "itemIds": [
+          "e2",
+          "e7",
+          "e8",
+          "u1"
+        ],
+        "label": "Actividades básicas"
+      },
+      {
+        "examples": "asearte, puertas, el hogar",
+        "id": "moderadas",
+        "itemIds": [
+          "e1",
+          "e9",
+          "e10",
+          "e11",
+          "e4",
+          "u2"
+        ],
+        "label": "Uso cotidiano del brazo"
+      },
+      {
+        "examples": "jalar, cargar, lanzar, tu trabajo",
+        "id": "demandantes",
+        "itemIds": [
+          "e3",
+          "e5",
+          "e6",
+          "p3",
+          "u3",
+          "u4"
+        ],
+        "label": "Fuerza y carga"
+      }
+    ],
+    "estimatedMinutes": 2,
+    "flagLabels": {
+      "cubital": "Hormigueo en meñique y anular",
+      "trauma": "La molestia inició tras un golpe o caída"
+    },
+    "id": "codo-pree",
+    "instructions": "Si alguna actividad no la realizas normalmente, estima la dificultad que tendrías al intentarla.",
+    "instrumentCitation": "PREE (Patient-Rated Elbow Evaluation; MacDermid, 2009). Traducción orientativa; © J. MacDermid, de uso libre citando la fuente.",
+    "instrumentName": "PREE",
+    "questions": [
+      {
+        "anchors": {
+          "max": "El peor posible",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de codo del 0 al 10…",
+        "id": "p1",
+        "kind": "scale",
+        "shortLabel": "Dolor en reposo",
+        "text": "…en reposo"
+      },
+      {
+        "anchors": {
+          "max": "El peor posible",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de codo del 0 al 10…",
+        "id": "p2",
+        "kind": "scale",
+        "shortLabel": "Dolor en movimiento repetido",
+        "text": "…al hacer una tarea con movimiento repetido del codo"
+      },
+      {
+        "anchors": {
+          "max": "El peor posible",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de codo del 0 al 10…",
+        "id": "p3",
+        "kind": "scale",
+        "mirrorPhrase": "levantar objetos pesados dispara el dolor",
+        "shortLabel": "Dolor al levantar peso",
+        "text": "…al levantar un objeto pesado"
+      },
+      {
+        "anchors": {
+          "max": "El peor posible",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de codo del 0 al 10…",
+        "id": "p4",
+        "kind": "scale",
+        "shortLabel": "Dolor máximo",
+        "text": "…en su peor momento"
+      },
+      {
+        "anchors": {
+          "max": "Siempre",
+          "min": "Nunca"
+        },
+        "id": "p5",
+        "kind": "scale",
+        "shortLabel": "Frecuencia del dolor",
+        "text": "¿Con qué frecuencia tienes dolor?"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e1",
+        "kind": "scale",
+        "mirrorPhrase": "peinarte se volvió incómodo",
+        "shortLabel": "Peinarte",
+        "text": "Peinarte"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e2",
+        "kind": "scale",
+        "mirrorPhrase": "usar cubiertos te cuesta",
+        "shortLabel": "Usar cubiertos",
+        "text": "Comer con tenedor o cuchara"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e3",
+        "kind": "scale",
+        "mirrorPhrase": "jalar objetos pesados quedó en pausa",
+        "shortLabel": "Jalar objeto pesado",
+        "text": "Jalar un objeto pesado"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e4",
+        "kind": "scale",
+        "mirrorPhrase": "apoyar el brazo para levantarte cuesta",
+        "shortLabel": "Levantarte de la silla",
+        "text": "Usar tu brazo para levantarte de una silla"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e5",
+        "kind": "scale",
+        "mirrorPhrase": "cargar peso con ese brazo se volvió un reto",
+        "shortLabel": "Cargar 4-5 kg",
+        "text": "Cargar un objeto de 4 a 5 kilos con el brazo al costado"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e6",
+        "kind": "scale",
+        "mirrorPhrase": "lanzar hasta algo ligero resulta difícil",
+        "shortLabel": "Lanzar una pelota",
+        "text": "Lanzar un objeto pequeño, como una pelota"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e7",
+        "kind": "scale",
+        "mirrorPhrase": "sostener el teléfono incomoda",
+        "shortLabel": "Usar el teléfono",
+        "text": "Usar el teléfono"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e8",
+        "kind": "scale",
+        "mirrorPhrase": "abotonarte la camisa se ha vuelto lento",
+        "shortLabel": "Abotonar camisa",
+        "text": "Abrocharte los botones de la camisa"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e9",
+        "kind": "scale",
+        "mirrorPhrase": "lavarte la axila contraria cuesta trabajo",
+        "shortLabel": "Lavarte la axila contraria",
+        "text": "Lavarte la axila del lado contrario"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e10",
+        "kind": "scale",
+        "mirrorPhrase": "atarte las agujetas se complica",
+        "shortLabel": "Atarte las agujetas",
+        "text": "Atarte las agujetas"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "e11",
+        "kind": "scale",
+        "mirrorPhrase": "abrir una puerta girando la perilla duele",
+        "shortLabel": "Abrir una puerta",
+        "text": "Girar una perilla y abrir una puerta"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "u1",
+        "kind": "scale",
+        "mirrorPhrase": "tu arreglo personal se volvió más lento",
+        "shortLabel": "Actividades personales",
+        "text": "Tus actividades personales (vestirte, asearte)"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "u2",
+        "kind": "scale",
+        "mirrorPhrase": "el trabajo del hogar te está costando",
+        "shortLabel": "Trabajo del hogar",
+        "text": "El trabajo del hogar (limpieza, mantenimiento)"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "u3",
+        "kind": "scale",
+        "mirrorPhrase": "tu trabajo diario se ve afectado",
+        "shortLabel": "Tu trabajo",
+        "text": "Tu trabajo (empleo o labor habitual)"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "u4",
+        "kind": "scale",
+        "mirrorPhrase": "tus pasatiempos quedaron en pausa",
+        "shortLabel": "Actividades recreativas",
+        "text": "Tus actividades recreativas"
+      }
+    ],
+    "reportTexts": {
+      "leve": [
+        "Tu codo te está avisando, pero conserva su función general. Es buen momento para identificar la causa con precisión — la mayoría de los problemas de codo detectados temprano responden a tratamientos simples.",
+        "Una valoración con exploración física te dirá qué lo origina."
+      ],
+      "moderada": [
+        "Tu puntaje indica que el codo ya interfiere con actividades de tu día a día. Este patrón aparece en tendinitis, sobrecargas y otras lesiones del codo — distinguirlas requiere exploración física dirigida.",
+        "Atenderlo a tiempo evita que se vuelva crónico. Una valoración te dará un diagnóstico con nombre y apellido, y un plan concreto."
+      ],
+      "severa": [
+        "Tu puntaje refleja una limitación importante: tu codo está condicionando desde comer hasta trabajar. Un cuadro con este impacto necesita diagnóstico preciso pronto.",
+        "La valoración incluye exploración completa del codo y los estudios que tu caso requiera."
+      ]
+    },
+    "scoring": {
+      "direction": "higher-is-worse",
+      "kind": "weighted-subscales",
+      "subscales": [
+        {
+          "id": "dolor",
+          "itemIds": [
+            "p1",
+            "p2",
+            "p3",
+            "p4",
+            "p5"
+          ],
+          "maxRaw": 50,
+          "weight": 0.5
+        },
+        {
+          "id": "funcion",
+          "itemIds": [
+            "e1",
+            "e2",
+            "e3",
+            "e4",
+            "e5",
+            "e6",
+            "e7",
+            "e8",
+            "e9",
+            "e10",
+            "e11",
+            "u1",
+            "u2",
+            "u3",
+            "u4"
+          ],
+          "maxRaw": 150,
+          "weight": 0.5
+        }
+      ]
+    },
+    "triage": [
+      {
+        "id": "T1",
+        "options": [
+          {
+            "action": "goto:T2",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T3",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tu molestia empezó por un golpe o una caída reciente?"
+      },
+      {
+        "id": "T2",
+        "options": [
+          {
+            "action": "flag:urgente-trauma",
+            "label": "Sí"
+          },
+          {
+            "action": "flag:trauma",
+            "label": "No"
+          }
+        ],
+        "text": "¿Ves el codo deformado o no puedes doblarlo ni estirarlo?"
+      },
+      {
+        "id": "T3",
+        "options": [
+          {
+            "action": "flag:cubital",
+            "label": "Sí"
+          },
+          {
+            "action": "continue",
+            "label": "No"
+          }
+        ],
+        "text": "¿Sientes hormigueo en el dedo meñique y el anular?"
+      }
+    ],
+    "zoneId": "codo",
+    "zoneLabel": "Codo"
+  },
+  "cuello": {
+    "applyGradient": false,
+    "domainPhrases": {
+      "amarillo": {
+        "actividades": "Tus actividades empiezan a resentirse{ej}. Es una señal temprana.",
+        "bienestar": "Tu bienestar empieza a pagar el precio{ej}.",
+        "dolor": "Tu dolor es de intensidad leve{ej}. Atenderlo ahora evita que escale."
+      },
+      "naranja": {
+        "actividades": "Tu problema ya está recortando tus actividades de forma clara{ej}.",
+        "bienestar": "El problema ya pesa sobre tu ánimo y tu calidad de vida{ej}.",
+        "dolor": "Tu dolor alcanza una intensidad considerable{ej}. No es un nivel para acostumbrarse a él: merece diagnóstico."
+      },
+      "rojo": {
+        "actividades": "Tu problema te está robando días completos de vida y de trabajo{ej}.",
+        "bienestar": "Vivir así te está desgastando{ej}. Tu bienestar también es motivo de consulta — y de los importantes.",
+        "dolor": "Tu dolor está en niveles altos{ej}. Nadie debería funcionar así — necesita atención."
+      },
+      "verde": {
+        "actividades": "Tu problema casi no está tocando tus actividades. Protege ese terreno.",
+        "bienestar": "Tu ánimo y tu calidad de vida se conservan. Eso ayuda mucho a la recuperación.",
+        "dolor": "Tu dolor se mantiene en niveles bajos. Buen punto de partida para resolver la causa."
+      }
+    },
+    "domainThresholds": [
+      2.5,
+      5,
+      7.5
+    ],
+    "domains": [
+      {
+        "aggregation": "max",
+        "examples": "el cuello y lo que baja al brazo",
+        "id": "dolor",
+        "itemIds": [
+          "i1",
+          "i2"
+        ],
+        "label": "Tu dolor"
+      },
+      {
+        "examples": "trabajo, casa, días perdidos",
+        "id": "actividades",
+        "itemIds": [
+          "i3",
+          "i6",
+          "i7"
+        ],
+        "label": "Tus actividades"
+      },
+      {
+        "examples": "ánimo y calidad de vida",
+        "id": "bienestar",
+        "itemIds": [
+          "i4",
+          "i5"
+        ],
+        "label": "Tu bienestar"
+      }
+    ],
+    "estimatedMinutes": 1,
+    "flagLabels": {
+      "mielopatia": "Torpeza nueva en las manos o inestabilidad al caminar",
+      "radicular-cervical": "El dolor baja hacia el brazo",
+      "trauma": "El dolor inició tras un accidente o golpe"
+    },
+    "id": "cuello-comi",
+    "instrumentCitation": "COMI (Core Outcome Measures Index; Deyo et al., 1998; Mannion et al., 2009) — instrumento del registro europeo de columna Spine Tango, EUROSPINE. Traducción orientativa; de uso libre.",
+    "instrumentName": "COMI-neck",
+    "questions": [
+      {
+        "anchors": {
+          "max": "El peor imaginable",
+          "min": "Sin dolor"
+        },
+        "id": "i1",
+        "kind": "scale",
+        "mirrorPhrase": "el dolor de cuello se mantiene presente",
+        "shortLabel": "Dolor de cuello",
+        "text": "¿Cuánto dolor de CUELLO has tenido durante la última semana?"
+      },
+      {
+        "anchors": {
+          "max": "El peor imaginable",
+          "min": "Sin dolor"
+        },
+        "id": "i2",
+        "kind": "scale",
+        "mirrorPhrase": "el dolor se corre hacia tu brazo",
+        "shortLabel": "Dolor hacia el brazo",
+        "text": "¿Cuánto dolor en el BRAZO o el HOMBRO del lado afectado has tenido durante la última semana?"
+      },
+      {
+        "id": "i3",
+        "mirrorPhrase": "tus tareas de todos los días se ven interferidas",
+        "options": [
+          {
+            "label": "Nada",
+            "value": 0
+          },
+          {
+            "label": "Un poco",
+            "value": 2.5
+          },
+          {
+            "label": "Moderadamente",
+            "value": 5
+          },
+          {
+            "label": "Mucho",
+            "value": 7.5
+          },
+          {
+            "label": "Muchísimo",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Interferencia diaria",
+        "text": "Durante la última semana, ¿cuánto interfirió tu problema de cuello con tus actividades normales, incluyendo el trabajo dentro y fuera de casa?"
+      },
+      {
+        "id": "i4",
+        "mirrorPhrase": "la idea de seguir así no te deja tranquilo",
+        "options": [
+          {
+            "label": "Muy satisfecho",
+            "value": 0
+          },
+          {
+            "label": "Algo satisfecho",
+            "value": 2.5
+          },
+          {
+            "label": "Ni satisfecho ni insatisfecho",
+            "value": 5
+          },
+          {
+            "label": "Algo insatisfecho",
+            "value": 7.5
+          },
+          {
+            "label": "Muy insatisfecho",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Vivir con los síntomas",
+        "text": "Si tuvieras que pasar el resto de tu vida con los síntomas que tienes ahora mismo, ¿cómo te sentirías?"
+      },
+      {
+        "id": "i5",
+        "mirrorPhrase": "calificas tu calidad de vida por debajo de lo que mereces",
+        "options": [
+          {
+            "label": "Muy buena",
+            "value": 0
+          },
+          {
+            "label": "Buena",
+            "value": 2.5
+          },
+          {
+            "label": "Regular",
+            "value": 5
+          },
+          {
+            "label": "Mala",
+            "value": 7.5
+          },
+          {
+            "label": "Muy mala",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Calidad de vida",
+        "text": "En general, durante la última semana, ¿cómo ha sido tu calidad de vida?"
+      },
+      {
+        "id": "i6",
+        "mirrorPhrase": "has tenido que recortar días de tus actividades",
+        "options": [
+          {
+            "label": "Ningún día",
+            "value": 0
+          },
+          {
+            "label": "Entre 1 y 7",
+            "value": 2.5
+          },
+          {
+            "label": "Entre 8 y 14",
+            "value": 5
+          },
+          {
+            "label": "Entre 15 y 21",
+            "value": 7.5
+          },
+          {
+            "label": "Más de 21",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Días con actividades reducidas",
+        "text": "Durante las últimas 4 semanas, ¿cuántos días redujiste tus actividades habituales (trabajo, casa o escuela) por tu problema de cuello?"
+      },
+      {
+        "id": "i7",
+        "mirrorPhrase": "el problema te ha costado días de trabajo",
+        "options": [
+          {
+            "label": "Ningún día",
+            "value": 0
+          },
+          {
+            "label": "Entre 1 y 7",
+            "value": 2.5
+          },
+          {
+            "label": "Entre 8 y 14",
+            "value": 5
+          },
+          {
+            "label": "Entre 15 y 21",
+            "value": 7.5
+          },
+          {
+            "label": "Más de 21",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Días de trabajo perdidos",
+        "text": "Durante las últimas 4 semanas, ¿cuántos días faltaste al trabajo — incluido el trabajo del hogar — por tu problema de cuello?"
+      }
+    ],
+    "reportTexts": {
+      "leve": [
+        "Tu cuello te está avisando, pero el impacto general aún es bajo. Es el mejor momento para entender la causa — la mayoría de los problemas cervicales detectados temprano se resuelven sin cirugía.",
+        "Una valoración con exploración física te dará un diagnóstico claro."
+      ],
+      "moderada": [
+        "Tu resultado indica que el problema de cuello ya está pesando sobre tu día a día. Este patrón puede venir de origen muscular, articular o de un nervio comprimido — distinguirlo requiere exploración física dirigida y, en algunos casos, estudios de imagen.",
+        "Identificar la causa a tiempo evita que se vuelva crónico. Una valoración te dará un diagnóstico con nombre y apellido, y un plan concreto."
+      ],
+      "severa": [
+        "Tu resultado refleja un impacto importante: el problema de cuello está condicionando tu dolor, tus actividades y tu bienestar. Un cuadro así necesita diagnóstico preciso pronto.",
+        "La valoración incluye exploración neurológica de brazos y cuello, y los estudios que tu caso requiera."
+      ]
+    },
+    "scoring": {
+      "disabilityItems": [
+        "i6",
+        "i7"
+      ],
+      "functionItem": "i3",
+      "kind": "comi",
+      "painItems": [
+        "i1",
+        "i2"
+      ],
+      "qolItem": "i5",
+      "wellbeingItem": "i4"
+    },
+    "semaphoreTitle": "Cómo te está afectando, según tus respuestas",
+    "triage": [
+      {
+        "id": "T1",
+        "options": [
+          {
+            "action": "flag:radicular-cervical",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T2",
+            "label": "No"
+          }
+        ],
+        "text": "¿El dolor baja hacia el brazo o la mano?"
+      },
+      {
+        "id": "T2",
+        "options": [
+          {
+            "action": "flag:mielopatia",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T3",
+            "label": "No"
+          }
+        ],
+        "text": "¿Has notado torpeza nueva en las manos (se te caen las cosas, cuesta abotonar) o inestabilidad al caminar?"
+      },
+      {
+        "id": "T3",
+        "options": [
+          {
+            "action": "flag:trauma",
+            "label": "Sí"
+          },
+          {
+            "action": "continue",
+            "label": "No"
+          }
+        ],
+        "text": "¿El dolor empezó tras un accidente o golpe (por ejemplo, un choque)?"
+      }
+    ],
+    "zoneId": "cuello",
+    "zoneLabel": "Cuello"
+  },
+  "espalda-alta": {
+    "applyGradient": false,
+    "domainPhrases": {
+      "amarillo": {
+        "actividades": "Tus actividades empiezan a resentirse{ej}. Es una señal temprana.",
+        "bienestar": "Tu bienestar empieza a pagar el precio{ej}.",
+        "dolor": "Tu dolor es de intensidad leve{ej}. Atenderlo ahora evita que escale."
+      },
+      "naranja": {
+        "actividades": "Tu problema ya está recortando tus actividades de forma clara{ej}.",
+        "bienestar": "El problema ya pesa sobre tu ánimo y tu calidad de vida{ej}.",
+        "dolor": "Tu dolor alcanza una intensidad considerable{ej}. No es un nivel para acostumbrarse a él: merece diagnóstico."
+      },
+      "rojo": {
+        "actividades": "Tu problema te está robando días completos de vida y de trabajo{ej}.",
+        "bienestar": "Vivir así te está desgastando{ej}. Tu bienestar también es motivo de consulta — y de los importantes.",
+        "dolor": "Tu dolor está en niveles altos{ej}. Nadie debería funcionar así — necesita atención."
+      },
+      "verde": {
+        "actividades": "Tu problema casi no está tocando tus actividades. Protege ese terreno.",
+        "bienestar": "Tu ánimo y tu calidad de vida se conservan. Eso ayuda mucho a la recuperación.",
+        "dolor": "Tu dolor se mantiene en niveles bajos. Buen punto de partida para resolver la causa."
+      }
+    },
+    "domainThresholds": [
+      2.5,
+      5,
+      7.5
+    ],
+    "domains": [
+      {
+        "aggregation": "max",
+        "examples": "la espalda alta y lo que rodea al pecho",
+        "id": "dolor",
+        "itemIds": [
+          "i1",
+          "i2"
+        ],
+        "label": "Tu dolor"
+      },
+      {
+        "examples": "trabajo, casa, días perdidos",
+        "id": "actividades",
+        "itemIds": [
+          "i3",
+          "i6",
+          "i7"
+        ],
+        "label": "Tus actividades"
+      },
+      {
+        "examples": "ánimo y calidad de vida",
+        "id": "bienestar",
+        "itemIds": [
+          "i4",
+          "i5"
+        ],
+        "label": "Tu bienestar"
+      }
+    ],
+    "estimatedMinutes": 1,
+    "flagLabels": {
+      "banda-dorsal": "El dolor rodea el pecho como una banda",
+      "deficit-dorsal": "Debilidad o torpeza en las piernas de aparición gradual",
+      "trauma": "El dolor inició tras un golpe o caída"
+    },
+    "id": "espalda-alta-comi",
+    "instrumentCitation": "COMI (Core Outcome Measures Index; Deyo et al., 1998; Mannion et al., 2009) — instrumento del registro europeo de columna Spine Tango, EUROSPINE. Traducción orientativa; de uso libre. Adaptación orientativa a la región dorsal.",
+    "instrumentName": "COMI",
+    "questions": [
+      {
+        "anchors": {
+          "max": "El peor imaginable",
+          "min": "Sin dolor"
+        },
+        "id": "i1",
+        "kind": "scale",
+        "mirrorPhrase": "el dolor de espalda alta se mantiene presente",
+        "shortLabel": "Dolor de espalda alta",
+        "text": "¿Cuánto dolor de ESPALDA ALTA has tenido durante la última semana?"
+      },
+      {
+        "anchors": {
+          "max": "El peor imaginable",
+          "min": "Sin dolor"
+        },
+        "id": "i2",
+        "kind": "scale",
+        "mirrorPhrase": "el dolor rodea hacia tu pecho o costillas",
+        "shortLabel": "Dolor en banda",
+        "text": "¿Cuánto dolor que RODEA hacia el pecho o las costillas has tenido durante la última semana?"
+      },
+      {
+        "id": "i3",
+        "mirrorPhrase": "tus tareas de todos los días se ven interferidas",
+        "options": [
+          {
+            "label": "Nada",
+            "value": 0
+          },
+          {
+            "label": "Un poco",
+            "value": 2.5
+          },
+          {
+            "label": "Moderadamente",
+            "value": 5
+          },
+          {
+            "label": "Mucho",
+            "value": 7.5
+          },
+          {
+            "label": "Muchísimo",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Interferencia diaria",
+        "text": "Durante la última semana, ¿cuánto interfirió tu problema de espalda alta con tus actividades normales, incluyendo el trabajo dentro y fuera de casa?"
+      },
+      {
+        "id": "i4",
+        "mirrorPhrase": "la idea de seguir así no te deja tranquilo",
+        "options": [
+          {
+            "label": "Muy satisfecho",
+            "value": 0
+          },
+          {
+            "label": "Algo satisfecho",
+            "value": 2.5
+          },
+          {
+            "label": "Ni satisfecho ni insatisfecho",
+            "value": 5
+          },
+          {
+            "label": "Algo insatisfecho",
+            "value": 7.5
+          },
+          {
+            "label": "Muy insatisfecho",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Vivir con los síntomas",
+        "text": "Si tuvieras que pasar el resto de tu vida con los síntomas que tienes ahora mismo, ¿cómo te sentirías?"
+      },
+      {
+        "id": "i5",
+        "mirrorPhrase": "calificas tu calidad de vida por debajo de lo que mereces",
+        "options": [
+          {
+            "label": "Muy buena",
+            "value": 0
+          },
+          {
+            "label": "Buena",
+            "value": 2.5
+          },
+          {
+            "label": "Regular",
+            "value": 5
+          },
+          {
+            "label": "Mala",
+            "value": 7.5
+          },
+          {
+            "label": "Muy mala",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Calidad de vida",
+        "text": "En general, durante la última semana, ¿cómo ha sido tu calidad de vida?"
+      },
+      {
+        "id": "i6",
+        "mirrorPhrase": "has tenido que recortar días de tus actividades",
+        "options": [
+          {
+            "label": "Ningún día",
+            "value": 0
+          },
+          {
+            "label": "Entre 1 y 7",
+            "value": 2.5
+          },
+          {
+            "label": "Entre 8 y 14",
+            "value": 5
+          },
+          {
+            "label": "Entre 15 y 21",
+            "value": 7.5
+          },
+          {
+            "label": "Más de 21",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Días con actividades reducidas",
+        "text": "Durante las últimas 4 semanas, ¿cuántos días redujiste tus actividades habituales (trabajo, casa o escuela) por tu problema de espalda alta?"
+      },
+      {
+        "id": "i7",
+        "mirrorPhrase": "el problema te ha costado días de trabajo",
+        "options": [
+          {
+            "label": "Ningún día",
+            "value": 0
+          },
+          {
+            "label": "Entre 1 y 7",
+            "value": 2.5
+          },
+          {
+            "label": "Entre 8 y 14",
+            "value": 5
+          },
+          {
+            "label": "Entre 15 y 21",
+            "value": 7.5
+          },
+          {
+            "label": "Más de 21",
+            "value": 10
+          }
+        ],
+        "shortLabel": "Días de trabajo perdidos",
+        "text": "Durante las últimas 4 semanas, ¿cuántos días faltaste al trabajo — incluido el trabajo del hogar — por tu problema de espalda alta?"
+      }
+    ],
+    "reportTexts": {
+      "leve": [
+        "Tu espalda alta te está avisando, pero el impacto aún es bajo. En esta zona vale la pena entender la causa desde temprano — es la región donde un diagnóstico certero da más tranquilidad.",
+        "Una valoración con exploración física te dará un diagnóstico claro."
+      ],
+      "moderada": [
+        "Tu resultado indica que el dolor dorsal ya pesa sobre tu día a día. La espalda alta es una zona que merece estudio cuidadoso: su dolor puede venir del músculo, de la columna o, a veces, reflejarse desde otros órganos — distinguirlo requiere exploración dirigida.",
+        "Una valoración te dará un diagnóstico con nombre y apellido, y un plan concreto."
+      ],
+      "severa": [
+        "Tu resultado refleja un impacto importante en una zona que no conviene dejar sin diagnóstico: la columna dorsal. Con este nivel de afectación, la prioridad es identificar la causa pronto.",
+        "La valoración incluye exploración de columna y neurológica de piernas, y los estudios que tu caso requiera — en esta región suelen ser especialmente informativos."
+      ]
+    },
+    "scoring": {
+      "disabilityItems": [
+        "i6",
+        "i7"
+      ],
+      "functionItem": "i3",
+      "kind": "comi",
+      "painItems": [
+        "i1",
+        "i2"
+      ],
+      "qolItem": "i5",
+      "wellbeingItem": "i4"
+    },
+    "semaphoreTitle": "Cómo te está afectando, según tus respuestas",
+    "triage": [
+      {
+        "id": "T1",
+        "options": [
+          {
+            "action": "flag:banda-dorsal",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T2",
+            "label": "No"
+          }
+        ],
+        "text": "¿El dolor rodea el pecho o las costillas como una banda?"
+      },
+      {
+        "id": "T2",
+        "options": [
+          {
+            "action": "goto:T2b",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T3",
+            "label": "No"
+          }
+        ],
+        "text": "¿Has notado debilidad o torpeza en las piernas?"
+      },
+      {
+        "id": "T2b",
+        "options": [
+          {
+            "action": "flag:urgente-neurologico-dorsal",
+            "label": "Sí"
+          },
+          {
+            "action": "flag:deficit-dorsal",
+            "label": "No"
+          }
+        ],
+        "text": "¿Apareció de forma súbita (en horas o pocos días)?"
+      },
+      {
+        "id": "T3",
+        "options": [
+          {
+            "action": "flag:trauma",
+            "label": "Sí"
+          },
+          {
+            "action": "continue",
+            "label": "No"
+          }
+        ],
+        "text": "¿El dolor empezó tras un golpe o caída fuerte?"
+      }
+    ],
+    "zoneId": "espalda-alta",
+    "zoneLabel": "Espalda alta"
+  },
+  "espalda-baja": {
+    "domains": [
+      {
+        "examples": "vestirte, levantarte, moverte en casa",
+        "id": "basicas",
+        "itemIds": [
+          "q7",
+          "q9",
+          "q12",
+          "q14",
+          "q16",
+          "q19"
+        ],
+        "label": "Actividades básicas"
+      },
+      {
+        "examples": "caminar, estar de pie, escaleras",
+        "id": "moderadas",
+        "itemIds": [
+          "q2",
+          "q3",
+          "q5",
+          "q10",
+          "q17",
+          "q23"
+        ],
+        "label": "Actividad moderada"
+      },
+      {
+        "examples": "cargar peso, agacharte, quehaceres pesados",
+        "id": "demandantes",
+        "itemIds": [
+          "q4",
+          "q11",
+          "q21"
+        ],
+        "label": "Actividad demandante"
+      }
+    ],
+    "estimatedMinutes": 2,
+    "flagLabels": {
+      "claudicacion": "El dolor al caminar te obliga a detenerte y cede al sentarte",
+      "radicular": "El dolor se extiende por debajo de la rodilla",
+      "trauma": "El dolor inició tras un golpe o caída"
+    },
+    "id": "espalda-baja-rmdq",
+    "instrumentCitation": "Cuestionario de Roland-Morris, versión española validada. © Fundación Kovacs (Kovacs FM, Llobera J, Gil del Real MT, Abraira V, Gestoso M, Fernández C. Validation of the Spanish version of the Roland Morris Questionnaire. Spine 2002;27:538-542). Aplicación orientativa. Adaptación léxica mínima para México.",
+    "instrumentName": "Cuestionario Roland-Morris (RMDQ)",
+    "questionNoun": {
+      "plural": "frases",
+      "singular": "frase"
+    },
+    "questions": [
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q1",
+        "mirrorPhrase": "pasas más tiempo en casa del que quisieras",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Quedarse en casa",
+        "text": "Me quedo en casa la mayor parte del tiempo por mi dolor de espalda."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q2",
+        "mirrorPhrase": "buscas constantemente posturas que alivien",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Cambiar de postura",
+        "text": "Cambio de postura con frecuencia para intentar aliviar la espalda."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q3",
+        "mirrorPhrase": "desplazarte te toma más tiempo del habitual",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Caminar más lento",
+        "text": "Debido a mi espalda, camino más lentamente de lo normal."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q4",
+        "mirrorPhrase": "las labores del hogar se han vuelto un reto",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Quehaceres de casa",
+        "text": "Debido a mi espalda, no puedo hacer ninguno de los quehaceres que habitualmente hago en casa."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q5",
+        "mirrorPhrase": "las escaleras ya piden apoyo extra",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Usar el pasamanos",
+        "text": "Por mi espalda, uso el pasamanos para subir escaleras."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q6",
+        "mirrorPhrase": "tu espalda te pide recostarte con frecuencia",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Acostarse a descansar",
+        "text": "A causa de mi espalda, debo acostarme más a menudo para descansar."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q7",
+        "mirrorPhrase": "incorporarte de un asiento requiere ayuda de tus brazos",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Agarrarse para levantarse",
+        "text": "Debido a mi espalda, necesito agarrarme a algo para levantarme de los sillones o sofás."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q8",
+        "mirrorPhrase": "dependes más de otras personas para tareas cotidianas",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Pedir ayuda a otros",
+        "text": "Por culpa de mi espalda, pido a los demás que me hagan las cosas."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q9",
+        "mirrorPhrase": "vestirte se ha vuelto más lento de lo normal",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Vestirse más lento",
+        "text": "Me visto más lentamente de lo normal a causa de mi espalda."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q10",
+        "mirrorPhrase": "tolerar tiempo de pie se ha vuelto difícil",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Estar de pie poco",
+        "text": "A causa de mi espalda, sólo me quedo de pie durante cortos períodos de tiempo."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q11",
+        "mirrorPhrase": "agacharte o arrodillarte es algo que ya evitas",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Evitar inclinarse",
+        "text": "A causa de mi espalda, procuro evitar inclinarme o arrodillarme."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q12",
+        "mirrorPhrase": "levantarte de una silla cuesta más de lo que debería",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Levantarse de la silla",
+        "text": "Me cuesta levantarme de una silla por culpa de mi espalda."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q13",
+        "mirrorPhrase": "el dolor te acompaña la mayor parte del día",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Dolor casi siempre",
+        "text": "Me duele la espalda casi siempre."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q14",
+        "mirrorPhrase": "moverte en la cama se ha vuelto complicado",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Voltearse en la cama",
+        "text": "Me cuesta darme la vuelta en la cama por culpa de mi espalda."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q15",
+        "mirrorPhrase": "el dolor está afectando hasta tu apetito",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Poco apetito",
+        "text": "Debido a mi dolor de espalda, no tengo mucho apetito."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q16",
+        "mirrorPhrase": "vestirte de la cintura para abajo cuesta trabajo",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Ponerse calcetines",
+        "text": "Me cuesta ponerme los calcetines - o medias - por mi dolor de espalda."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q17",
+        "mirrorPhrase": "las caminatas largas quedaron fuera de tu alcance por ahora",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Andar distancias cortas",
+        "text": "Debido a mi dolor de espalda, tan solo ando distancias cortas."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q18",
+        "mirrorPhrase": "tu descanso nocturno está pagando el precio",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Dormir peor",
+        "text": "Duermo peor debido a mi espalda."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q19",
+        "mirrorPhrase": "vestirte ya requiere ayuda de alguien más",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Ayuda para vestirse",
+        "text": "Por mi dolor de espalda, deben ayudarme a vestirme."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q20",
+        "mirrorPhrase": "pasas la mayor parte del día sentado",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Sentado todo el día",
+        "text": "Estoy casi todo el día sentado a causa de mi espalda."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q21",
+        "mirrorPhrase": "los esfuerzos pesados en casa quedaron en pausa",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Evitar trabajos pesados",
+        "text": "Evito hacer trabajos pesados en casa, por culpa de mi espalda."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q22",
+        "mirrorPhrase": "el dolor está afectando tu estado de ánimo",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Más irritable",
+        "text": "Por mi dolor de espalda, estoy más irritable y de peor humor de lo normal."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q23",
+        "mirrorPhrase": "subir escaleras te toma más tiempo",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Subir escaleras lento",
+        "text": "A causa de mi espalda, subo las escaleras más lentamente de lo normal."
+      },
+      {
+        "contextHeader": "Piensa en cómo te encuentras HOY. ¿Esta frase te describe?",
+        "id": "q24",
+        "mirrorPhrase": "la cama se ha vuelto tu lugar principal",
+        "options": [
+          {
+            "label": "Sí",
+            "value": 1
+          },
+          {
+            "label": "No",
+            "value": 0
+          }
+        ],
+        "shortLabel": "Casi siempre en cama",
+        "text": "Me quedo casi constantemente en la cama por mi espalda."
+      }
+    ],
+    "reportTexts": {
+      "leve": [
+        "Tu espalda te está limitando poco por ahora — y ese es exactamente el mejor momento para entender qué lo causa. La mayoría de los problemas lumbares detectados temprano se resuelven sin cirugía.",
+        "Una valoración con exploración física te dará un diagnóstico claro."
+      ],
+      "moderada": [
+        "Tu resultado indica que el dolor lumbar ya está interfiriendo con actividades básicas de tu día. Este patrón puede corresponder a varios orígenes — muscular, discal o articular — y distinguirlos requiere exploración física y, en algunos casos, estudios de imagen.",
+        "Identificar la causa a tiempo evita que el problema se vuelva crónico. Una valoración te dará un diagnóstico con nombre y apellido, y un plan concreto."
+      ],
+      "severa": [
+        "Tu puntaje refleja una limitación importante: tu espalda está condicionando gran parte de tu vida diaria. Un cuadro con este impacto necesita diagnóstico preciso pronto para no seguir perdiendo función.",
+        "La valoración incluye exploración neurológica y de columna, y los estudios que tu caso requiera."
+      ]
+    },
+    "resultDisplay": "checklist",
+    "scoring": {
+      "kind": "linear",
+      "maxRaw": 24
+    },
+    "triage": [
+      {
+        "id": "T1",
+        "options": [
+          {
+            "action": "flag-next:radicular",
+            "label": "Sí"
+          },
+          {
+            "action": "next",
+            "label": "No"
+          }
+        ],
+        "text": "¿El dolor se extiende por la pierna, más abajo de la rodilla?"
+      },
+      {
+        "id": "T2",
+        "options": [
+          {
+            "action": "flag-next:claudicacion",
+            "label": "Sí"
+          },
+          {
+            "action": "next",
+            "label": "No"
+          }
+        ],
+        "text": "¿El dolor aparece al caminar, te obliga a detenerte y se alivia al sentarte?"
+      },
+      {
+        "id": "T3",
+        "options": [
+          {
+            "action": "flag-next:urgente-neurologico",
+            "label": "Sí"
+          },
+          {
+            "action": "next",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tienes alguno de estos: debilidad en pie o pierna que va avanzando, adormecimiento en la zona genital, o dificultad nueva para controlar la orina o el excremento?"
+      },
+      {
+        "id": "T4",
+        "options": [
+          {
+            "action": "flag-next:trauma",
+            "label": "Sí"
+          },
+          {
+            "action": "next",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tu dolor empezó tras un golpe o caída fuerte reciente?"
+      }
+    ],
+    "zoneId": "espalda-baja",
+    "zoneLabel": "Espalda baja"
+  },
+  "hombro": {
+    "domainThresholds": [
+      2.5,
+      5,
+      7.5
+    ],
+    "domains": [
+      {
+        "examples": "vestirte, alcanzar tus bolsillos",
+        "id": "basicas",
+        "itemIds": [
+          "f4",
+          "f5",
+          "f8"
+        ],
+        "label": "Actividades básicas"
+      },
+      {
+        "examples": "asearte, vestirte por la cabeza",
+        "id": "moderadas",
+        "itemIds": [
+          "f1",
+          "f2",
+          "f3",
+          "d4"
+        ],
+        "label": "Elevación media"
+      },
+      {
+        "examples": "repisas altas, cargar, empujar",
+        "id": "demandantes",
+        "itemIds": [
+          "d3",
+          "f6",
+          "f7",
+          "d5"
+        ],
+        "label": "Elevación completa y carga"
+      }
+    ],
+    "estimatedMinutes": 2,
+    "flagLabels": {
+      "manguito": "Pérdida súbita de fuerza para elevar el brazo",
+      "origen-cervical": "Hormigueo que baja del cuello al brazo",
+      "trauma": "La molestia inició tras un golpe o caída"
+    },
+    "id": "hombro-spadi",
+    "instructions": "Si alguna actividad no la realizas normalmente, estima la dificultad que tendrías al intentarla.",
+    "instrumentCitation": "SPADI (Shoulder Pain and Disability Index; Roach et al., 1991; versión numérica Williams et al., 1995). Traducción orientativa; instrumento de dominio público.",
+    "instrumentName": "SPADI",
+    "questions": [
+      {
+        "anchors": {
+          "max": "El peor imaginable",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de hombro del 0 al 10…",
+        "id": "d1",
+        "kind": "scale",
+        "shortLabel": "Dolor máximo",
+        "text": "…en su peor momento"
+      },
+      {
+        "anchors": {
+          "max": "El peor imaginable",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de hombro del 0 al 10…",
+        "id": "d2",
+        "kind": "scale",
+        "shortLabel": "Dormir de ese lado",
+        "text": "…al acostarte sobre el lado afectado"
+      },
+      {
+        "anchors": {
+          "max": "El peor imaginable",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de hombro del 0 al 10…",
+        "id": "d3",
+        "kind": "scale",
+        "mirrorPhrase": "alcanzar una repisa alta despierta tu dolor",
+        "shortLabel": "Alcanzar en alto",
+        "text": "…al alcanzar algo en una repisa alta"
+      },
+      {
+        "anchors": {
+          "max": "El peor imaginable",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de hombro del 0 al 10…",
+        "id": "d4",
+        "kind": "scale",
+        "mirrorPhrase": "llevarte la mano a la nuca duele",
+        "shortLabel": "Mano a la nuca",
+        "text": "…al tocarte la parte de atrás del cuello"
+      },
+      {
+        "anchors": {
+          "max": "El peor imaginable",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de hombro del 0 al 10…",
+        "id": "d5",
+        "kind": "scale",
+        "mirrorPhrase": "empujar con ese brazo cobra factura",
+        "shortLabel": "Empujar",
+        "text": "…al empujar con el brazo afectado"
+      },
+      {
+        "anchors": {
+          "max": "Necesito ayuda / no puedo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "f1",
+        "kind": "scale",
+        "mirrorPhrase": "lavarte el pelo se volvió tarea difícil",
+        "shortLabel": "Lavarte el pelo",
+        "text": "Lavarte el pelo"
+      },
+      {
+        "anchors": {
+          "max": "Necesito ayuda / no puedo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "f2",
+        "kind": "scale",
+        "mirrorPhrase": "lavarte la espalda cuesta trabajo",
+        "shortLabel": "Lavarte la espalda",
+        "text": "Lavarte la espalda"
+      },
+      {
+        "anchors": {
+          "max": "Necesito ayuda / no puedo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "f3",
+        "kind": "scale",
+        "mirrorPhrase": "meterte una camiseta por la cabeza se complica",
+        "shortLabel": "Camiseta por la cabeza",
+        "text": "Ponerte una camiseta o suéter por la cabeza"
+      },
+      {
+        "anchors": {
+          "max": "Necesito ayuda / no puedo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "f4",
+        "kind": "scale",
+        "mirrorPhrase": "abotonarte la camisa se ha vuelto lento",
+        "shortLabel": "Abotonar camisa",
+        "text": "Ponerte una camisa que se abotona por delante"
+      },
+      {
+        "anchors": {
+          "max": "Necesito ayuda / no puedo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "f5",
+        "kind": "scale",
+        "mirrorPhrase": "subirte los pantalones cuesta más de lo normal",
+        "shortLabel": "Ponerte pantalones",
+        "text": "Ponerte los pantalones"
+      },
+      {
+        "anchors": {
+          "max": "Necesito ayuda / no puedo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "f6",
+        "kind": "scale",
+        "mirrorPhrase": "colocar cosas en alto quedó casi fuera de alcance",
+        "shortLabel": "Objeto en repisa alta",
+        "text": "Colocar un objeto en una repisa alta"
+      },
+      {
+        "anchors": {
+          "max": "Necesito ayuda / no puedo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "f7",
+        "kind": "scale",
+        "mirrorPhrase": "cargar peso con ese brazo se volvió un reto",
+        "shortLabel": "Cargar 4-5 kg",
+        "text": "Cargar un objeto pesado de 4 a 5 kilos"
+      },
+      {
+        "anchors": {
+          "max": "Necesito ayuda / no puedo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad",
+        "id": "f8",
+        "kind": "scale",
+        "mirrorPhrase": "alcanzar tu bolsillo trasero se complica",
+        "shortLabel": "Bolsillo trasero",
+        "text": "Sacar algo de tu bolsillo trasero"
+      }
+    ],
+    "reportTexts": {
+      "leve": [
+        "Tu hombro te está avisando, pero su función general se conserva. Es el momento ideal para identificar la causa — los problemas de hombro atendidos temprano suelen resolverse con tratamientos simples.",
+        "Una valoración con exploración física te dirá con certeza qué lo origina."
+      ],
+      "moderada": [
+        "Tu puntaje indica que el hombro ya limita actividades de tu día a día de forma importante. Este patrón es frecuente en lesiones del manguito rotador y en la inflamación del hombro — distinguirlo requiere exploración física y, con frecuencia, estudios de imagen.",
+        "Detectarlo a tiempo evita que la limitación avance. Una valoración te dará un diagnóstico con nombre y apellido, y un plan concreto."
+      ],
+      "severa": [
+        "Tu puntaje refleja una limitación importante: tu hombro está condicionando desde vestirte hasta cargar. Con este nivel de impacto, posponer el diagnóstico puede costar movilidad difícil de recuperar.",
+        "La valoración incluye maniobras específicas del hombro y los estudios que tu caso requiera."
+      ]
+    },
+    "scoring": {
+      "direction": "higher-is-worse",
+      "kind": "weighted-subscales",
+      "subscales": [
+        {
+          "id": "dolor",
+          "itemIds": [
+            "d1",
+            "d2",
+            "d3",
+            "d4",
+            "d5"
+          ],
+          "maxRaw": 50,
+          "weight": 0.5
+        },
+        {
+          "id": "funcion",
+          "itemIds": [
+            "f1",
+            "f2",
+            "f3",
+            "f4",
+            "f5",
+            "f6",
+            "f7",
+            "f8"
+          ],
+          "maxRaw": 80,
+          "weight": 0.5
+        }
+      ]
+    },
+    "triage": [
+      {
+        "id": "T1",
+        "options": [
+          {
+            "action": "goto:T2",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T3",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tu molestia empezó por un golpe o una caída reciente?"
+      },
+      {
+        "id": "T2",
+        "options": [
+          {
+            "action": "flag:urgente-trauma",
+            "label": "Sí"
+          },
+          {
+            "action": "flag:trauma",
+            "label": "No"
+          }
+        ],
+        "text": "¿Ves el hombro deformado o te resulta imposible mover el brazo?"
+      },
+      {
+        "id": "T3",
+        "options": [
+          {
+            "action": "flag:manguito",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T4",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tras un esfuerzo o una caída perdiste de repente la fuerza para levantar el brazo?"
+      },
+      {
+        "id": "T4",
+        "options": [
+          {
+            "action": "flag:origen-cervical",
+            "label": "Sí"
+          },
+          {
+            "action": "continue",
+            "label": "No"
+          }
+        ],
+        "text": "¿Sientes hormigueo que baja del cuello hacia el brazo o la mano?"
+      }
+    ],
+    "zoneId": "hombro",
+    "zoneLabel": "Hombro"
+  },
+  "muneca": {
+    "domainThresholds": [
+      2.5,
+      5,
+      7.5
+    ],
+    "domains": [
+      {
+        "examples": "vestirte, tu aseo personal",
+        "id": "basicas",
+        "itemIds": [
+          "s3",
+          "s6",
+          "u1"
+        ],
+        "label": "Actividades básicas"
+      },
+      {
+        "examples": "puertas, cocinar, el hogar",
+        "id": "moderadas",
+        "itemIds": [
+          "s1",
+          "s2",
+          "u2"
+        ],
+        "label": "Uso cotidiano de la mano"
+      },
+      {
+        "examples": "apoyarte, cargar, tu trabajo",
+        "id": "demandantes",
+        "itemIds": [
+          "s4",
+          "s5",
+          "r3",
+          "u3",
+          "u4"
+        ],
+        "label": "Fuerza y carga"
+      }
+    ],
+    "estimatedMinutes": 2,
+    "flagLabels": {
+      "mediano": "Hormigueo nocturno en pulgar, índice y medio",
+      "trauma": "La molestia inició tras una caída o golpe"
+    },
+    "id": "muneca-prwhe",
+    "instructions": "Si alguna actividad no la realizas normalmente, estima la dificultad que tendrías al intentarla.",
+    "instrumentCitation": "PRWHE (Patient-Rated Wrist/Hand Evaluation; MacDermid, 1998). Traducción orientativa; © J. MacDermid, de uso libre citando la fuente.",
+    "instrumentName": "PRWHE",
+    "questions": [
+      {
+        "anchors": {
+          "max": "El peor posible",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de muñeca o mano del 0 al 10…",
+        "id": "r1",
+        "kind": "scale",
+        "shortLabel": "Dolor en reposo",
+        "text": "…en reposo"
+      },
+      {
+        "anchors": {
+          "max": "El peor posible",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de muñeca o mano del 0 al 10…",
+        "id": "r2",
+        "kind": "scale",
+        "shortLabel": "Dolor en movimiento repetido",
+        "text": "…al hacer un movimiento repetido con la muñeca"
+      },
+      {
+        "anchors": {
+          "max": "El peor posible",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de muñeca o mano del 0 al 10…",
+        "id": "r3",
+        "kind": "scale",
+        "mirrorPhrase": "levantar objetos pesados dispara el dolor",
+        "shortLabel": "Dolor al levantar peso",
+        "text": "…al levantar un objeto pesado"
+      },
+      {
+        "anchors": {
+          "max": "El peor posible",
+          "min": "Sin dolor"
+        },
+        "contextHeader": "Durante la última semana, califica tu dolor de muñeca o mano del 0 al 10…",
+        "id": "r4",
+        "kind": "scale",
+        "shortLabel": "Dolor máximo",
+        "text": "…en su peor momento"
+      },
+      {
+        "anchors": {
+          "max": "Siempre",
+          "min": "Nunca"
+        },
+        "id": "r5",
+        "kind": "scale",
+        "shortLabel": "Frecuencia del dolor",
+        "text": "¿Con qué frecuencia tienes dolor?"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "s1",
+        "kind": "scale",
+        "mirrorPhrase": "girar una perilla se volvió doloroso",
+        "shortLabel": "Girar una perilla",
+        "text": "Girar una perilla"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "s2",
+        "kind": "scale",
+        "mirrorPhrase": "cortar tu comida cuesta trabajo",
+        "shortLabel": "Cortar con cuchillo",
+        "text": "Cortar carne con un cuchillo"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "s3",
+        "kind": "scale",
+        "mirrorPhrase": "abotonarte la camisa se ha vuelto lento",
+        "shortLabel": "Abotonar camisa",
+        "text": "Abrocharte los botones de la camisa"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "s4",
+        "kind": "scale",
+        "mirrorPhrase": "apoyar la mano para levantarte duele",
+        "shortLabel": "Levantarte de la silla",
+        "text": "Usar esa mano para empujarte y levantarte de una silla"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "s5",
+        "kind": "scale",
+        "mirrorPhrase": "cargar peso con esa mano quedó en pausa",
+        "shortLabel": "Cargar 4-5 kg",
+        "text": "Cargar un objeto de 4 a 5 kilos"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "s6",
+        "kind": "scale",
+        "mirrorPhrase": "hasta el aseo personal se complica",
+        "shortLabel": "Usar papel higiénico",
+        "text": "Usar papel higiénico"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "u1",
+        "kind": "scale",
+        "mirrorPhrase": "tu arreglo personal se volvió más lento",
+        "shortLabel": "Actividades personales",
+        "text": "Tus actividades personales (vestirte, asearte)"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "u2",
+        "kind": "scale",
+        "mirrorPhrase": "el trabajo del hogar te está costando",
+        "shortLabel": "Trabajo del hogar",
+        "text": "El trabajo del hogar (limpieza, mantenimiento)"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "u3",
+        "kind": "scale",
+        "mirrorPhrase": "tu trabajo diario se ve afectado",
+        "shortLabel": "Tu trabajo",
+        "text": "Tu trabajo (empleo o labor habitual)"
+      },
+      {
+        "anchors": {
+          "max": "Incapaz de hacerlo",
+          "min": "Sin dificultad"
+        },
+        "contextHeader": "…tu dificultad para realizar cada actividad con la mano afectada",
+        "id": "u4",
+        "kind": "scale",
+        "mirrorPhrase": "tus pasatiempos quedaron en pausa",
+        "shortLabel": "Actividades recreativas",
+        "text": "Tus actividades recreativas"
+      }
+    ],
+    "reportTexts": {
+      "leve": [
+        "Tu muñeca te está avisando, pero la función de tu mano se conserva. Es el mejor momento para identificar la causa — la mano agradece los diagnósticos tempranos.",
+        "Una valoración con exploración física te dirá con certeza qué lo origina."
+      ],
+      "moderada": [
+        "Tu puntaje indica que la muñeca o la mano ya limitan actividades de tu día a día. Este patrón aparece en tendinitis, compresiones de nervio y secuelas de lesiones — distinguirlo requiere exploración dirigida.",
+        "Atenderlo a tiempo protege la función de tu mano. Una valoración te dará un diagnóstico con nombre y apellido, y un plan concreto."
+      ],
+      "severa": [
+        "Tu puntaje refleja una limitación importante: tu mano está condicionando actividades esenciales. La mano no perdona los retrasos — un cuadro así necesita diagnóstico pronto.",
+        "La valoración incluye exploración de movilidad, fuerza y nervios, y los estudios que tu caso requiera."
+      ]
+    },
+    "scoring": {
+      "direction": "higher-is-worse",
+      "kind": "weighted-subscales",
+      "subscales": [
+        {
+          "id": "dolor",
+          "itemIds": [
+            "r1",
+            "r2",
+            "r3",
+            "r4",
+            "r5"
+          ],
+          "maxRaw": 50,
+          "weight": 0.5
+        },
+        {
+          "id": "funcion",
+          "itemIds": [
+            "s1",
+            "s2",
+            "s3",
+            "s4",
+            "s5",
+            "s6",
+            "u1",
+            "u2",
+            "u3",
+            "u4"
+          ],
+          "maxRaw": 100,
+          "weight": 0.5
+        }
+      ]
+    },
+    "triage": [
+      {
+        "id": "T1",
+        "options": [
+          {
+            "action": "goto:T2",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T3",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tu molestia empezó por una caída apoyando la mano o por un golpe?"
+      },
+      {
+        "id": "T2",
+        "options": [
+          {
+            "action": "flag:urgente-trauma",
+            "label": "Sí"
+          },
+          {
+            "action": "flag:trauma",
+            "label": "No"
+          }
+        ],
+        "text": "¿Ves la muñeca deformada o tienes dolor intenso en un punto del hueso?"
+      },
+      {
+        "id": "T3",
+        "options": [
+          {
+            "action": "flag:mediano",
+            "label": "Sí"
+          },
+          {
+            "action": "continue",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tienes hormigueo en pulgar, índice y medio que te despierta por la noche?"
+      }
+    ],
+    "zoneId": "muneca",
+    "zoneLabel": "Muñeca y mano"
+  },
+  "rodilla": {
+    "domains": [
+      {
+        "examples": "levantarte de una silla, la rigidez al despertar",
+        "id": "basicas",
+        "itemIds": [
+          "q1",
+          "q6"
+        ],
+        "label": "Actividades básicas"
+      },
+      {
+        "examples": "escaleras, estar de pie, estirar la rodilla",
+        "id": "moderadas",
+        "itemIds": [
+          "q3",
+          "q4",
+          "q5"
+        ],
+        "label": "Actividad moderada"
+      },
+      {
+        "examples": "girar sobre la rodilla, agacharte al piso",
+        "id": "demandantes",
+        "itemIds": [
+          "q2",
+          "q7"
+        ],
+        "label": "Actividad demandante"
+      }
+    ],
+    "estimatedMinutes": 1,
+    "flagLabels": {
+      "inestabilidad": "La rodilla se traba o se dobla sola",
+      "trauma": "La molestia inició tras un golpe o torcedura"
+    },
+    "id": "rodilla-koos-jr",
+    "instrumentCitation": "KOOS-JR (Knee injury and Osteoarthritis Outcome Score, Joint Replacement; Lyman et al., Clin Orthop Relat Res 2016). Traducción orientativa; instrumento © Hospital for Special Surgery, de uso libre.",
+    "instrumentName": "KOOS-JR",
+    "questions": [
+      {
+        "contextHeader": "Piensa en tu rodilla durante la última semana.",
+        "id": "q1",
+        "mirrorPhrase": "tu rodilla amanece rígida",
+        "options": [
+          {
+            "label": "Ninguna",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderada",
+            "value": 2
+          },
+          {
+            "label": "Severa",
+            "value": 3
+          },
+          {
+            "label": "Extrema",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Rigidez matutina",
+        "text": "¿Qué tan severa es la rigidez de tu rodilla al despertar por la mañana?"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿cuánto dolor de rodilla has tenido al…",
+        "id": "q2",
+        "mirrorPhrase": "los giros sobre la rodilla despiertan el dolor",
+        "options": [
+          {
+            "label": "Ninguno",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderado",
+            "value": 2
+          },
+          {
+            "label": "Severo",
+            "value": 3
+          },
+          {
+            "label": "Extremo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Girar sobre la rodilla",
+        "text": "…girar o pivotar sobre tu rodilla"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿cuánto dolor de rodilla has tenido al…",
+        "id": "q3",
+        "mirrorPhrase": "estirarla por completo genera molestia",
+        "options": [
+          {
+            "label": "Ninguno",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderado",
+            "value": 2
+          },
+          {
+            "label": "Severo",
+            "value": 3
+          },
+          {
+            "label": "Extremo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Estirar la rodilla",
+        "text": "…estirar completamente la rodilla"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿cuánto dolor de rodilla has tenido al…",
+        "id": "q4",
+        "mirrorPhrase": "las escaleras despiertan tu dolor",
+        "options": [
+          {
+            "label": "Ninguno",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderado",
+            "value": 2
+          },
+          {
+            "label": "Severo",
+            "value": 3
+          },
+          {
+            "label": "Extremo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Escaleras",
+        "text": "…subir o bajar escaleras"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿cuánto dolor de rodilla has tenido al…",
+        "id": "q5",
+        "mirrorPhrase": "estar de pie te pasa factura",
+        "options": [
+          {
+            "label": "Ninguno",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderado",
+            "value": 2
+          },
+          {
+            "label": "Severo",
+            "value": 3
+          },
+          {
+            "label": "Extremo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Estar de pie",
+        "text": "…estar de pie"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿qué tanta dificultad has tenido para…",
+        "id": "q6",
+        "mirrorPhrase": "incorporarte de un asiento se volvió un esfuerzo",
+        "options": [
+          {
+            "label": "Ninguna",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderada",
+            "value": 2
+          },
+          {
+            "label": "Severa",
+            "value": 3
+          },
+          {
+            "label": "Extrema",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Levantarte de una silla",
+        "text": "…levantarte desde una silla"
+      },
+      {
+        "contextHeader": "Durante la última semana, ¿qué tanta dificultad has tenido para…",
+        "id": "q7",
+        "mirrorPhrase": "agacharte al piso cuesta trabajo",
+        "options": [
+          {
+            "label": "Ninguna",
+            "value": 0
+          },
+          {
+            "label": "Leve",
+            "value": 1
+          },
+          {
+            "label": "Moderada",
+            "value": 2
+          },
+          {
+            "label": "Severa",
+            "value": 3
+          },
+          {
+            "label": "Extrema",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Agacharte al piso",
+        "text": "…agacharte al piso o recoger un objeto"
+      }
+    ],
+    "reportTexts": {
+      "leve": [
+        "Tu rodilla te está avisando, pero el impacto en tu día a día todavía es bajo. Detectar el origen ahora — cartílago, meniscos o ligamentos — abre las opciones más simples de tratamiento.",
+        "Una valoración con exploración física te dirá con certeza qué lo está causando."
+      ],
+      "moderada": [
+        "Tu puntaje indica que el problema de tu rodilla ya limita actividades de tu vida diaria de forma importante. Este patrón es frecuente en el desgaste articular y en lesiones de meniscos o ligamentos — pero distinguir cuál es tu caso requiere exploración física y, generalmente, estudios de imagen.",
+        "Identificarlo a tiempo amplía tus opciones. Una valoración te dará un diagnóstico con nombre y apellido, y un plan concreto."
+      ],
+      "severa": [
+        "Tu puntaje indica una limitación importante: tu rodilla está condicionando gran parte de tu vida diaria. Con este nivel de impacto, posponer el diagnóstico solo estrecha las opciones.",
+        "La valoración incluye exploración física completa y la solicitud de los estudios que tu caso requiera."
+      ]
+    },
+    "resultDisplay": "bars",
+    "scoring": {
+      "kind": "table",
+      "table": [
+        100,
+        91.975,
+        84.6,
+        79.914,
+        76.332,
+        73.342,
+        70.704,
+        68.284,
+        65.994,
+        63.776,
+        61.583,
+        59.381,
+        57.14,
+        54.84,
+        52.465,
+        50.012,
+        47.487,
+        44.905,
+        42.281,
+        39.625,
+        36.931,
+        34.174,
+        31.307,
+        28.251,
+        24.875,
+        20.941,
+        15.939,
+        8.291,
+        0
+      ]
+    },
+    "triage": [
+      {
+        "id": "T1",
+        "options": [
+          {
+            "action": "goto:T2",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T3",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tu molestia empezó por un golpe, torcedura o accidente reciente?"
+      },
+      {
+        "id": "T2",
+        "options": [
+          {
+            "action": "flag:trauma",
+            "label": "Sí"
+          },
+          {
+            "action": "flag:urgente-trauma",
+            "label": "No"
+          }
+        ],
+        "text": "¿Puedes apoyar la pierna y dar unos pasos, aunque duela?"
+      },
+      {
+        "id": "T3",
+        "options": [
+          {
+            "action": "flag:inestabilidad",
+            "label": "Sí"
+          },
+          {
+            "action": "continue",
+            "label": "No"
+          }
+        ],
+        "text": "¿La rodilla se te traba o se te dobla sola de repente?"
+      }
+    ],
+    "zoneId": "rodilla",
+    "zoneLabel": "Rodilla"
+  },
+  "tobillo": {
+    "domains": [
+      {
+        "examples": "estar de pie, caminar, tu arreglo personal",
+        "id": "basicas",
+        "itemIds": [
+          "q1",
+          "q2",
+          "q12",
+          "q13",
+          "q18"
+        ],
+        "label": "Actividades básicas"
+      },
+      {
+        "examples": "escaleras, banquetas, caminatas, el hogar",
+        "id": "moderadas",
+        "itemIds": [
+          "q3",
+          "q6",
+          "q7",
+          "q9",
+          "q14",
+          "q15",
+          "q16",
+          "q17",
+          "q19"
+        ],
+        "label": "Marcha y vida diaria"
+      },
+      {
+        "examples": "cuestas, cuclillas, trabajo pesado",
+        "id": "demandantes",
+        "itemIds": [
+          "q4",
+          "q5",
+          "q8",
+          "q10",
+          "q11",
+          "q20",
+          "q21"
+        ],
+        "label": "Terreno difícil y esfuerzo"
+      }
+    ],
+    "estimatedMinutes": 2,
+    "flagLabels": {
+      "inflamacion-aguda": "Hinchazón con calor o enrojecimiento de la piel",
+      "trauma": "La molestia inició tras una torcedura o golpe"
+    },
+    "id": "tobillo-faam-adl",
+    "instrumentCitation": "FAAM (Foot and Ankle Ability Measure, subescala de actividades de la vida diaria; Martin et al., Foot Ankle Int 2005). Traducción orientativa; instrumento de dominio público.",
+    "instrumentName": "FAAM-ADL",
+    "minAnswered": 19,
+    "questionNoun": {
+      "plural": "actividades",
+      "singular": "actividad"
+    },
+    "questions": [
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q1",
+        "mirrorPhrase": "estar de pie te pasa factura",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Estar de pie",
+        "text": "…estar de pie"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q2",
+        "mirrorPhrase": "caminar en plano ya se siente",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Caminar en plano",
+        "text": "…caminar en terreno plano"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q3",
+        "mirrorPhrase": "andar descalzo incomoda",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Caminar descalzo",
+        "text": "…caminar en terreno plano sin zapatos"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q4",
+        "mirrorPhrase": "las subidas te cuestan",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Subir cuestas",
+        "text": "…subir cuestas"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q5",
+        "mirrorPhrase": "las bajadas castigan tu pisada",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Bajar cuestas",
+        "text": "…bajar cuestas"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q6",
+        "mirrorPhrase": "subir escaleras te cuesta",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Subir escaleras",
+        "text": "…subir escaleras"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q7",
+        "mirrorPhrase": "bajar escaleras se volvió delicado",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Bajar escaleras",
+        "text": "…bajar escaleras"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q8",
+        "mirrorPhrase": "el terreno disparejo se volvió territorio incómodo",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Terreno disparejo",
+        "text": "…caminar en terreno disparejo"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q9",
+        "mirrorPhrase": "subir y bajar banquetas exige cuidado",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Banquetas",
+        "text": "…subir y bajar banquetas"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q10",
+        "mirrorPhrase": "ponerte en cuclillas quedó difícil",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Cuclillas",
+        "text": "…ponerte en cuclillas"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q11",
+        "mirrorPhrase": "pararte de puntas cuesta",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Pararte de puntas",
+        "text": "…pararte de puntas"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q12",
+        "mirrorPhrase": "los primeros pasos del día duelen",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Primeros pasos",
+        "text": "…dar los primeros pasos al levantarte"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q13",
+        "mirrorPhrase": "hasta las caminatas cortas se sienten",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Caminar 5 min",
+        "text": "…caminar 5 minutos o menos"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q14",
+        "mirrorPhrase": "caminar diez minutos ya es un reto",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Caminar 10 min",
+        "text": "…caminar alrededor de 10 minutos"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q15",
+        "mirrorPhrase": "las caminatas largas quedaron en pausa",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Caminar 15+ min",
+        "text": "…caminar 15 minutos o más"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q16",
+        "mirrorPhrase": "las tareas del hogar te cuestan",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Tareas del hogar",
+        "text": "…las tareas de tu casa"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q17",
+        "mirrorPhrase": "tus actividades de todos los días se ven afectadas",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Actividades cotidianas",
+        "text": "…tus actividades de todos los días"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q18",
+        "mirrorPhrase": "hasta tu arreglo personal se complica",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Cuidado personal",
+        "text": "…tu cuidado personal"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q19",
+        "mirrorPhrase": "el trabajo de pie o caminando te cuesta",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Trabajo ligero",
+        "text": "…trabajo ligero a moderado (estar de pie, caminar)"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q20",
+        "mirrorPhrase": "el trabajo pesado quedó fuera de alcance",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Trabajo pesado",
+        "text": "…trabajo pesado (empujar, jalar, subir, cargar)"
+      },
+      {
+        "allowNA": true,
+        "contextHeader": "Por tu tobillo o pie, ¿qué tanta dificultad tienes para…",
+        "id": "q21",
+        "mirrorPhrase": "tus pasatiempos quedaron en pausa",
+        "options": [
+          {
+            "label": "Ninguna dificultad",
+            "value": 0
+          },
+          {
+            "label": "Dificultad leve",
+            "value": 1
+          },
+          {
+            "label": "Dificultad moderada",
+            "value": 2
+          },
+          {
+            "label": "Dificultad extrema",
+            "value": 3
+          },
+          {
+            "label": "Incapaz de hacerlo",
+            "value": 4
+          }
+        ],
+        "shortLabel": "Recreativas",
+        "text": "…tus actividades recreativas"
+      }
+    ],
+    "reportTexts": {
+      "leve": [
+        "Tu tobillo o pie te está avisando, pero tu marcha general se conserva. Es el mejor momento para identificar la causa — el pie sostiene todo lo demás, y los problemas detectados temprano se corrigen con medidas simples.",
+        "Una valoración con exploración física te dirá con certeza qué lo origina."
+      ],
+      "moderada": [
+        "Tu puntaje indica que el tobillo o el pie ya limita tu marcha y tus actividades de forma importante. Este patrón aparece en secuelas de esguince, tendinitis y desgaste articular — distinguirlo requiere exploración física y, a veces, estudios de imagen.",
+        "Atenderlo a tiempo evita compensaciones que terminan doliendo en la rodilla, la cadera o la espalda. Una valoración te dará un diagnóstico con nombre y apellido, y un plan concreto."
+      ],
+      "severa": [
+        "Tu puntaje refleja una limitación importante: cada paso está condicionado. Un pie que no apoya bien compromete todo lo que está arriba — un cuadro así necesita diagnóstico pronto.",
+        "La valoración incluye exploración de apoyo, estabilidad y marcha, y los estudios que tu caso requiera."
+      ]
+    },
+    "scoring": {
+      "kind": "linear-adaptive",
+      "perItemMax": 4
+    },
+    "triage": [
+      {
+        "id": "T1",
+        "options": [
+          {
+            "action": "goto:T2",
+            "label": "Sí"
+          },
+          {
+            "action": "goto:T3",
+            "label": "No"
+          }
+        ],
+        "text": "¿Tu molestia empezó por una torcedura, golpe o caída reciente?"
+      },
+      {
+        "id": "T2",
+        "options": [
+          {
+            "action": "flag:trauma",
+            "label": "Sí"
+          },
+          {
+            "action": "flag:urgente-trauma",
+            "label": "No"
+          }
+        ],
+        "text": "¿Puedes apoyar el pie y dar al menos cuatro pasos, aunque duela?"
+      },
+      {
+        "id": "T3",
+        "options": [
+          {
+            "action": "flag:inflamacion-aguda",
+            "label": "Sí"
+          },
+          {
+            "action": "continue",
+            "label": "No"
+          }
+        ],
+        "text": "¿La zona está muy hinchada, caliente o con la piel enrojecida?"
+      }
+    ],
+    "zoneId": "tobillo",
+    "zoneLabel": "Tobillo y pie"
+  }
+}

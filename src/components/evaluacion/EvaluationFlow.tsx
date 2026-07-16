@@ -9,7 +9,7 @@ import type {
   TestDefinition,
 } from "@/lib/evaluacion/types";
 import { computeResult } from "@/lib/evaluacion/engine";
-import { TESTS, AVAILABLE_ZONES } from "@/lib/evaluacion/tests";
+import { getTest, AVAILABLE_ZONES } from "@/lib/evaluacion/tests";
 import ZonePicker from "@/components/evaluacion/ZonePicker";
 import AlarmScreen from "@/components/evaluacion/AlarmScreen";
 import TriageScreen from "@/components/evaluacion/TriageScreen";
@@ -35,10 +35,7 @@ export default function EvaluationFlow({
 }: {
   initialZone?: BodyZoneId;
 }) {
-  const startTest =
-    initialZone && TESTS[initialZone]
-      ? TESTS[initialZone]!
-      : null;
+  const startTest = initialZone ? getTest(initialZone, "es") : null;
 
   const [step, setStep] = useState<Step>(startTest ? "alarma" : "zona");
   const [test, setTest] = useState<TestDefinition | null>(startTest);
@@ -68,7 +65,7 @@ export default function EvaluationFlow({
   }
 
   function handleZoneSelect(zoneId: BodyZoneId) {
-    const t = TESTS[zoneId];
+    const t = getTest(zoneId, "es");
     if (!t) return;
     trackEvent("evaluacion_iniciada", { zona: zoneId });
     setTest(t);
