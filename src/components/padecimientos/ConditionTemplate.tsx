@@ -16,6 +16,7 @@ import {
 import type { Padecimiento } from "@/lib/padecimientos";
 import { waMessage } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/types";
+import { assessmentHref } from "@/lib/i18n/slug-map";
 import { getConditionsUi, type ConditionsUi } from "@/lib/i18n/pages/conditions";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
@@ -77,9 +78,8 @@ export default function ConditionTemplate({
     )
   );
   // Sin zona (padecimientos paraguas) el test arranca en el mapa corporal.
-  const evaluacionHref = p.testZone
-    ? `/evaluacion?zona=${p.testZone}`
-    : "/evaluacion";
+  // ES: /evaluacion?zona=… · EN: /en/assessment?zone=… (id de zona interno).
+  const evaluacionHref = assessmentHref(locale, p.testZone);
   // Texto del bloque post-síntomas: "tu {zona}" en minúsculas, o "tu zona".
   const zonaMinuscula = p.zonaChip ? p.zonaChip.toLowerCase() : "zona";
   const fotoComoLoTrato = COMO_LO_TRATO_FOTO[p.grupo];

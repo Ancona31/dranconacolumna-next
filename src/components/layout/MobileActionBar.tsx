@@ -3,23 +3,40 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
-import type { UiStrings } from "@/lib/i18n/types";
+import type { Locale, UiStrings } from "@/lib/i18n/types";
+import { assessmentHref } from "@/lib/i18n/slug-map";
 import { getPadecimiento } from "@/lib/padecimientos";
+import { getPadecimientoEn } from "@/lib/padecimientos/en";
 import { trackEvent } from "@/lib/analytics";
 
 export default function MobileActionBar({ strings }: { strings: UiStrings }) {
   const pathname = usePathname();
   const whatsappLink = buildWhatsAppLink(strings.whatsappDefaultMessage);
+  const locale: Locale = pathname?.startsWith("/en") ? "en" : "es";
 
   // El flujo de evaluación necesita foco total y trae su propio CTA.
-  if (pathname?.startsWith("/evaluacion")) return null;
+  if (
+    pathname?.startsWith("/evaluacion") ||
+    pathname?.startsWith("/en/assessment")
+  )
+    return null;
 
   // En una página de padecimiento con zona de test, el CTA precarga la zona en
-  // el evaluador; en el resto de rutas arranca desde el mapa corporal.
-  const slug = pathname?.match(/^\/padecimientos\/([^/]+)\/?$/)?.[1];
-  const testZone = slug ? getPadecimiento(slug)?.testZone : undefined;
+  // el evaluador; en el resto de rutas arranca desde el mapa corporal. El
+  // registro de padecimientos es por idioma (ES /padecimientos · EN
+  // /en/conditions); el id de zona es interno y no cambia.
+  const esSlug = pathname?.match(/^\/padecimientos\/([^/]+)\/?$/)?.[1];
+  const enSlug = pathname?.match(/^\/en\/conditions\/([^/]+)\/?$/)?.[1];
+  const testZone =
+    locale === "en"
+      ? enSlug
+        ? getPadecimientoEn(enSlug)?.testZone
+        : undefined
+      : esSlug
+        ? getPadecimiento(esSlug)?.testZone
+        : undefined;
   const evaluacionHref = testZone
-    ? `/evaluacion?zona=${testZone}`
+    ? assessmentHref(locale, testZone)
     : strings.mobileBar.evaluationHref;
 
   return (

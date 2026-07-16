@@ -53,7 +53,8 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
   },
   // Índice de padecimientos (los 13 padecimientos ya tienen par EN).
   { es: "/padecimientos", en: "/en/conditions" },
-  // TODO F3: /evaluacion ↔ /en/assessment.
+  // Evaluación (F3.A).
+  { es: "/evaluacion", en: "/en/assessment" },
 ];
 
 const ES_TO_EN = new Map(PAIRS.map((p) => [p.es, p.en] as const));
@@ -81,4 +82,16 @@ export function getAlternatePath(pathname: string, from: Locale): string {
 export function routeFor(esPath: string, locale: Locale): string {
   if (locale === "es") return esPath;
   return ES_TO_EN.get(esPath) ?? esPath;
+}
+
+/**
+ * Ruta del evaluador en `locale`, con la zona precargada opcional. La base sale
+ * del slug-map (ES /evaluacion · EN /en/assessment). El id de zona es INTERNO y
+ * no cambia entre idiomas; solo cambia el nombre del parámetro: `zona` en ES,
+ * `zone` en EN.
+ */
+export function assessmentHref(locale: Locale, zone?: string): string {
+  const base = routeFor("/evaluacion", locale);
+  if (!zone) return base;
+  return `${base}?${locale === "en" ? "zone" : "zona"}=${zone}`;
 }

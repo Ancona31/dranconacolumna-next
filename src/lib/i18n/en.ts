@@ -9,8 +9,7 @@ import type { UiStrings } from "./types";
  */
 export const en: UiStrings = {
   nav: [
-    // TODO F3: /en/assessment cuando exista la evaluación en EN.
-    { label: "Free Evaluation", href: "/evaluacion" },
+    { label: "Free Assessment", href: "/en/assessment" },
     { label: "Conditions", href: "/en/conditions" },
     { label: "Spine Surgery", href: "/en/spine-surgery" },
     { label: "About Me", href: "/en/about" },
@@ -36,7 +35,7 @@ export const en: UiStrings = {
   },
   mobileBar: {
     evaluationCta: "Start my evaluation",
-    evaluationHref: "/en",
+    evaluationHref: "/en/assessment",
     whatsappLabel: "WhatsApp",
   },
   whatsappFloat: {
