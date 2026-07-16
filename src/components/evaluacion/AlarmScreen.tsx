@@ -2,8 +2,17 @@
 
 import { useState } from "react";
 import { Check } from "lucide-react";
-import { RED_FLAGS, RED_FLAG_NONE_ID } from "@/lib/evaluacion/red-flags";
+import {
+  RED_FLAGS,
+  RED_FLAG_NONE_ID,
+  RED_FLAG_NONE_LABEL,
+} from "@/lib/evaluacion/red-flags";
 import type { TestDefinition } from "@/lib/evaluacion/types";
+import type { Locale } from "@/lib/i18n/types";
+import {
+  getEvaluationUi,
+  type EvaluationUi,
+} from "@/lib/i18n/pages/evaluacion";
 
 type AlarmScreenProps = {
   /** Test en curso; provee el conteo de ítems y la duración estimada. */
@@ -13,19 +22,26 @@ type AlarmScreenProps = {
    * marcados (vacío si eligió "Ninguna"). Ningún flag interrumpe el test.
    */
   onContinue: (flagIds: string[]) => void;
+  locale?: Locale;
 };
 
 /** "24 frases · alrededor de 2 minutos" — conteo de ítems + duración. */
-function durationLabel(test: TestDefinition) {
+function durationLabel(test: TestDefinition, ui: EvaluationUi) {
   const noun =
     test.questionNoun?.plural ??
-    (test.questions.length === 1 ? "pregunta" : "preguntas");
-  const min = test.estimatedMinutes;
-  const time = `alrededor de ${min} ${min === 1 ? "minuto" : "minutos"}`;
-  return `${test.questions.length} ${noun} · ${time}`;
+    (test.questions.length === 1
+      ? ui.alarm.nounFallbackSingular
+      : ui.alarm.nounFallbackPlural);
+  const time = ui.alarm.durationApprox(test.estimatedMinutes);
+  return ui.alarm.durationJoin(test.questions.length, noun, time);
 }
 
-export default function AlarmScreen({ test, onContinue }: AlarmScreenProps) {
+export default function AlarmScreen({
+  test,
+  onContinue,
+  locale = "es",
+}: AlarmScreenProps) {
+  const ui = getEvaluationUi(locale);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   function toggle(id: string) {
@@ -54,19 +70,17 @@ export default function AlarmScreen({ test, onContinue }: AlarmScreenProps) {
 
   const items = [
     ...RED_FLAGS,
-    { id: RED_FLAG_NONE_ID, label: "Ninguna de las anteriores" },
+    { id: RED_FLAG_NONE_ID, label: RED_FLAG_NONE_LABEL },
   ];
 
   return (
     <div className="mx-auto w-full max-w-xl">
       <h1 className="font-heading text-2xl font-bold text-primary sm:text-3xl">
-        Antes de empezar, ¿algo de esto te está pasando?
+        {ui.alarm.h1}
       </h1>
-      <p className="mt-2 font-body text-ink/70">
-        Selecciona todo lo que aplique. Es importante para orientarte bien.
-      </p>
+      <p className="mt-2 font-body text-ink/70">{ui.alarm.subtitle}</p>
       <p className="mt-1 font-body text-sm text-ink/50">
-        {durationLabel(test)}
+        {durationLabel(test, ui)}
       </p>
 
       {test.instructions && (
@@ -112,7 +126,7 @@ export default function AlarmScreen({ test, onContinue }: AlarmScreenProps) {
         disabled={!hasSelection}
         className="mt-6 w-full rounded-full bg-primary px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Continuar
+        {ui.alarm.continue}
       </button>
     </div>
   );

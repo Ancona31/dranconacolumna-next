@@ -275,6 +275,12 @@ export type TestDefinition = {
   questions: TestQuestion[];
   scoring: Scoring;
   reportTexts: ReportTexts;
+  /**
+   * Fragmento de zona para la opción "No aplica" de los ítems con `allowNA`
+   * (hoy solo el tobillo): completa "…no por {naZoneFragment}". El motor no lo
+   * usa; lo consume QuestionScreen.
+   */
+  naZoneFragment?: string;
 };
 
 export type RedFlag = { id: string; label: string };

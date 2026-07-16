@@ -10,6 +10,11 @@ import type {
 } from "@/lib/evaluacion/types";
 import { computeResult } from "@/lib/evaluacion/engine";
 import { getTest, AVAILABLE_ZONES } from "@/lib/evaluacion/tests";
+import type { Locale } from "@/lib/i18n/types";
+import {
+  getEvaluationUi,
+  type EvaluationUi,
+} from "@/lib/i18n/pages/evaluacion";
 import ZonePicker from "@/components/evaluacion/ZonePicker";
 import AlarmScreen from "@/components/evaluacion/AlarmScreen";
 import TriageScreen from "@/components/evaluacion/TriageScreen";
@@ -18,24 +23,27 @@ import ResultScreen from "@/components/evaluacion/ResultScreen";
 
 type Step = "zona" | "alarma" | "triaje" | "test" | "resultado";
 
-function timeLabel(test: TestDefinition) {
+function timeLabel(test: TestDefinition, ui: EvaluationUi) {
   return test.estimatedMinutes <= 1
-    ? "menos de 1 min"
-    : `~${test.estimatedMinutes} min`;
+    ? ui.flow.timeUnder1
+    : ui.flow.timeApprox(test.estimatedMinutes);
 }
 
 /** Sustantivo del ítem, con mayúscula inicial ("Pregunta" / "Frase"). */
-function questionNounCap(test: TestDefinition) {
-  const singular = test.questionNoun?.singular ?? "pregunta";
+function questionNounCap(test: TestDefinition, ui: EvaluationUi) {
+  const singular = test.questionNoun?.singular ?? ui.alarm.nounFallbackSingular;
   return singular.charAt(0).toUpperCase() + singular.slice(1);
 }
 
 export default function EvaluationFlow({
   initialZone,
+  locale = "es",
 }: {
   initialZone?: BodyZoneId;
+  locale?: Locale;
 }) {
-  const startTest = initialZone ? getTest(initialZone, "es") : null;
+  const ui = getEvaluationUi(locale);
+  const startTest = initialZone ? getTest(initialZone, locale) : null;
 
   const [step, setStep] = useState<Step>(startTest ? "alarma" : "zona");
   const [test, setTest] = useState<TestDefinition | null>(startTest);
@@ -65,7 +73,7 @@ export default function EvaluationFlow({
   }
 
   function handleZoneSelect(zoneId: BodyZoneId) {
-    const t = getTest(zoneId, "es");
+    const t = getTest(zoneId, locale);
     if (!t) return;
     trackEvent("evaluacion_iniciada", { zona: zoneId });
     setTest(t);
@@ -95,7 +103,7 @@ export default function EvaluationFlow({
     setAnswers(nextAnswers);
     if (qIndex + 1 >= test.questions.length) {
       setResult(
-        computeResult(test, nextAnswers, [...alarmFlags, ...triageFlags])
+        computeResult(test, nextAnswers, [...alarmFlags, ...triageFlags], locale)
       );
       setStep("resultado");
     } else {
@@ -132,6 +140,7 @@ export default function EvaluationFlow({
           <ZonePicker
             availableZones={AVAILABLE_ZONES}
             onSelect={handleZoneSelect}
+            locale={locale}
           />
         </div>
       </section>
@@ -154,7 +163,7 @@ export default function EvaluationFlow({
           onClick={reset}
           className="font-body text-sm text-ink/50 transition-colors duration-150 hover:text-ink"
         >
-          Salir
+          {ui.flow.exit}
         </button>
       </div>
 
@@ -163,13 +172,18 @@ export default function EvaluationFlow({
         className="eval-screen flex-1 px-4 py-8 sm:py-10"
       >
         {step === "alarma" && test && (
-          <AlarmScreen test={test} onContinue={handleAlarmContinue} />
+          <AlarmScreen
+            test={test}
+            onContinue={handleAlarmContinue}
+            locale={locale}
+          />
         )}
 
         {step === "triaje" && test && (
           <TriageScreen
             triage={test.triage}
             onComplete={handleTriageComplete}
+            locale={locale}
           />
         )}
 
@@ -178,14 +192,18 @@ export default function EvaluationFlow({
             question={test.questions[qIndex]}
             index={qIndex}
             total={total}
-            nounLabel={questionNounCap(test)}
-            timeLabel={timeLabel(test)}
+            nounLabel={questionNounCap(test, ui)}
+            timeLabel={timeLabel(test, ui)}
+            naZoneFragment={test.naZoneFragment}
             onAnswer={handleAnswer}
             onBack={handleBack}
+            locale={locale}
           />
         )}
 
-        {step === "resultado" && result && <ResultScreen result={result} />}
+        {step === "resultado" && result && (
+          <ResultScreen result={result} locale={locale} />
+        )}
       </div>
     </div>
   );

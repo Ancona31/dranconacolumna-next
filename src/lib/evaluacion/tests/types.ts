@@ -113,4 +113,9 @@ export type TestContent = {
   /** Texto por id de dominio. */
   domains?: Record<string, DomainContent>;
   reportTexts: ReportTexts;
+  /**
+   * Fragmento de zona para el "No aplica" de los ítems con allowNA (tobillo):
+   * completa "…no por {naZoneFragment}".
+   */
+  naZoneFragment?: string;
 };

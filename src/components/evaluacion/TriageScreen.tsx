@@ -2,17 +2,22 @@
 
 import { useState } from "react";
 import type { TriageQuestion } from "@/lib/evaluacion/types";
+import type { Locale } from "@/lib/i18n/types";
+import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
 
 type TriageScreenProps = {
   triage: TriageQuestion[];
   /** Termina el triaje y pasa al test, con los flags acumulados. */
   onComplete: (flags: string[]) => void;
+  locale?: Locale;
 };
 
 export default function TriageScreen({
   triage,
   onComplete,
+  locale = "es",
 }: TriageScreenProps) {
+  const ui = getEvaluationUi(locale).triage;
   const [index, setIndex] = useState(0);
   const [flags, setFlags] = useState<string[]>([]);
 
@@ -63,7 +68,7 @@ export default function TriageScreen({
   return (
     <div className="mx-auto w-full max-w-xl">
       <span className="font-body text-sm text-ink/60">
-        Sobre tu dolor · {index + 1} de {triage.length}
+        {ui.eyebrow(index + 1, triage.length)}
       </span>
       <h1 className="mt-1 font-heading text-2xl font-bold text-primary sm:text-3xl">
         {question.text}

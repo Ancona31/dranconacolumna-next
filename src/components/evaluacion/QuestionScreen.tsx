@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import type { TestQuestion } from "@/lib/evaluacion/types";
+import type { Locale } from "@/lib/i18n/types";
+import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
 
 /** Opción "No aplica" del FAAM: la respuesta es null y el ítem sale del cálculo. */
 const NA = "na" as const;
@@ -14,9 +16,12 @@ type QuestionScreenProps = {
   /** Sustantivo del ítem capitalizado ("Pregunta" / "Frase"). */
   nounLabel: string;
   timeLabel: string;
+  /** Fragmento de zona del "No aplica" (solo tests con allowNA, p. ej. tobillo). */
+  naZoneFragment?: string;
   /** `null` = el paciente marcó "No aplica". */
   onAnswer: (value: number | null) => void;
   onBack: () => void;
+  locale?: Locale;
 };
 
 export default function QuestionScreen({
@@ -25,9 +30,12 @@ export default function QuestionScreen({
   total,
   nounLabel,
   timeLabel,
+  naZoneFragment,
   onAnswer,
   onBack,
+  locale = "es",
 }: QuestionScreenProps) {
+  const ui = getEvaluationUi(locale).question;
   const [picked, setPicked] = useState<number | typeof NA | null>(null);
   const timer = useRef<number | null>(null);
 
@@ -50,10 +58,10 @@ export default function QuestionScreen({
           className="-ml-1 inline-flex items-center gap-1 font-body text-sm text-ink/60 transition-colors duration-150 hover:text-accent"
         >
           <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
-          Atrás
+          {ui.back}
         </button>
         <span className="font-body text-sm text-ink/60">
-          {nounLabel} {index + 1} de {total} · {timeLabel}
+          {ui.header(nounLabel, index + 1, total, timeLabel)}
         </span>
       </div>
 
@@ -130,7 +138,7 @@ export default function QuestionScreen({
                   : "border-ink/25 bg-transparent text-ink/60 hover:border-accent hover:text-accent"
               }`}
             >
-              No aplica — está limitada por otra causa, no por mi tobillo o pie
+              {`${ui.naLead}${naZoneFragment ?? ""}`}
             </button>
           )}
         </>

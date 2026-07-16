@@ -1,24 +1,13 @@
 import type { Metadata } from "next";
 import type { BodyZoneId } from "@/components/home/BodyFigureSVG";
 import EvaluationFlow from "@/components/evaluacion/EvaluationFlow";
+import { AVAILABLE_ZONES } from "@/lib/evaluacion/tests";
 
 export const metadata: Metadata = {
   title: "Evaluación gratuita de tu dolor",
   description:
     "Señala dónde te duele, responde una evaluación clínica validada y recibe tu reporte explicado al momento. Gratis y sin registro.",
 };
-
-const VALID_ZONES: BodyZoneId[] = [
-  "cuello",
-  "espalda-alta",
-  "espalda-baja",
-  "hombro",
-  "codo",
-  "muneca",
-  "cadera",
-  "rodilla",
-  "tobillo",
-];
 
 export default async function EvaluacionPage({
   searchParams,
@@ -27,7 +16,7 @@ export default async function EvaluacionPage({
 }) {
   const { zona } = await searchParams;
   const initialZone =
-    zona && VALID_ZONES.includes(zona as BodyZoneId)
+    zona && AVAILABLE_ZONES.includes(zona as BodyZoneId)
       ? (zona as BodyZoneId)
       : undefined;
 

@@ -18,6 +18,7 @@ import type {
   DomainId,
   DomainState,
   EvaluationResult,
+  NonUrgentLevel,
   Recommendation,
 } from "@/lib/evaluacion/types";
 import {
@@ -25,20 +26,21 @@ import {
   buildAlertBanner,
   computeDomains,
   type DomainResult,
-  EVALUATION_SIGNATURE,
-  FUNC_ALL_GREEN_LINE,
   FUNC_COLORS,
-  FUNC_STATE_LABELS,
   getEvaluationPlan,
   getPartialAnswersNote,
   getRecommendation,
   getRecommendationColors,
   getSemaphoreTitle,
   getWarningSigns,
-  nivelDefinitions,
   NIVEL_BADGE_COLORS,
-  WARNING_CLOSING,
 } from "@/lib/evaluacion/engine";
+import { getEngineCopy } from "@/lib/evaluacion/i18n";
+import type { Locale } from "@/lib/i18n/types";
+import {
+  getEvaluationUi,
+  type EvaluationUi,
+} from "@/lib/i18n/pages/evaluacion";
 import { BODY_PATH, BODY_ZONES } from "@/components/home/BodyFigureSVG";
 import {
   DOCTOR_FULL_NAME,
@@ -47,13 +49,6 @@ import {
 } from "@/lib/config";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import QrSvg from "@/lib/evaluacion/pdf/QrSvg";
-
-// Enlace de agendamiento FIJO y corto: mensaje mínimo → QR poco denso y de
-// lectura confiable. Mismo destino para el QR y el <Link> clicable del bloque.
-// Ya no se codifica folio/score/ventana (eso hacía el QR denso y frágil).
-const SCHEDULE_WA_LINK = buildWhatsAppLink(
-  "Hola Dr. Ancona, quiero agendar una consulta."
-);
 
 // TODO: si se agregan /public/fonts/*.ttf, registrar aquí Plus Jakarta Sans
 // (bold, títulos) e Inter (regular/semibold) con Font.register. Por ahora se
@@ -78,16 +73,16 @@ const C = {
 };
 
 const PHONE_DISPLAY = "999 636 4504";
-const CERT = "Certificado CMOT 26/5567/25";
 
 // Estilo del QR en UN solo lugar: placa blanca con puntos azul tinta
 // (contraste correcto y detectable).
 const QR_STYLE = { fg: "#0B3C5D", bgPlate: true };
 
-const LEVELS = {
-  leve: { label: "Limitación leve", color: C.success },
-  moderada: { label: "Limitación moderada", color: C.warning },
-  severa: { label: "Limitación severa", color: C.danger },
+// Color de la pill de nivel (la etiqueta de texto sale de la capa i18n).
+const LEVEL_COLOR: Record<NonUrgentLevel, string> = {
+  leve: C.success,
+  moderada: C.warning,
+  severa: C.danger,
 };
 
 const styles = StyleSheet.create({
@@ -266,7 +261,7 @@ function PdfGauge({ score }: { score: number }) {
 
 // Membrete universal: mismo header fijo (altura explícita 86) en TODAS las
 // páginas. Sin render condicional — se imprime idéntico en p1, p2, pN.
-function HeaderBand() {
+function HeaderBand({ ui }: { ui: EvaluationUi }) {
   return (
     <View style={styles.headerBand} fixed>
       <View style={styles.headerLeft}>
@@ -276,50 +271,43 @@ function HeaderBand() {
         </View>
         <View>
           <Text style={styles.docName}>{DOCTOR_FULL_NAME}</Text>
-          <Text style={styles.docSub}>
-            Ortopedia · Traumatología · Cirugía de Columna
-          </Text>
+          <Text style={styles.docSub}>{ui.pdf.headerSub}</Text>
         </View>
       </View>
       <View style={styles.headerRight}>
         <Text>
-          Céd. Prof. {CEDULA_PROFESIONAL} · Céd. Esp. {CEDULA_ESPECIALIDAD}
+          {ui.pdf.cedProfLabel} {CEDULA_PROFESIONAL} · {ui.pdf.cedEspLabel}{" "}
+          {CEDULA_ESPECIALIDAD}
         </Text>
-        <Text>{CERT}</Text>
+        <Text>{ui.pdf.cert}</Text>
       </View>
     </View>
   );
 }
 
-function FooterBand() {
+function FooterBand({ ui }: { ui: EvaluationUi }) {
   return (
     <>
       <View style={styles.footerBand} fixed>
-        <Text style={styles.footerText}>
-          dranconacolumna.com  ·  WhatsApp {PHONE_DISPLAY}  ·  Mérida y Umán
-        </Text>
+        <Text style={styles.footerText}>{ui.pdf.footer(PHONE_DISPLAY)}</Text>
       </View>
       {/* Único condicional por página permitido: render en un Text fijo. */}
       <Text
         fixed
         style={styles.footerPage}
         render={({ pageNumber, totalPages }) =>
-          `Página ${pageNumber} de ${totalPages}`
+          ui.pdf.pageLabel(pageNumber, totalPages)
         }
       />
     </>
   );
 }
 
-function Legal({ citation }: { citation: string }) {
+function Legal({ citation, ui }: { citation: string; ui: EvaluationUi }) {
   return (
     <View style={styles.legal} wrap={false}>
       <Text>{citation}</Text>
-      <Text style={{ marginTop: 3 }}>
-        Este reporte no constituye un diagnóstico ni sustituye una consulta
-        médica. Generado en tu dispositivo: tus respuestas no se almacenan en
-        ningún servidor. dranconacolumna.com
-      </Text>
+      <Text style={{ marginTop: 3 }}>{ui.pdf.legalDisclaimer}</Text>
     </View>
   );
 }
@@ -367,29 +355,34 @@ function RecommendationBlock({ rec }: { rec: Recommendation }) {
   );
 }
 
-function CtaBlock({ waLink, urgent }: { waLink: string; urgent: boolean }) {
+function CtaBlock({
+  waLink,
+  urgent,
+  ui,
+}: {
+  waLink: string;
+  urgent: boolean;
+  ui: EvaluationUi;
+}) {
   return (
     <View style={styles.ctaBox} wrap={false}>
       <View style={{ flex: 1, paddingRight: 12 }}>
         <Text
           style={{ color: "#fff", fontFamily: "Helvetica-Bold", fontSize: 10.5 }}
         >
-          {urgent
-            ? "Avísanos de tu caso por WhatsApp"
-            : "Escríbenos por WhatsApp para agendar tu valoración"}
+          {urgent ? ui.pdf.ctaUrgent : ui.pdf.ctaNormal}
         </Text>
         <Link src={waLink} style={styles.greenPill}>
           {PHONE_DISPLAY}
         </Link>
         {urgent ? (
           <Text style={{ color: "#D5E3EF", fontSize: 8.5, marginTop: 7 }}>
-            Y lleva este reporte a tu valoración de hoy — le servirá al médico
-            que te atienda.
+            {ui.pdf.urgentCarryNote}
           </Text>
         ) : (
           <>
             <Text style={{ color: "#D5E3EF", fontSize: 8.5, marginTop: 7 }}>
-              Consulta en Mérida y Umán
+              {ui.pdf.ctaConsultLine}
             </Text>
             <Text
               style={{
@@ -399,8 +392,7 @@ function CtaBlock({ waLink, urgent }: { waLink: string; urgent: boolean }) {
                 fontStyle: "italic",
               }}
             >
-              Presenta este reporte en tu cita — me permite conocer tu caso antes
-              de explorarte.
+              {ui.pdf.ctaPresentReport}
             </Text>
           </>
         )}
@@ -425,15 +417,23 @@ function CtaBlock({ waLink, urgent }: { waLink: string; urgent: boolean }) {
             textAlign: "center",
           }}
         >
-          Escanéalo o tócalo
+          {ui.pdf.qrCaption}
         </Text>
       </View>
     </View>
   );
 }
 
-function AlertBlock({ result }: { result: EvaluationResult }) {
-  const banner = buildAlertBanner(result);
+function AlertBlock({
+  result,
+  ui,
+  locale,
+}: {
+  result: EvaluationResult;
+  ui: EvaluationUi;
+  locale: Locale;
+}) {
+  const banner = buildAlertBanner(result, locale);
   if (!banner) return null;
   const tone =
     banner.tone === "urgente"
@@ -450,7 +450,7 @@ function AlertBlock({ result }: { result: EvaluationResult }) {
       <Text style={{ marginTop: 4 }}>{banner.body}</Text>
       {banner.tone === "urgente" ? (
         <Text style={{ marginTop: 5, fontFamily: "Helvetica-Bold" }}>
-          Muestra este reporte al médico que te atienda.
+          {ui.pdf.urgentShowReport}
         </Text>
       ) : null}
     </View>
@@ -605,7 +605,13 @@ function PdfDomainIcon({ id, color }: { id: DomainId; color: string }) {
 // Tarjeta del semáforo (misma versión completa que la pantalla): fila superior
 // (icono + label + indicador y etiqueta de estado) + ejemplos gris cursiva +
 // frase completa de la matriz con sus mirrors.
-function CapacityCardPdf({ domain }: { domain: DomainResult }) {
+function CapacityCardPdf({
+  domain,
+  locale,
+}: {
+  domain: DomainResult;
+  locale: Locale;
+}) {
   const { bg, strong } = FUNC_COLORS[domain.state];
   return (
     <View
@@ -624,7 +630,7 @@ function CapacityCardPdf({ domain }: { domain: DomainResult }) {
           <Text
             style={{ fontFamily: "Helvetica-Bold", fontSize: 8, color: strong }}
           >
-            {FUNC_STATE_LABELS[domain.state]}
+            {getEngineCopy(locale).funcStateLabels[domain.state]}
           </Text>
         </View>
       </View>
@@ -657,29 +663,35 @@ function BulletList({ items, color }: { items: string[]; color: string }) {
 export default function ReportPdf({
   result,
   name,
+  locale = "es",
 }: {
   result: EvaluationResult;
   name?: string;
   /** Aceptado por compatibilidad con quien invoca; el QR ahora es vectorial. */
   qrDataUrl?: string;
+  locale?: Locale;
 }) {
-  const level = LEVELS[result.level];
-  const rec = getRecommendation(result.level, result.alertLevel);
-  const fecha = result.createdAt.toLocaleString("es-MX", {
+  const ui = getEvaluationUi(locale);
+  const copy = getEngineCopy(locale);
+  const levelLabel = ui.result.levelPill[result.level];
+  const levelColor = LEVEL_COLOR[result.level];
+  const rec = getRecommendation(result.level, result.alertLevel, locale);
+  const fecha = result.createdAt.toLocaleString(ui.pdf.dateLocale, {
     dateStyle: "long",
     timeStyle: "short",
   });
-  const domains = computeDomains(result.test, result.answers);
+  const domains = computeDomains(result.test, result.answers, locale);
   const allGreen = allDomainsGreen(domains);
-  const evaluationPlan = getEvaluationPlan(result);
-  const warningSigns = getWarningSigns(result);
-  const partialNote = getPartialAnswersNote(result);
+  const evaluationPlan = getEvaluationPlan(result, locale);
+  const warningSigns = getWarningSigns(result, locale);
+  const partialNote = getPartialAnswersNote(result, locale);
+  const scheduleWaLink = buildWhatsAppLink(ui.pdf.scheduleWaMessage);
 
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
-        <HeaderBand />
-        <FooterBand />
+        <HeaderBand ui={ui} />
+        <FooterBand ui={ui} />
 
         <View style={styles.body}>
           {/* Header-título + mini-silueta de marca (bloque completo) */}
@@ -693,12 +705,14 @@ export default function ReportPdf({
           >
             <View style={{ flex: 1, paddingRight: 12 }}>
               <Text style={styles.title}>
-                REPORTE DE EVALUACIÓN — {result.zoneLabel.toUpperCase()}
+                {ui.pdf.titleReport(result.zoneLabel.toUpperCase())}
               </Text>
               <Text style={styles.meta}>
-                {fecha} · Folio {result.folio}
+                {ui.pdf.metaLine(fecha, result.folio)}
               </Text>
-              {name ? <Text style={styles.meta}>Reporte de: {name}</Text> : null}
+              {name ? (
+                <Text style={styles.meta}>{ui.pdf.reportOf(name)}</Text>
+              ) : null}
             </View>
             <View style={{ marginTop: 10 }}>
               <PdfMiniSilhouette result={result} />
@@ -706,7 +720,7 @@ export default function ReportPdf({
           </View>
 
           {/* Banner de alerta condicional (entre título y resultado) */}
-          <AlertBlock result={result} />
+          <AlertBlock result={result} ui={ui} locale={locale} />
 
           {/* Bloque de resultado */}
           <View style={{ marginTop: 9 }} wrap={false}>
@@ -735,18 +749,18 @@ export default function ReportPdf({
                       color: C.muted,
                     }}
                   >
-                    /100
+                    {ui.pdf.per100}
                   </Text>
                 </View>
                 <Text style={{ fontSize: 9, lineHeight: 1.2, marginTop: 2, color: "#5b6772" }}>
-                  índice de limitación
+                  {ui.pdf.indexCaption}
                 </Text>
                 <Text style={{ fontSize: 7.5, lineHeight: 1.2, color: C.muted, marginTop: 2 }}>
-                  0–30 leve · 31–60 moderada · 61–100 severa
+                  {ui.pdf.cutsLegend}
                 </Text>
                 <View style={{ marginTop: 6 }}>
-                  <Text style={[styles.levelPill, { backgroundColor: level.color }]}>
-                    {level.label}
+                  <Text style={[styles.levelPill, { backgroundColor: levelColor }]}>
+                    {levelLabel}
                   </Text>
                 </View>
               </View>
@@ -778,10 +792,10 @@ export default function ReportPdf({
                   color: NIVEL_BADGE_COLORS[result.level].strong,
                 }}
               >
-                ¿Qué significa limitación {result.level}?
+                {ui.pdf.badgeQuestion(result.level)}
               </Text>
               <Text style={{ fontSize: 8.5, color: C.ink, marginTop: 2 }}>
-                {nivelDefinitions[result.level]}
+                {copy.nivelDefinitions[result.level]}
               </Text>
             </View>
           </View>
@@ -790,14 +804,14 @@ export default function ReportPdf({
           {domains.length > 0 ? (
             <View style={styles.section} wrap={false}>
               <Text style={styles.sectionTitle}>
-                {getSemaphoreTitle(result.test).toUpperCase()}
+                {getSemaphoreTitle(result.test, locale).toUpperCase()}
               </Text>
               {domains.map((domain) => (
-                <CapacityCardPdf key={domain.id} domain={domain} />
+                <CapacityCardPdf key={domain.id} domain={domain} locale={locale} />
               ))}
               {allGreen ? (
                 <Text style={{ fontSize: 8, color: C.muted, marginTop: 1 }}>
-                  {FUNC_ALL_GREEN_LINE}
+                  {copy.funcAllGreenLine}
                 </Text>
               ) : null}
             </View>
@@ -805,7 +819,7 @@ export default function ReportPdf({
 
           {/* Qué significa */}
           <View style={styles.section} wrap={false}>
-            <Text style={styles.sectionTitle}>QUÉ SIGNIFICA TU RESULTADO</Text>
+            <Text style={styles.sectionTitle}>{ui.pdf.meaningTitle}</Text>
             {result.test.reportTexts[result.level].map((p, i) => (
               <Text key={i} style={{ marginBottom: 3 }}>
                 {p}
@@ -816,11 +830,9 @@ export default function ReportPdf({
           {/* Qué debe evaluarse en tu caso */}
           {evaluationPlan.length > 0 ? (
             <View style={styles.section} wrap={false}>
-              <Text style={styles.sectionTitle}>
-                QUÉ DEBE EVALUARSE EN TU CASO
-              </Text>
+              <Text style={styles.sectionTitle}>{ui.pdf.evalPlanTitle}</Text>
               <BulletList items={evaluationPlan} color={C.accent} />
-              <Text style={styles.signature}>{EVALUATION_SIGNATURE}</Text>
+              <Text style={styles.signature}>{copy.evaluationSignature}</Text>
             </View>
           ) : null}
 
@@ -828,13 +840,13 @@ export default function ReportPdf({
           {warningSigns.length > 0 ? (
             <View style={styles.section} wrap={false}>
               <Text style={[styles.sectionTitle, { color: C.danger }]}>
-                SEÑALES PARA NO ESPERAR TU CITA
+                {ui.pdf.warningTitle}
               </Text>
               <BulletList items={warningSigns} color={C.danger} />
               <Text
                 style={{ fontSize: 8.5, fontFamily: "Helvetica-Bold", marginTop: 4 }}
               >
-                {WARNING_CLOSING}
+                {copy.warningClosing}
               </Text>
             </View>
           ) : null}
@@ -844,10 +856,11 @@ export default function ReportPdf({
           <View wrap={false}>
             <RecommendationBlock rec={rec} />
             <CtaBlock
-              waLink={SCHEDULE_WA_LINK}
+              waLink={scheduleWaLink}
               urgent={result.alertLevel === "urgente"}
+              ui={ui}
             />
-            <Legal citation={result.test.instrumentCitation} />
+            <Legal citation={result.test.instrumentCitation} ui={ui} />
           </View>
         </View>
       </Page>

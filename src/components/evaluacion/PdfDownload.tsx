@@ -5,8 +5,17 @@ import { Download } from "lucide-react";
 import type { EvaluationResult } from "@/lib/evaluacion/types";
 import { getResultWhatsAppLink } from "@/lib/evaluacion/engine";
 import { trackEvent } from "@/lib/analytics";
+import type { Locale } from "@/lib/i18n/types";
+import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
 
-export default function PdfDownload({ result }: { result: EvaluationResult }) {
+export default function PdfDownload({
+  result,
+  locale = "es",
+}: {
+  result: EvaluationResult;
+  locale?: Locale;
+}) {
+  const ui = getEvaluationUi(locale).pdfDownload;
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -30,6 +39,7 @@ export default function PdfDownload({ result }: { result: EvaluationResult }) {
           result={result}
           name={name.trim() || undefined}
           qrDataUrl={qrDataUrl}
+          locale={locale}
         />
       ).toBlob();
 
@@ -58,7 +68,7 @@ export default function PdfDownload({ result }: { result: EvaluationResult }) {
         className="flex w-full items-center justify-center gap-2 rounded-full border border-primary px-6 py-3 font-body text-sm font-semibold text-primary transition duration-150 hover:bg-primary hover:text-white active:scale-[0.985]"
       >
         <Download className="h-4 w-4" strokeWidth={1.5} />
-        Descargar mi reporte (PDF)
+        {ui.open}
       </button>
     );
   }
@@ -69,7 +79,7 @@ export default function PdfDownload({ result }: { result: EvaluationResult }) {
         htmlFor="pdf-name"
         className="font-body text-sm font-medium text-ink"
       >
-        ¿A nombre de quién generamos tu PDF? (opcional)
+        {ui.nameQuestion}
       </label>
       <input
         id="pdf-name"
@@ -77,7 +87,7 @@ export default function PdfDownload({ result }: { result: EvaluationResult }) {
         value={name}
         onChange={(e) => setName(e.target.value)}
         autoComplete="off"
-        placeholder="Tu nombre"
+        placeholder={ui.namePlaceholder}
         className="mt-2 w-full rounded-xl border border-ink/20 bg-background px-4 py-3 font-body text-ink outline-none focus:border-accent"
       />
       <button
@@ -87,11 +97,9 @@ export default function PdfDownload({ result }: { result: EvaluationResult }) {
         className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985] disabled:opacity-50"
       >
         <Download className="h-4 w-4" strokeWidth={1.5} />
-        {busy ? "Generando…" : "Generar PDF"}
+        {busy ? ui.generating : ui.generate}
       </button>
-      <p className="mt-2 font-body text-xs text-ink/45">
-        El nombre solo se imprime en el documento; no se guarda en ningún lado.
-      </p>
+      <p className="mt-2 font-body text-xs text-ink/45">{ui.privacyNote}</p>
     </div>
   );
 }

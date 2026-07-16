@@ -5,6 +5,8 @@ import BodyFigureSVG, {
   BODY_ZONES,
   type BodyZoneId,
 } from "@/components/home/BodyFigureSVG";
+import type { Locale } from "@/lib/i18n/types";
+import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
 
 // viewBox de BodyFigureSVG.
 const VIEW_W = 220;
@@ -17,24 +19,25 @@ type ZonePickerProps = {
    */
   availableZones: BodyZoneId[];
   onSelect: (zoneId: BodyZoneId) => void;
+  locale?: Locale;
 };
 
 export default function ZonePicker({
   availableZones,
   onSelect,
+  locale = "es",
 }: ZonePickerProps) {
   const [hovered, setHovered] = useState<BodyZoneId | null>(null);
+  const ui = getEvaluationUi(locale).zonePicker;
 
   const highlighted = hovered ?? availableZones[0] ?? "cadera";
 
   return (
     <div className="mx-auto w-full max-w-md text-center">
       <h1 className="font-heading text-3xl font-extrabold text-primary sm:text-4xl">
-        ¿Dónde te duele?
+        {ui.h1}
       </h1>
-      <p className="mt-2 font-body text-ink/70">
-        Toca la zona donde sientes la molestia.
-      </p>
+      <p className="mt-2 font-body text-ink/70">{ui.subtitle}</p>
 
       <div className="relative mx-auto mt-8 w-[62%] max-w-[300px]">
         <BodyFigureSVG
@@ -51,7 +54,7 @@ export default function ZonePicker({
               key={zone.id}
               type="button"
               disabled={!available}
-              aria-label={`Evaluar ${zone.label}`}
+              aria-label={ui.zoneAria(zone.label)}
               onClick={() => onSelect(zone.id)}
               onMouseEnter={() => setHovered(zone.id)}
               onMouseLeave={() => setHovered(null)}

@@ -28,10 +28,7 @@ import {
   allDomainsGreen,
   buildAlertBanner,
   computeDomains,
-  EVALUATION_SIGNATURE,
-  FUNC_ALL_GREEN_LINE,
   FUNC_COLORS,
-  FUNC_STATE_LABELS,
   getEvaluationPlan,
   getPartialAnswersNote,
   getRecommendation,
@@ -39,11 +36,11 @@ import {
   getResultWhatsAppLink,
   getSemaphoreTitle,
   getWarningSigns,
-  nivelDefinitions,
   NIVEL_BADGE_COLORS,
-  UNSCORABLE_MESSAGE,
-  WARNING_CLOSING,
 } from "@/lib/evaluacion/engine";
+import { getEngineCopy } from "@/lib/evaluacion/i18n";
+import type { Locale } from "@/lib/i18n/types";
+import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
 import { BODY_PATH, BODY_ZONES } from "@/components/home/BodyFigureSVG";
 import PdfDownload from "@/components/evaluacion/PdfDownload";
 import ShareButton from "@/components/share/ShareButton";
@@ -52,26 +49,19 @@ import { SITE_URL } from "@/lib/config";
 
 // Compartir el enlace a la evaluación (no el PDF): que otra persona haga su
 // test. Mismo bloque en el reporte scorable y en el no-scorable.
-const EVAL_SHARE = {
-  url: `${SITE_URL}/evaluacion`,
-  title: "Evaluación clínica gratuita — Dr. Angel Ancona",
-  text: "Hice esta evaluación de mi dolor y me dio un reporte en minutos. Haz la tuya gratis:",
-} as const;
-
-function ShareEvaluation() {
+function ShareEvaluation({ locale }: { locale: Locale }) {
+  const ui = getEvaluationUi(locale).result;
   return (
     <div className="mt-6 rounded-xl border border-primary/15 bg-primary-soft p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
-      <p className="font-body text-sm text-ink/70">
-        ¿Conoces a alguien con dolor? Comparte la evaluación gratuita.
-      </p>
+      <p className="font-body text-sm text-ink/70">{ui.sharePrompt}</p>
       <div className="mt-3 sm:mt-0 sm:shrink-0">
         <ShareButton
-          url={EVAL_SHARE.url}
-          title={EVAL_SHARE.title}
-          text={EVAL_SHARE.text}
+          url={`${SITE_URL}${ui.shareUrlPath}`}
+          title={ui.shareTitle}
+          text={ui.shareText}
           variant="card"
           origen="reporte"
-          label="Compartir esta evaluación"
+          label={ui.shareButtonLabel}
         />
       </div>
     </div>
@@ -83,10 +73,11 @@ const BANNER_STYLES = {
   urgente: { box: "border-danger bg-danger/10", title: "text-danger" },
 };
 
-const LEVEL_STYLES: Record<NonUrgentLevel, { pill: string; label: string }> = {
-  leve: { pill: "bg-success/10 text-success", label: "Limitación leve" },
-  moderada: { pill: "bg-warning/10 text-warning", label: "Limitación moderada" },
-  severa: { pill: "bg-danger/10 text-danger", label: "Limitación severa" },
+// Clase de la pill de nivel (el color no lo da el texto). El texto sale de ui.
+const LEVEL_PILL: Record<NonUrgentLevel, string> = {
+  leve: "bg-success/10 text-success",
+  moderada: "bg-warning/10 text-warning",
+  severa: "bg-danger/10 text-danger",
 };
 
 // Icono lucide por dominio y glifo de estado (SVG, nunca emoji). Cubre la
@@ -120,11 +111,19 @@ function arc(a: number, b: number) {
   )} ${p2.y.toFixed(2)}`;
 }
 
-function Gauge({ score, ready }: { score: number; ready: boolean }) {
+function Gauge({
+  score,
+  ready,
+  ariaLabel,
+}: {
+  score: number;
+  ready: boolean;
+  ariaLabel: string;
+}) {
   const needleDeg = (score / 100) * 180 - 90;
   return (
     <svg viewBox="0 0 240 140" className="w-full max-w-[280px]" role="img"
-      aria-label={`Índice de limitación ${score} de 100`}>
+      aria-label={ariaLabel}>
       <path d={arc(0, 30)} stroke="var(--color-success)" strokeWidth={16} fill="none" strokeLinecap="butt" />
       <path d={arc(30, 60)} stroke="var(--color-warning)" strokeWidth={16} fill="none" strokeLinecap="butt" />
       <path d={arc(60, 100)} stroke="var(--color-danger)" strokeWidth={16} fill="none" strokeLinecap="butt" />
@@ -144,7 +143,13 @@ function Gauge({ score, ready }: { score: number; ready: boolean }) {
 }
 
 // Mini-silueta de marca con la zona evaluada marcada en el color del nivel.
-function MiniSilhouette({ result }: { result: EvaluationResult }) {
+function MiniSilhouette({
+  result,
+  locale,
+}: {
+  result: EvaluationResult;
+  locale: Locale;
+}) {
   const pt = BODY_ZONES.find((z) => z.id === result.test.zoneId);
   const strong = NIVEL_BADGE_COLORS[result.level].strong;
   return (
@@ -152,7 +157,7 @@ function MiniSilhouette({ result }: { result: EvaluationResult }) {
       viewBox="0 0 220 540"
       className="h-16 w-auto shrink-0"
       role="img"
-      aria-label={`Zona evaluada: ${result.zoneLabel}`}
+      aria-label={getEvaluationUi(locale).result.zoneAria(result.zoneLabel)}
     >
       <path d={BODY_PATH} fill="var(--color-accent)" fillOpacity={0.12} />
       {pt && (
@@ -167,8 +172,10 @@ function MiniSilhouette({ result }: { result: EvaluationResult }) {
 
 function CapacityCard({
   domain,
+  locale,
 }: {
   domain: ReturnType<typeof computeDomains>[number];
+  locale: Locale;
 }) {
   const { bg, strong } = FUNC_COLORS[domain.state];
   const Icon = DOMAIN_ICON[domain.id] ?? Activity;
@@ -196,7 +203,7 @@ function CapacityCard({
             <Glyph className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
           </span>
           <span className="font-body text-xs font-bold" style={{ color: strong }}>
-            {FUNC_STATE_LABELS[domain.state]}
+            {getEngineCopy(locale).funcStateLabels[domain.state]}
           </span>
         </span>
       </div>
@@ -209,24 +216,37 @@ function CapacityCard({
 }
 
 /** Encabezado común: mini-silueta + título + folio. */
-function ResultHeader({ result }: { result: EvaluationResult }) {
+function ResultHeader({
+  result,
+  locale,
+}: {
+  result: EvaluationResult;
+  locale: Locale;
+}) {
+  const ui = getEvaluationUi(locale).result;
   return (
     <div className="flex items-center justify-center gap-3">
-      <MiniSilhouette result={result} />
+      <MiniSilhouette result={result} locale={locale} />
       <div className="text-left">
         <h1 className="font-heading text-2xl font-bold text-primary sm:text-3xl">
-          Tu evaluación de {result.zoneLabel}
+          {ui.headerTitle(result.zoneLabel)}
         </h1>
         <p className="mt-1 font-body text-sm text-ink/50">
-          Folio {result.folio}
+          {ui.folioLabel} {result.folio}
         </p>
       </div>
     </div>
   );
 }
 
-function AlertBanner({ result }: { result: EvaluationResult }) {
-  const banner = buildAlertBanner(result);
+function AlertBanner({
+  result,
+  locale,
+}: {
+  result: EvaluationResult;
+  locale: Locale;
+}) {
+  const banner = buildAlertBanner(result, locale);
   if (!banner) return null;
   return (
     <div
@@ -257,21 +277,29 @@ function AlertBanner({ result }: { result: EvaluationResult }) {
  * Queda lo que sigue siendo cierto — la alerta si la hubo, las señales de la
  * zona y la puerta de contacto. Sin PDF: el reporte se articula sobre el score.
  */
-function UnscorableScreen({ result }: { result: EvaluationResult }) {
-  const warningSigns = getWarningSigns(result);
+function UnscorableScreen({
+  result,
+  locale,
+}: {
+  result: EvaluationResult;
+  locale: Locale;
+}) {
+  const ui = getEvaluationUi(locale).result;
+  const copy = getEngineCopy(locale);
+  const warningSigns = getWarningSigns(result, locale);
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <ResultHeader result={result} />
-      <AlertBanner result={result} />
+      <ResultHeader result={result} locale={locale} />
+      <AlertBanner result={result} locale={locale} />
 
       <div className="mt-6 rounded-xl border-[1.5px] border-ink/15 bg-ink/[0.03] p-5">
-        <p className="font-body text-ink/80">{UNSCORABLE_MESSAGE}</p>
+        <p className="font-body text-ink/80">{copy.unscorableMessage}</p>
       </div>
 
       {warningSigns.length > 0 && (
         <div className="mt-8 rounded-xl border-l-4 border-danger bg-danger/5 p-4">
           <h2 className="font-heading text-lg font-bold text-danger">
-            Señales para no esperar tu cita
+            {ui.warningTitle}
           </h2>
           <ul className="mt-3 space-y-2">
             {warningSigns.map((sign) => (
@@ -285,7 +313,7 @@ function UnscorableScreen({ result }: { result: EvaluationResult }) {
             ))}
           </ul>
           <p className="mt-3 font-body text-sm font-semibold text-ink">
-            {WARNING_CLOSING}
+            {copy.warningClosing}
           </p>
         </div>
       )}
@@ -302,23 +330,24 @@ function UnscorableScreen({ result }: { result: EvaluationResult }) {
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
       >
         <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
-        {result.alertLevel === "urgente"
-          ? "Avísanos de tu caso por WhatsApp"
-          : "Escríbenos para agendar tu valoración"}
+        {result.alertLevel === "urgente" ? ui.ctaUrgent : ui.ctaNormal}
       </a>
 
       {/* Compartir la evaluación (secundario: no compite con el CTA de WhatsApp). */}
-      <ShareEvaluation />
+      <ShareEvaluation locale={locale} />
 
-      <p className="mt-6 font-body text-xs text-ink/45">
-        Esta evaluación es orientativa y no sustituye una consulta médica. Tus
-        respuestas no salen de tu dispositivo.
-      </p>
+      <p className="mt-6 font-body text-xs text-ink/45">{ui.disclaimer}</p>
     </div>
   );
 }
 
-export default function ResultScreen({ result }: { result: EvaluationResult }) {
+export default function ResultScreen({
+  result,
+  locale = "es",
+}: {
+  result: EvaluationResult;
+  locale?: Locale;
+}) {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const id = requestAnimationFrame(() => setReady(true));
@@ -335,42 +364,42 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
     });
   }, [result]);
 
-  if (result.unscorable) return <UnscorableScreen result={result} />;
+  if (result.unscorable)
+    return <UnscorableScreen result={result} locale={locale} />;
 
-  const style = LEVEL_STYLES[result.level];
-  const rec = getRecommendation(result.level, result.alertLevel);
+  const ui = getEvaluationUi(locale).result;
+  const copy = getEngineCopy(locale);
+  const rec = getRecommendation(result.level, result.alertLevel, locale);
   const recColors = getRecommendationColors(rec);
   const RecIcon = rec.urgent ? AlarmClock : CalendarClock;
   const whatsappLink = getResultWhatsAppLink(result);
   const paragraphs = result.test.reportTexts[result.level];
-  const domains = computeDomains(result.test, result.answers);
+  const domains = computeDomains(result.test, result.answers, locale);
   const allGreen = allDomainsGreen(domains);
-  const evaluationPlan = getEvaluationPlan(result);
-  const warningSigns = getWarningSigns(result);
-  const partialNote = getPartialAnswersNote(result);
+  const evaluationPlan = getEvaluationPlan(result, locale);
+  const warningSigns = getWarningSigns(result, locale);
+  const partialNote = getPartialAnswersNote(result, locale);
 
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <ResultHeader result={result} />
+      <ResultHeader result={result} locale={locale} />
 
       {/* Banner de alerta condicional (arriba del medidor) */}
-      <AlertBanner result={result} />
+      <AlertBanner result={result} locale={locale} />
 
       {/* Medidor + score */}
       <div className="mt-6 flex flex-col items-center">
-        <Gauge score={result.score} ready={ready} />
+        <Gauge score={result.score} ready={ready} ariaLabel={ui.gaugeAria(result.score)} />
         <p className="-mt-2 font-heading text-5xl font-extrabold text-primary">
           {result.score}
-          <span className="text-2xl text-ink/50">/100</span>
+          <span className="text-2xl text-ink/50">{ui.per100}</span>
         </p>
-        <p className="font-body text-sm text-ink/60">índice de limitación</p>
-        <p className="mt-1 font-body text-xs text-ink/45">
-          0–30 leve · 31–60 moderada · 61–100 severa
-        </p>
+        <p className="font-body text-sm text-ink/60">{ui.indexCaption}</p>
+        <p className="mt-1 font-body text-xs text-ink/45">{ui.cutsLegend}</p>
         <span
-          className={`mt-3 rounded-full px-4 py-1 font-body text-sm font-semibold ${style.pill}`}
+          className={`mt-3 rounded-full px-4 py-1 font-body text-sm font-semibold ${LEVEL_PILL[result.level]}`}
         >
-          {style.label}
+          {ui.levelPill[result.level]}
         </span>
         {partialNote && (
           <p className="mt-3 max-w-md text-center font-body text-xs text-ink/50">
@@ -391,10 +420,10 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
           className="font-heading text-sm font-bold"
           style={{ color: NIVEL_BADGE_COLORS[result.level].strong }}
         >
-          ¿Qué significa limitación {result.level}?
+          {ui.badgeQuestion(result.level)}
         </p>
         <p className="mt-1 font-body text-sm text-ink">
-          {nivelDefinitions[result.level]}
+          {copy.nivelDefinitions[result.level]}
         </p>
       </div>
 
@@ -402,16 +431,16 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
       {domains.length > 0 && (
         <div className="mt-8">
           <h2 className="font-heading text-lg font-bold text-primary">
-            {getSemaphoreTitle(result.test)}
+            {getSemaphoreTitle(result.test, locale)}
           </h2>
           <div className="mt-4 space-y-3">
             {domains.map((domain) => (
-              <CapacityCard key={domain.id} domain={domain} />
+              <CapacityCard key={domain.id} domain={domain} locale={locale} />
             ))}
           </div>
           {allGreen && (
             <p className="mt-3 font-body text-sm text-ink/70">
-              {FUNC_ALL_GREEN_LINE}
+              {copy.funcAllGreenLine}
             </p>
           )}
         </div>
@@ -420,7 +449,7 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
       {/* Qué significa tu resultado */}
       <div className="mt-8">
         <h2 className="font-heading text-lg font-bold text-primary">
-          Qué significa tu resultado
+          {ui.meaningTitle}
         </h2>
         <div className="mt-3 space-y-3 font-body text-ink/75">
           {paragraphs.map((p, i) => (
@@ -433,7 +462,7 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
       {evaluationPlan.length > 0 && (
         <div className="mt-8">
           <h2 className="font-heading text-lg font-bold text-primary">
-            Qué debe evaluarse en tu caso
+            {ui.evalPlanTitle}
           </h2>
           <ul className="mt-3 space-y-2">
             {evaluationPlan.map((item) => (
@@ -450,7 +479,7 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
             ))}
           </ul>
           <p className="mt-3 font-body text-sm italic text-ink/60">
-            {EVALUATION_SIGNATURE}
+            {copy.evaluationSignature}
           </p>
         </div>
       )}
@@ -459,7 +488,7 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
       {warningSigns.length > 0 && (
         <div className="mt-8 rounded-xl border-l-4 border-danger bg-danger/5 p-4">
           <h2 className="font-heading text-lg font-bold text-danger">
-            Señales para no esperar tu cita
+            {ui.warningTitle}
           </h2>
           <ul className="mt-3 space-y-2">
             {warningSigns.map((sign) => (
@@ -476,7 +505,7 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
             ))}
           </ul>
           <p className="mt-3 font-body text-sm font-semibold text-ink">
-            {WARNING_CLOSING}
+            {copy.warningClosing}
           </p>
         </div>
       )}
@@ -530,26 +559,20 @@ export default function ResultScreen({ result }: { result: EvaluationResult }) {
           className="flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
         >
           <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
-          {result.alertLevel === "urgente"
-            ? "Avísanos de tu caso por WhatsApp"
-            : "Escríbenos para agendar tu valoración"}
+          {result.alertLevel === "urgente" ? ui.ctaUrgent : ui.ctaNormal}
         </a>
         {result.alertLevel === "urgente" && (
           <p className="text-center font-body text-sm text-ink/70">
-            Y lleva este reporte a tu valoración de hoy — le servirá al médico
-            que te atienda.
+            {ui.urgentCarryNote}
           </p>
         )}
-        <PdfDownload result={result} />
+        <PdfDownload result={result} locale={locale} />
       </div>
 
       {/* Compartir la evaluación (secundario: no compite con el CTA de WhatsApp). */}
-      <ShareEvaluation />
+      <ShareEvaluation locale={locale} />
 
-      <p className="mt-6 font-body text-xs text-ink/45">
-        Esta evaluación es orientativa y no sustituye una consulta médica. Tus
-        respuestas no salen de tu dispositivo.
-      </p>
+      <p className="mt-6 font-body text-xs text-ink/45">{ui.disclaimer}</p>
     </div>
   );
 }

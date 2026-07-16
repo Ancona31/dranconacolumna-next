@@ -2885,6 +2885,7 @@
     "instrumentCitation": "FAAM (Foot and Ankle Ability Measure, subescala de actividades de la vida diaria; Martin et al., Foot Ankle Int 2005). Traducción orientativa; instrumento de dominio público.",
     "instrumentName": "FAAM-ADL",
     "minAnswered": 19,
+    "naZoneFragment": "mi tobillo o pie",
     "questionNoun": {
       "plural": "actividades",
       "singular": "actividad"

@@ -219,4 +219,8 @@ export const tobilloContentEs: TestContent = {
       "La valoración incluye exploración de apoyo, estabilidad y marcha, y los estudios que tu caso requiera.",
     ],
   },
+
+  // F3 corrección (a): completa el "No aplica — …no por {naZoneFragment}" del
+  // QuestionScreen. Byte-idéntico al literal que estaba hardcodeado ("mi tobillo o pie").
+  naZoneFragment: "mi tobillo o pie",
 };

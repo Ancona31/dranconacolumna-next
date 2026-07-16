@@ -105,5 +105,7 @@ export function assembleTest(
   if (structure.applyGradient !== undefined)
     def.applyGradient = structure.applyGradient;
   if (content.domainPhrases) def.domainPhrases = content.domainPhrases;
+  if (content.naZoneFragment !== undefined)
+    def.naZoneFragment = content.naZoneFragment;
   return def;
 }
