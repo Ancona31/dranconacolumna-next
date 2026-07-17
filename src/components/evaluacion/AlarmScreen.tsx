@@ -2,11 +2,8 @@
 
 import { useState } from "react";
 import { Check } from "lucide-react";
-import {
-  RED_FLAGS,
-  RED_FLAG_NONE_ID,
-  RED_FLAG_NONE_LABEL,
-} from "@/lib/evaluacion/red-flags";
+import { RED_FLAGS, RED_FLAG_NONE_ID } from "@/lib/evaluacion/red-flags";
+import { getEngineCopy } from "@/lib/evaluacion/i18n";
 import type { TestDefinition } from "@/lib/evaluacion/types";
 import type { Locale } from "@/lib/i18n/types";
 import {
@@ -42,6 +39,7 @@ export default function AlarmScreen({
   locale = "es",
 }: AlarmScreenProps) {
   const ui = getEvaluationUi(locale);
+  const copy = getEngineCopy(locale);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   function toggle(id: string) {
@@ -69,8 +67,8 @@ export default function AlarmScreen({
   }
 
   const items = [
-    ...RED_FLAGS,
-    { id: RED_FLAG_NONE_ID, label: RED_FLAG_NONE_LABEL },
+    ...RED_FLAGS.map((f) => ({ id: f.id, label: copy.redFlagLabels[f.id] })),
+    { id: RED_FLAG_NONE_ID, label: copy.redFlagNoneLabel },
   ];
 
   return (

@@ -724,8 +724,11 @@ export function computeResult(
   const level = levelFromScore(score, test.scoring.levels ?? DEFAULT_LEVELS);
 
   // "Marcaste:" = alarma universal + flags de triaje de precaución, en ese orden.
+  const redFlagLabels = getEngineCopy(locale).redFlagLabels;
   const alertMarks = [
-    ...RED_FLAGS.filter((rf) => flags.includes(rf.id)).map((rf) => rf.label),
+    ...RED_FLAGS.filter((rf) => flags.includes(rf.id)).map(
+      (rf) => redFlagLabels[rf.id]
+    ),
     ...flags
       .filter((f) => CAUTION_FLAGS.has(f))
       .map((f) => test.flagLabels?.[f])

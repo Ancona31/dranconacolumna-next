@@ -107,6 +107,15 @@ export const es: EngineCopy = {
   exampleLead: " — por ejemplo, ",
   exampleJoin: " y ",
 
+  redFlagLabels: {
+    fiebre: "Fiebre junto con el dolor",
+    "perdida-peso": "Pérdida de peso sin explicación",
+    cancer: "Antecedente de cáncer",
+    "dolor-nocturno":
+      "El dolor me despierta por la noche y no cede con el reposo",
+  },
+  redFlagNoneLabel: "Ninguna de las anteriores",
+
   urgentFlagBanners: {
     "urgente-trauma": {
       title: "Tu lesión necesita valoración hoy",

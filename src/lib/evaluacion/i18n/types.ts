@@ -71,6 +71,12 @@ export interface EngineCopy {
   /** Conector entre las dos paráfrasis de ejemplo (" y "). */
   exampleJoin: string;
 
+  /* -------------------------- Alarma universal ---------------------------- */
+  /** Etiquetas de los datos de alarma universales, por id (ver RED_FLAGS). */
+  redFlagLabels: Record<string, string>;
+  /** Etiqueta de la opción exclusiva de "ninguna" (RED_FLAG_NONE_ID). */
+  redFlagNoneLabel: string;
+
   /* ------------------------------ Banners --------------------------------- */
   /** Banner de urgencia por flag (lleva el alertLevel a 'urgente'). */
   urgentFlagBanners: Record<string, BannerCopy>;

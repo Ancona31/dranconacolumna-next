@@ -283,7 +283,7 @@ export type TestDefinition = {
   naZoneFragment?: string;
 };
 
-export type RedFlag = { id: string; label: string };
+export type RedFlag = { id: string };
 
 /** questionId → value elegido; `null` = el paciente marcó "No aplica". */
 export type AnswerMap = Record<string, number | null>;
