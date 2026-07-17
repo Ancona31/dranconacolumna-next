@@ -7,6 +7,7 @@ import BodyFigureSVG, {
 } from "@/components/home/BodyFigureSVG";
 import type { Locale } from "@/lib/i18n/types";
 import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
+import { getZoneLabel } from "@/lib/i18n/zone-labels";
 
 // viewBox de BodyFigureSVG.
 const VIEW_W = 220;
@@ -32,6 +33,12 @@ export default function ZonePicker({
 
   const highlighted = hovered ?? availableZones[0] ?? "cadera";
 
+  // Etiquetas por locale para el chip de la silueta y los aria-label. En ES
+  // resuelven a la etiqueta interna de BODY_ZONES (render byte-idéntico).
+  const zoneLabels = Object.fromEntries(
+    BODY_ZONES.map((z) => [z.id, getZoneLabel(z.id, locale)])
+  ) as Record<BodyZoneId, string>;
+
   return (
     <div className="mx-auto w-full max-w-md text-center">
       <h1 className="font-heading text-3xl font-extrabold text-primary sm:text-4xl">
@@ -43,6 +50,7 @@ export default function ZonePicker({
         <BodyFigureSVG
           highlightedZone={highlighted}
           mode="selected"
+          zoneLabels={zoneLabels}
           className="h-auto w-full text-primary"
         />
 
@@ -54,7 +62,7 @@ export default function ZonePicker({
               key={zone.id}
               type="button"
               disabled={!available}
-              aria-label={ui.zoneAria(zone.label)}
+              aria-label={ui.zoneAria(zoneLabels[zone.id])}
               onClick={() => onSelect(zone.id)}
               onMouseEnter={() => setHovered(zone.id)}
               onMouseLeave={() => setHovered(null)}

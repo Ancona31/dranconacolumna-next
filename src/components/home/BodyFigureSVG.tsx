@@ -99,12 +99,18 @@ interface BodyFigureSVGProps {
   highlightedZone?: BodyZoneId;
   mode?: BodyFigureMode;
   className?: string;
+  /**
+   * Override de etiquetas por zona para el chip del modo "selected". Sin él, el
+   * chip usa la etiqueta interna en español de BODY_ZONES (contexto ES).
+   */
+  zoneLabels?: Partial<Record<BodyZoneId, string>>;
 }
 
 export default function BodyFigureSVG({
   highlightedZone = "espalda-baja",
   mode = "ambient",
   className,
+  zoneLabels,
 }: BodyFigureSVGProps) {
   const hot = BODY_ZONES.find((z) => z.id === highlightedZone);
   const ambient = mode === "ambient";
@@ -289,7 +295,8 @@ export default function BodyFigureSVG({
       {!ambient &&
         hot &&
         (() => {
-          const chipWidth = Math.round(hot.label.length * CHIP_CHAR_W + CHIP_PADDING_X * 2);
+          const hotLabel = zoneLabels?.[hot.id] ?? hot.label;
+          const chipWidth = Math.round(hotLabel.length * CHIP_CHAR_W + CHIP_PADDING_X * 2);
           const anchoredX =
             hot.cx > 110 ? hot.cx - CHIP_GAP - chipWidth : hot.cx + CHIP_GAP;
           // Las etiquetas largas se salen del lienzo desde su anclaje: se
@@ -310,7 +317,7 @@ export default function BodyFigureSVG({
                 fontWeight="600"
                 fill={PAPER}
               >
-                {hot.label}
+                {hotLabel}
               </text>
             </g>
           );
