@@ -11,7 +11,7 @@ export const fracturaDeColumna: Padecimiento = {
   zonaChip: "Columna dorsal y lumbar",
   definicion: [
     "Una vértebra puede fracturarse de dos maneras muy distintas: por un golpe fuerte — un accidente, una caída de altura — o por compresión en un hueso debilitado por osteoporosis, donde a veces basta un esfuerzo trivial: cargar una bolsa, un tropiezo, hasta un estornudo.",
-    "Las fracturas por osteoporosis son la epidemia silenciosa de la columna: muchas se confunden con 'dolor de espalda normal' y se diagnostican tarde. Detectarlas a tiempo cambia todo — incluido el acceso a tratamientos de mínima invasión que alivian en horas.",
+    "Las fracturas por osteoporosis son la epidemia silenciosa de la columna: muchas se confunden con 'dolor de espalda normal' y se diagnostican tarde. Detectarlas a tiempo cambia todo — incluido el acceso a tratamientos de mínima invasión que pueden aliviar en horas o pocos días.",
   ],
   sintomas: [
     "Dolor de espalda súbito e intenso, con o sin golpe aparente",
