@@ -45,7 +45,7 @@ export const herniaDeDisco: Padecimiento = {
     },
   ],
   citaDoctor:
-    "Primero agotamos lo conservador, porque muchas hernias mejoran así. Pero cuando la cirugía es lo que tu caso necesita, mi alta especialidad en mínima invasión te regresa a tu vida en días, no en meses.",
+    "Primero agotamos lo conservador, porque muchas hernias mejoran así. Pero cuando la cirugía es lo que tu caso necesita, mi alta especialidad en mínima invasión te pone de pie el mismo día — y de vuelta a tu vida en semanas, no en meses.",
   comoLoTrato: [
     "Mi primera tarea es confirmar que tu dolor de verdad viene de una hernia — no todo dolor que baja a la pierna lo es. Eso se resuelve con exploración física y, cuando el caso lo amerita, una resonancia.",
     "Si es hernia, empezamos por lo conservador: en mi consulta, operar es la excepción. Y cuando la cirugía sí es lo indicado, mi alta especialidad me permite ofrecerte técnicas de mínima invasión: incisiones milimétricas, alta el mismo día o en 24 horas en la mayoría de los casos, y de regreso a tu vida en semanas, no meses.",
