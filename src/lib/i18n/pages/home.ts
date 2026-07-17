@@ -96,7 +96,7 @@ const HOME_ES: HomeContent = {
     figureAria: "Comenzar mi evaluación",
   },
   trust: {
-    rating: "4.9 en Google",
+    rating: "5.0 en Google",
     surgeries: "+200 cirugías de columna",
     cedulaProf: "Céd. Prof.",
     cedulaEsp: "Céd. Esp.",
@@ -203,7 +203,7 @@ const HOME_ES: HomeContent = {
     eyebrow: "Opiniones en Google",
     h2: "Lo que dicen mis pacientes",
     ratingNumber: "5.0",
-    ratingCaption: "6 opiniones en Google · valoración verificada",
+    ratingCaption: "opiniones verificadas en Google",
     cardLabel: "Opinión en Google",
     readMore: "Leer más",
     readLess: "Leer menos",
