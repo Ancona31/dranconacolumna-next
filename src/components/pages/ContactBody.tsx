@@ -22,8 +22,13 @@ const DIAS_LABORABLES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 /**
  * Grafo JSON-LD para SEO local: el médico y sus dos consultorios, construido
  * desde SEDES y la config para no duplicar los datos de contacto.
+ *
+ * Es la MISMA entidad real en ambos idiomas, así que los @id no cambian por
+ * locale: solo se traduce el texto libre (description del médico y nombre del
+ * consejo). El resto del grafo —direcciones, geo, teléfonos, horarios, @type—
+ * es data neutra y queda idéntica. En ES el grafo es byte-idéntico al previo.
  */
-function buildContactJsonLd() {
+function buildContactJsonLd(locale: Locale) {
   const physicianId = `${SITE_URL}/#physician`;
 
   const physician = {
@@ -31,7 +36,9 @@ function buildContactJsonLd() {
     "@id": physicianId,
     name: DOCTOR_FULL_NAME,
     description:
-      "Ortopedista, traumatólogo y cirujano de columna. Atiende con cita previa en Mérida y Umán, Yucatán.",
+      locale === "en"
+        ? "Orthopedic surgeon, fellowship-trained in spine surgery. Seeing patients by appointment in Mérida and Umán, Yucatán, Mexico."
+        : "Ortopedista, traumatólogo y cirujano de columna. Atiende con cita previa en Mérida y Umán, Yucatán.",
     url: SITE_URL,
     medicalSpecialty: ["Musculoskeletal", "Surgical"],
     identifier: [
@@ -48,7 +55,10 @@ function buildContactJsonLd() {
     ],
     memberOf: {
       "@type": "MedicalOrganization",
-      name: "Consejo Mexicano de Ortopedia y Traumatología, A.C.",
+      name:
+        locale === "en"
+          ? "Mexican Board of Orthopedics and Traumatology"
+          : "Consejo Mexicano de Ortopedia y Traumatología, A.C.",
     },
     department: SEDES.map((sede) => ({ "@id": `${SITE_URL}/#clinic-${sede.id}` })),
   };
@@ -196,7 +206,7 @@ export default function ContactBody({ locale }: { locale: Locale }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(buildContactJsonLd()),
+          __html: JSON.stringify(buildContactJsonLd(locale)),
         }}
       />
 
