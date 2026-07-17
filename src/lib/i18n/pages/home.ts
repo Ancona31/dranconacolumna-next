@@ -39,6 +39,8 @@ export interface HomeContent {
   differentiators: {
     eyebrow: string;
     cards: { title: string; text: string; linkLabel?: string }[];
+    /** alt de cada imagen de tarjeta, en el mismo orden que las tarjetas. */
+    imageAlts: string[];
   };
   conditions: {
     h2: string;
@@ -54,7 +56,7 @@ export interface HomeContent {
     zoneAriaBefore: string;
     items: Record<ConditionSlug, ConditionCopy>;
   };
-  about: { text: string; cta: string };
+  about: { text: string; cta: string; imageAlt: string };
   reviews: {
     eyebrow: string;
     h2: string;
@@ -64,6 +66,13 @@ export interface HomeContent {
     readMore: string;
     readLess: string;
     seeAll: string;
+    /** aria-label del grupo de estrellas. */
+    starsAria: string;
+    /** aria-label de las flechas del carrusel. */
+    prevAria: string;
+    nextAria: string;
+    /** Prefijo del aria-label de cada punto: `${goToReview} ${i + 1}`. */
+    goToReview: string;
   };
   insurance: { eyebrow: string; h2: string; sub: string };
   locations: { h2: string; seeContact: string };
@@ -129,6 +138,11 @@ const HOME_ES: HomeContent = {
         text: "Te atiendo yo en la valoración, en el quirófano y en cada revisión — no un equipo rotativo. Mi WhatsApp responde, porque las urgencias no esperan.",
       },
     ],
+    imageAlts: [
+      "Equipo quirúrgico durante una cirugía de columna de mínima invasión",
+      "El Dr. Ancona durante la cirugía de una fractura",
+      "El Dr. Angel Ancona en el hospital",
+    ],
   },
   conditions: {
     h2: "Padecimientos que trato",
@@ -183,6 +197,7 @@ const HOME_ES: HomeContent = {
   about: {
     text: "Ortopedista y traumatólogo con alta especialidad en cirugía de columna. Atiendo todo el aparato musculoesquelético — de una fractura a una cirugía compleja de columna — con las técnicas menos invasivas disponibles, personalmente y en cada etapa: desde la primera consulta hasta tu recuperación.",
     cta: "Conóceme",
+    imageAlt: "Retrato profesional del Dr. Angel Ancona",
   },
   reviews: {
     eyebrow: "Opiniones en Google",
@@ -193,6 +208,10 @@ const HOME_ES: HomeContent = {
     readMore: "Leer más",
     readLess: "Leer menos",
     seeAll: "Ver todas las opiniones en Google →",
+    starsAria: "5 de 5 estrellas",
+    prevAria: "Opinión anterior",
+    nextAria: "Opinión siguiente",
+    goToReview: "Ir a la opinión",
   },
   insurance: {
     eyebrow: "Cobertura",
@@ -266,6 +285,11 @@ const HOME_EN: HomeContent = {
         text: "I see you myself at every step — consultation, operating room, and every follow-up. Not a rotating team. I answer my own WhatsApp, because urgent problems can't wait.",
       },
     ],
+    imageAlts: [
+      "Surgical team during a minimally invasive spine surgery",
+      "Dr. Ancona operating on a fracture",
+      "Dr. Angel Ancona at the hospital",
+    ],
   },
   conditions: {
     h2: "Conditions I treat",
@@ -322,6 +346,7 @@ const HOME_EN: HomeContent = {
   about: {
     text: "Orthopedic surgeon, fellowship-trained in spine surgery. I treat the entire musculoskeletal system — from a fracture to complex spine surgery — with the least invasive techniques available — and I'm with you personally at every stage, from your first consultation through recovery.",
     cta: "Meet Dr. Ancona",
+    imageAlt: "Professional portrait of Dr. Angel Ancona",
   },
   reviews: {
     eyebrow: "Google reviews",
@@ -332,6 +357,10 @@ const HOME_EN: HomeContent = {
     readMore: "Read more",
     readLess: "Read less",
     seeAll: "See all reviews on Google →",
+    starsAria: "5 out of 5 stars",
+    prevAria: "Previous review",
+    nextAria: "Next review",
+    goToReview: "Go to review",
   },
   insurance: {
     eyebrow: "Coverage",

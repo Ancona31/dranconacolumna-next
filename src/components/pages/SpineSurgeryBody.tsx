@@ -35,7 +35,7 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
             <div className="relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-2xl">
               <Image
                 src="/images/quirofano-2.jpg"
-                alt="Cirugía endoscópica de columna: el monitor muestra la visión del endoscopio en tiempo real"
+                alt={c.imageAlt}
                 fill
                 className="object-cover"
                 sizes="100vw"

@@ -27,6 +27,8 @@ export interface EvaluationUi {
   zonePicker: {
     h1: string;
     subtitle: string;
+    /** aria-label de la silueta (BodyFigureSVG). */
+    figureAria: string;
     /** aria-label del botón de una zona. */
     zoneAria: (label: string) => string;
   };
@@ -149,6 +151,8 @@ export const EVAL_UI_ES: EvaluationUi = {
   zonePicker: {
     h1: "¿Dónde te duele?",
     subtitle: "Toca la zona donde sientes la molestia.",
+    figureAria:
+      "Figura humana vista de espaldas con las zonas del cuerpo que puedes evaluar",
     zoneAria: (label) => `Evaluar ${label}`,
   },
 
@@ -270,6 +274,8 @@ export const EVAL_UI_EN: EvaluationUi = {
   zonePicker: {
     h1: "Where does it hurt?",
     subtitle: "Tap the area where you feel the discomfort.",
+    figureAria:
+      "Human figure seen from behind, showing the body areas you can assess",
     zoneAria: (label) => `Assess ${label}`,
   },
 

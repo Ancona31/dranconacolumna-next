@@ -56,7 +56,13 @@ export default function HeroBodyMap({ locale }: { locale: Locale }) {
             aria-label={c.figureAria}
             className="relative block w-[60%] max-w-[280px] md:w-full md:max-w-[360px]"
           >
-            <BodyFigureSVG mode="ambient" className="h-auto w-full text-primary" />
+            {/* El <Link> ya aporta el nombre accesible; la silueta va decorativa
+                (aria-hidden) para no duplicar la etiqueta. */}
+            <BodyFigureSVG
+              mode="ambient"
+              decorative
+              className="h-auto w-full text-primary"
+            />
           </Link>
         </Reveal>
       </div>

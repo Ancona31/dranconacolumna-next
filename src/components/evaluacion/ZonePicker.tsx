@@ -51,6 +51,7 @@ export default function ZonePicker({
           highlightedZone={highlighted}
           mode="selected"
           zoneLabels={zoneLabels}
+          ariaLabel={ui.figureAria}
           className="h-auto w-full text-primary"
         />
 

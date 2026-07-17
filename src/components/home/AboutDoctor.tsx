@@ -16,7 +16,7 @@ export default function AboutDoctor({ locale }: { locale: Locale }) {
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl">
             <Image
               src="/images/dr-ancona-perfil.jpg"
-              alt="Retrato profesional del Dr. Angel Ancona"
+              alt={c.imageAlt}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"

@@ -8,6 +8,8 @@ import type { Locale } from "../types";
  */
 export interface AboutContent {
   metadata: { title: Metadata["title"]; description: string };
+  /** alt del retrato del hero. */
+  imageAlt: string;
   hero: { eyebrow: string; subtitle: string; intro: string };
   work: { h2: string; paragraphs: string[] };
   training: { h2: string; items: string[] };
@@ -29,6 +31,7 @@ const ABOUT_ES: AboutContent = {
     description:
       "Conoce al Dr. Angel M. Ancona Pérez: formación, certificaciones y su manera de tratar a cada paciente. Alta especialidad en cirugía de columna.",
   },
+  imageAlt: "Dr. Angel M. Ancona Pérez, ortopedista y traumatólogo",
   hero: {
     eyebrow: "Sobre mí",
     subtitle: "Ortopedista y traumatólogo · Alta especialidad en cirugía de columna",
@@ -77,6 +80,7 @@ const ABOUT_EN: AboutContent = {
     description:
       "Meet Dr. Angel M. Ancona Pérez: training, board certification, and how he cares for his patients. Fellowship-trained spine surgeon in Mérida, Mexico.",
   },
+  imageAlt: "Dr. Angel M. Ancona Pérez, orthopedic and spine surgeon",
   hero: {
     eyebrow: "About me",
     subtitle: "Orthopedic surgeon · Fellowship-trained in spine surgery",

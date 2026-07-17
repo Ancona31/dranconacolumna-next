@@ -7,26 +7,22 @@ import { getHomeContent } from "@/lib/i18n/pages/home";
 import { routeFor } from "@/lib/i18n/slug-map";
 
 // Icono, imagen y destino ES de cada tarjeta, en el mismo orden que el
-// contenido. El destino se traduce por locale con routeFor; las imágenes y sus
-// textos alternativos son iguales en ambos idiomas.
+// contenido. El destino se traduce por locale con routeFor; el alt de cada
+// imagen se localiza (differentiators.imageAlts[i]) y por eso no vive aquí.
 const CARD_META: {
   Icon: typeof ShieldCheck;
-  image: { src: string; alt: string; objectPosition?: string };
+  image: { src: string; objectPosition?: string };
   esHref?: string;
 }[] = [
   {
     Icon: ShieldCheck,
-    image: {
-      src: "/images/quirofano-1.jpg",
-      alt: "Equipo quirúrgico durante una cirugía de columna de mínima invasión",
-    },
+    image: { src: "/images/quirofano-1.jpg" },
     esHref: "/cirugia-de-columna",
   },
   {
     Icon: Bone,
     image: {
       src: "/images/quirofano-fractura.jpg",
-      alt: "El Dr. Ancona durante la cirugía de una fractura",
       objectPosition: "center 42%",
     },
     esHref: "/padecimientos",
@@ -35,7 +31,6 @@ const CARD_META: {
     Icon: HeartHandshake,
     image: {
       src: "/images/dr-ancona-hospital.jpg",
-      alt: "El Dr. Angel Ancona en el hospital",
       objectPosition: "center 25%",
     },
   },
@@ -67,7 +62,7 @@ export default function Differentiators({ locale }: { locale: Locale }) {
                   <div className="relative aspect-[4/3] w-full">
                     <Image
                       src={image.src}
-                      alt={image.alt}
+                      alt={c.imageAlts[i]}
                       fill
                       className="object-cover"
                       style={

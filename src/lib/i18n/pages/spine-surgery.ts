@@ -8,6 +8,8 @@ import type { Locale } from "../types";
  */
 export interface SpineContent {
   metadata: { title: Metadata["title"]; description: string };
+  /** alt de la imagen del hero. */
+  imageAlt: string;
   hero: { eyebrow: string; h1: string; text: string };
   when: { h2: string; text: string };
   techniques: {
@@ -28,6 +30,8 @@ const SPINE_ES: SpineContent = {
     description:
       "Cirugía de columna con alta especialidad en Mérida: hernia de disco, canal estrecho, fracturas vertebrales. Técnicas de mínima invasión cuando el caso lo permite.",
   },
+  imageAlt:
+    "Cirugía endoscópica de columna: el monitor muestra la visión del endoscopio en tiempo real",
   hero: {
     eyebrow: "Mi subespecialidad",
     h1: "Cirugía de columna",
@@ -81,6 +85,8 @@ const SPINE_EN: SpineContent = {
     description:
       "Spine surgery in Mérida, Mexico, by a fellowship-trained surgeon: herniated discs, spinal stenosis, vertebral fractures. Minimally invasive techniques when the case allows.",
   },
+  imageAlt:
+    "Endoscopic spine surgery: the monitor shows the endoscope's real-time view",
   hero: {
     eyebrow: "My subspecialty",
     h1: "Spine surgery",

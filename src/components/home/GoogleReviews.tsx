@@ -43,9 +43,15 @@ function GoogleG({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-function Stars({ className = "h-4 w-4" }: { className?: string }) {
+function Stars({
+  className = "h-4 w-4",
+  label,
+}: {
+  className?: string;
+  label: string;
+}) {
   return (
-    <div className="flex gap-0.5" role="img" aria-label="5 de 5 estrellas">
+    <div className="flex gap-0.5" role="img" aria-label={label}>
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
@@ -66,12 +72,14 @@ function ReviewCard({
   cardLabel,
   readMore,
   readLess,
+  starsAria,
 }: {
   review: Review;
   borderColor: string;
   cardLabel: string;
   readMore: string;
   readLess: string;
+  starsAria: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const isLong = review.text.length > TRUNCATE_AT;
@@ -104,7 +112,7 @@ function ReviewCard({
       </div>
 
       <div className="mt-4">
-        <Stars className="h-4 w-4" />
+        <Stars className="h-4 w-4" label={starsAria} />
       </div>
 
       <p className="mt-3 font-body text-[14.5px] leading-[1.7] text-ink/[0.78]">
@@ -199,7 +207,7 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
               <span className="font-heading text-[32px] font-bold leading-none text-primary">
                 {c.ratingNumber}
               </span>
-              <Stars className="h-5 w-5" />
+              <Stars className="h-5 w-5" label={c.starsAria} />
             </div>
             <p className="mt-2 font-body text-[13px] text-ink/60">
               {c.ratingCaption}
@@ -247,6 +255,7 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
                       cardLabel={c.cardLabel}
                       readMore={c.readMore}
                       readLess={c.readLess}
+                      starsAria={c.starsAria}
                     />
                   </li>
                 ))}
@@ -258,7 +267,7 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
           <div className="mt-8 hidden items-center justify-center gap-4 md:flex">
             <button
               type="button"
-              aria-label="Opinión anterior"
+              aria-label={c.prevAria}
               onClick={() => go(current - 1)}
               className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-primary text-primary transition-colors duration-150 hover:bg-primary hover:text-white"
             >
@@ -266,7 +275,7 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
             </button>
             <button
               type="button"
-              aria-label="Opinión siguiente"
+              aria-label={c.nextAria}
               onClick={() => go(current + 1)}
               className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-primary text-primary transition-colors duration-150 hover:bg-primary hover:text-white"
             >
@@ -280,7 +289,7 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
               <button
                 key={i}
                 type="button"
-                aria-label={`Ir a la opinión ${i + 1}`}
+                aria-label={`${c.goToReview} ${i + 1}`}
                 aria-current={i === current ? "true" : undefined}
                 onClick={() => go(i)}
                 className="h-2 w-2 rounded-full transition-colors duration-150"

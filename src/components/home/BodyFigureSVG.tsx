@@ -95,6 +95,10 @@ const CHIP_PADDING_X = 14; // por lado
 const CHIP_GAP = 18; // separación entre el nodo y el chip
 const CHIP_MARGIN = 4; // margen mínimo contra el borde del viewBox
 
+/** aria-label por defecto (contexto ES) cuando la figura no es decorativa. */
+const DEFAULT_ARIA =
+  "Figura humana vista de espaldas con las zonas del cuerpo que puedes evaluar";
+
 interface BodyFigureSVGProps {
   highlightedZone?: BodyZoneId;
   mode?: BodyFigureMode;
@@ -104,6 +108,16 @@ interface BodyFigureSVGProps {
    * chip usa la etiqueta interna en español de BODY_ZONES (contexto ES).
    */
   zoneLabels?: Partial<Record<BodyZoneId, string>>;
+  /**
+   * aria-label de la figura. Por defecto, el español interno; las páginas EN
+   * pasan aquí su traducción. Se ignora si `decorative`.
+   */
+  ariaLabel?: string;
+  /**
+   * Cuando un ancestro ya etiqueta la figura (p. ej. el <Link> del hero), se
+   * marca decorativa (aria-hidden) para no duplicar el nombre accesible.
+   */
+  decorative?: boolean;
 }
 
 export default function BodyFigureSVG({
@@ -111,6 +125,8 @@ export default function BodyFigureSVG({
   mode = "ambient",
   className,
   zoneLabels,
+  ariaLabel,
+  decorative = false,
 }: BodyFigureSVGProps) {
   const hot = BODY_ZONES.find((z) => z.id === highlightedZone);
   const ambient = mode === "ambient";
@@ -161,8 +177,9 @@ export default function BodyFigureSVG({
     <svg
       viewBox="0 0 220 540"
       className={className}
-      role="img"
-      aria-label="Figura humana vista de espaldas con las zonas del cuerpo que puedes evaluar"
+      {...(decorative
+        ? { "aria-hidden": true }
+        : { role: "img", "aria-label": ariaLabel ?? DEFAULT_ARIA })}
     >
       {/* Silueta rellena, estilo diagrama clinico */}
       <path

@@ -27,7 +27,7 @@ export default function AboutBody({ locale }: { locale: Locale }) {
             <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl">
               <Image
                 src="/images/dr-ancona-perfil.jpg"
-                alt="Dr. Angel M. Ancona Pérez, ortopedista y traumatólogo"
+                alt={c.imageAlt}
                 fill
                 priority
                 className="object-cover"
