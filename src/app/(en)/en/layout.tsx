@@ -5,7 +5,7 @@ import { fontVariables } from "@/lib/fonts";
 import BodyShell from "@/components/layout/BodyShell";
 
 const SITE_NAME_EN =
-  "Dr. Angel Ancona · Orthopedics, Traumatology & Spine Surgery";
+  "Dr. Angel Ancona · Orthopedics & Spine Surgery";
 
 const SITE_DESCRIPTION_EN =
   "Spine surgery in Mérida, Mexico. Guided self-assessment and consultation with Dr. Angel M. Ancona Pérez.";
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
         url: "/og-image-en.png",
         width: 1200,
         height: 630,
-        alt: "Dr. Angel M. Ancona Pérez — Orthopedics, Traumatology & Spine Surgery",
+        alt: "Dr. Angel M. Ancona Pérez — Orthopedics & Spine Surgery",
       },
     ],
   },
