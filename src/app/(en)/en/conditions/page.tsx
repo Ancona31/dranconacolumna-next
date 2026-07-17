@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import ConditionsBodyMap from "@/components/home/ConditionsBodyMap";
+import { buildAlternates } from "@/lib/i18n/alternates";
 
 export const metadata: Metadata = {
   title: { absolute: "Conditions I Treat | Dr. Angel Ancona · Mérida, Mexico" },
   description:
     "Spine and orthopedic conditions treated by Dr. Angel Ancona in Mérida, Mexico: herniated disc, sciatica, stenosis, joint pain, and more. Free assessment.",
+  alternates: buildAlternates("/padecimientos", "en"),
 };
 
 export default function ConditionsIndexPage() {

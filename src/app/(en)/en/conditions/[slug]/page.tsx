@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ConditionTemplate from "@/components/padecimientos/ConditionTemplate";
 import { getPadecimientoEn, PADECIMIENTOS_EN } from "@/lib/padecimientos/en";
+import { buildAlternates } from "@/lib/i18n/alternates";
+import { getAlternatePath } from "@/lib/i18n/slug-map";
 
 type Params = { slug: string };
 
@@ -23,10 +25,14 @@ export async function generateMetadata({
   // (El noindex EN lo hereda del layout (en) mientras dure la FASE.)
   if (!p) return {};
 
+  // La ruta canónica ES del par se resuelve desde el slug-map (EN → ES).
+  const esPath = getAlternatePath(`/en/conditions/${slug}`, "en");
+
   return {
     // absolute: el metaTitle ya trae la marca; evita duplicar el template.
     title: { absolute: p.metaTitle },
     description: p.metaDescription,
+    alternates: buildAlternates(esPath, "en"),
   };
 }
 

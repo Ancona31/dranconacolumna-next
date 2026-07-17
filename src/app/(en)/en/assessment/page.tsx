@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import type { BodyZoneId } from "@/components/home/BodyFigureSVG";
 import EvaluationFlow from "@/components/evaluacion/EvaluationFlow";
 import { AVAILABLE_ZONES } from "@/lib/evaluacion/tests";
+import { buildAlternates } from "@/lib/i18n/alternates";
 
-// noindex heredado del layout (en) mientras el contenido EN está en curso (F3).
 export const metadata: Metadata = {
   title: "Free Pain Assessment",
   description:
     "Point to where it hurts, answer a validated clinical questionnaire, and get your report explained instantly. Free, no sign-up.",
+  alternates: buildAlternates("/evaluacion", "en"),
 };
 
 export default async function AssessmentPage({

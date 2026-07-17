@@ -9,8 +9,12 @@ import GoogleReviews from "@/components/home/GoogleReviews";
 import InsuranceBar from "@/components/home/InsuranceBar";
 import Locations from "@/components/home/Locations";
 import { getHomeContent } from "@/lib/i18n/pages/home";
+import { buildAlternates } from "@/lib/i18n/alternates";
 
-export const metadata: Metadata = getHomeContent("en").metadata;
+export const metadata: Metadata = {
+  ...getHomeContent("en").metadata,
+  alternates: buildAlternates("/", "en"),
+};
 
 export default function EnHomePage() {
   return (

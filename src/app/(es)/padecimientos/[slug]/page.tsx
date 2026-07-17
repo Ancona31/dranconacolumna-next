@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ConditionTemplate from "@/components/padecimientos/ConditionTemplate";
 import { getPadecimiento, PADECIMIENTOS } from "@/lib/padecimientos";
+import { buildAlternates } from "@/lib/i18n/alternates";
 
 type Params = { slug: string };
 
@@ -26,6 +27,7 @@ export async function generateMetadata({
     // absolute: el metaTitle ya trae la marca; evita duplicar el template.
     title: { absolute: p.metaTitle },
     description: p.metaDescription,
+    alternates: buildAlternates(`/padecimientos/${slug}`, "es"),
   };
 }
 
