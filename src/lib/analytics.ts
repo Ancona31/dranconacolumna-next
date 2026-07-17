@@ -49,10 +49,22 @@ declare global {
   }
 }
 
+/**
+ * Locale de la página actual, derivado del pathname. El árbol EN vive bajo
+ * /en; todo lo demás es ES. Se calcula aquí en cada emisión para no tener que
+ * pasar el locale por los 13 puntos de llamada de trackEvent (que están en
+ * componentes tanto ES como EN).
+ */
+function currentLocale(): "es" | "en" {
+  const path = window.location.pathname;
+  return path === "/en" || path.startsWith("/en/") ? "en" : "es";
+}
+
 export function trackEvent<K extends keyof EventParams>(
   name: K,
   params: EventParams[K]
 ): void {
   if (typeof window === "undefined") return;
-  window.gtag?.("event", name, params);
+  // `locale` acompaña a todos los eventos; nombres y demás parámetros no cambian.
+  window.gtag?.("event", name, { ...params, locale: currentLocale() });
 }
