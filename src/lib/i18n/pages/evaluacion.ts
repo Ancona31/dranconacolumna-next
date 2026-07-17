@@ -11,8 +11,8 @@ import type { NonUrgentLevel } from "@/lib/evaluacion/types";
  * (getEngineCopy) y del contenido de cada test (getTest).
  *
  * El español se extrae LITERAL de los componentes actuales para que su render
- * quede byte-idéntico. El inglés (EVAL_UI_EN) reutiliza por ahora el ES con
- * TODO F3 — la traducción del chrome llega junto con el contenido en F3.B-E.
+ * quede byte-idéntico. El inglés (EVAL_UI_EN) es la contrapartida con los
+ * literales traducidos campo por campo.
  */
 export interface EvaluationUi {
   flow: {
@@ -250,10 +250,125 @@ export const EVAL_UI_ES: EvaluationUi = {
 };
 
 /**
- * Chrome EN. TODO F3 — por ahora reutiliza el ES para que /en/assessment
- * funcione; se traduce junto con el contenido en F3.B-E.
+ * Chrome EN. Contrapartida en inglés de EVAL_UI_ES. Las claves de nivel son
+ * internas en español (leve/moderada/severa); LEVEL_EN las mapea a inglés en
+ * badgeQuestion. Es capa de copy, no lógica.
  */
-export const EVAL_UI_EN: EvaluationUi = EVAL_UI_ES;
+const LEVEL_EN: Record<NonUrgentLevel, string> = {
+  leve: "mild",
+  moderada: "moderate",
+  severa: "severe",
+};
+
+export const EVAL_UI_EN: EvaluationUi = {
+  flow: {
+    exit: "Exit",
+    timeUnder1: "under 1 min",
+    timeApprox: (min) => `~${min} min`,
+  },
+
+  zonePicker: {
+    h1: "Where does it hurt?",
+    subtitle: "Tap the area where you feel the discomfort.",
+    zoneAria: (label) => `Assess ${label}`,
+  },
+
+  alarm: {
+    h1: "Before we start — is any of this happening to you?",
+    subtitle: "Select everything that applies. It matters for guiding you well.",
+    nounFallbackSingular: "question",
+    nounFallbackPlural: "questions",
+    durationApprox: (min) =>
+      `about ${min} ${min === 1 ? "minute" : "minutes"}`,
+    durationJoin: (count, noun, time) => `${count} ${noun} · ${time}`,
+    continue: "Continue",
+  },
+
+  triage: {
+    eyebrow: (current, total) => `About your pain · ${current} of ${total}`,
+  },
+
+  question: {
+    back: "Back",
+    header: (noun, current, total, time) =>
+      `${noun} ${current} of ${total} · ${time}`,
+    naLead: "Doesn't apply — it's limited by another cause, not by ",
+  },
+
+  result: {
+    shareUrlPath: "/en/assessment",
+    shareTitle: "Free clinical assessment — Dr. Angel Ancona",
+    shareText:
+      "I took this assessment of my pain and got a report in minutes. Take yours for free:",
+    sharePrompt: "Know someone in pain? Share the free assessment.",
+    shareButtonLabel: "Share this assessment",
+    headerTitle: (zoneLabel) => `Your ${zoneLabel} assessment`,
+    folioLabel: "Report ID",
+    gaugeAria: (score) => `Limitation index ${score} out of 100`,
+    zoneAria: (zoneLabel) => `Area assessed: ${zoneLabel}`,
+    per100: "/100",
+    indexCaption: "limitation index",
+    cutsLegend: "0–30 mild · 31–60 moderate · 61–100 severe",
+    levelPill: {
+      leve: "Mild limitation",
+      moderada: "Moderate limitation",
+      severa: "Severe limitation",
+    },
+    badgeQuestion: (level) => `What does ${LEVEL_EN[level]} limitation mean?`,
+    meaningTitle: "What your result means",
+    evalPlanTitle: "What should be evaluated in your case",
+    warningTitle: "Signs not to wait for your appointment",
+    ctaUrgent: "Let us know about your case on WhatsApp",
+    ctaNormal: "Message us to book your consultation",
+    urgentCarryNote:
+      "And take this report to your evaluation today — it will help the doctor who sees you.",
+    disclaimer:
+      "This assessment is for guidance and doesn't replace a medical consultation. Your answers never leave your device.",
+  },
+
+  pdfDownload: {
+    open: "Download my report (PDF)",
+    nameQuestion: "Whose name should we put on your PDF? (optional)",
+    namePlaceholder: "Your name",
+    generate: "Generate PDF",
+    generating: "Generating…",
+    privacyNote:
+      "The name is only printed on the document; it isn't stored anywhere.",
+  },
+
+  pdf: {
+    headerSub: "Orthopedics · Spine Surgery",
+    cedProfLabel: "Prof. License",
+    cedEspLabel: "Specialist License",
+    cert: "CMOT Board Certified 26/5567/25",
+    footer: (phone) =>
+      `dranconacolumna.com  ·  WhatsApp ${phone}  ·  Mérida & Umán`,
+    pageLabel: (page, total) => `Page ${page} of ${total}`,
+    dateLocale: "en-US",
+    titleReport: (zoneUpper) => `ASSESSMENT REPORT — ${zoneUpper}`,
+    metaLine: (fecha, folio) => `${fecha} · Report ID ${folio}`,
+    reportOf: (name) => `Report for: ${name}`,
+    per100: "/100",
+    indexCaption: "limitation index",
+    cutsLegend: "0–30 mild · 31–60 moderate · 61–100 severe",
+    badgeQuestion: (level) => `What does ${LEVEL_EN[level]} limitation mean?`,
+    meaningTitle: "WHAT YOUR RESULT MEANS",
+    evalPlanTitle: "WHAT SHOULD BE EVALUATED IN YOUR CASE",
+    warningTitle: "SIGNS NOT TO WAIT FOR YOUR APPOINTMENT",
+    urgentShowReport: "Show this report to the doctor who sees you.",
+    ctaUrgent: "Let us know about your case on WhatsApp",
+    ctaNormal: "Message us on WhatsApp to book your consultation",
+    urgentCarryNote:
+      "And take this report to your evaluation today — it will help the doctor who sees you.",
+    ctaConsultLine: "Seeing patients in Mérida and Umán",
+    ctaPresentReport:
+      "Bring this report to your appointment — it lets me know your case before I examine you.",
+    qrCaption: "Scan it or tap it",
+    scheduleWaMessage: "Hello Dr. Ancona, I'd like to schedule a consultation.",
+    legalDisclaimer:
+      "This report is not a diagnosis and doesn't replace a medical consultation. Generated on your device: your answers are not stored on any server. dranconacolumna.com",
+  },
+};
 
 const EVAL_UI: Record<Locale, EvaluationUi> = {
   es: EVAL_UI_ES,
