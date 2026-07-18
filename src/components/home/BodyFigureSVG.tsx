@@ -6,7 +6,7 @@
 // geometricamente sobre el contorno real. NO ajustar el path a mano; las
 // zonas se ajustan editando cx/cy en BODY_ZONES.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 export type BodyZoneId =
   | "cuello" | "espalda-alta" | "espalda-baja" | "hombro" | "codo"
@@ -26,8 +26,8 @@ export const BODY_ZONES: BodyZone[] = [
   { id: "espalda-baja", label: "Espalda baja", cx: 100, cy: 233 },
   { id: "hombro", label: "Hombro", cx: 47, cy: 107 },
   { id: "codo", label: "Codo", cx: 47, cy: 183 },
-  { id: "muneca", label: "Muñeca y mano", cx: 54, cy: 286 },
-  { id: "cadera", label: "Cadera", cx: 143, cy: 283 },
+  { id: "muneca", label: "Muñeca y mano", cx: 52, cy: 300 },
+  { id: "cadera", label: "Cadera", cx: 130, cy: 256 },
   { id: "rodilla", label: "Rodilla", cx: 117, cy: 410 },
   { id: "tobillo", label: "Tobillo y pie", cx: 109, cy: 506 },
 ];
@@ -89,11 +89,138 @@ const CORE_ACTIVE_SCALE = 6.5 / 5;
 
 // Chip de zona (modo selected). Se dimensiona al texto porque etiquetas como
 // "Muñeca y mano" no caben en un ancho fijo.
-const VIEW_W = 220;
+// F2.a: el viewBox se ensanchó a 300 para dar aire a los chips largos. La
+// figura se dibuja en su sistema original y se centra con un desplazamiento de
+// +40 en X (40 por lado); los chips se posicionan en el viewBox nuevo sumando
+// ese offset al cx del nodo.
+const VIEW_W = 300;
+const FIGURE_OFFSET_X = 40;
 const CHIP_CHAR_W = 7.4; // ancho medio de carácter a fontSize 12.5
 const CHIP_PADDING_X = 14; // por lado
 const CHIP_GAP = 18; // separación entre el nodo y el chip
 const CHIP_MARGIN = 4; // margen mínimo contra el borde del viewBox
+// Clearance mínima entre el borde del chip y el centro del nodo para darlo por
+// "despejado". Por debajo, el chip taparía el nodo y se intenta el lado opuesto.
+const CHIP_MIN_CLEAR = 8;
+
+// Lado preferido del chip por zona. Regla explícita (antes se derivaba de
+// cx > 110): a la izquierda del nodo salvo cadera/rodilla/tobillo, que van a la
+// derecha. Es solo la preferencia: si en ese lado el chip no despeja el nodo
+// (etiquetas anchas del brazo izquierdo como "Muñeca y mano" o "Shoulder"),
+// buildChipModel lo pasa al lado opuesto cuando allí sí despeja.
+const CHIP_SIDE: Record<BodyZoneId, "left" | "right"> = {
+  cuello: "left",
+  "espalda-alta": "left",
+  "espalda-baja": "left",
+  hombro: "left",
+  codo: "left",
+  muneca: "left",
+  cadera: "right",
+  rodilla: "right",
+  tobillo: "right",
+};
+
+interface ChipModel {
+  id: BodyZoneId;
+  label: string;
+  rectX: number;
+  width: number;
+  cy: number;
+  /** Desplazamiento de entrada/salida (px) según el lado por el que aparece. */
+  dx: string;
+}
+
+/** Coloca el chip a un lado del nodo, con clamp contra el viewBox, y devuelve
+ *  su rectX y la clearance (px entre el borde del chip y el centro del nodo;
+ *  negativa = lo tapa). */
+function placeChip(
+  nodeX: number,
+  width: number,
+  side: "left" | "right",
+): { rectX: number; clearance: number } {
+  const anchoredX =
+    side === "left" ? nodeX - CHIP_GAP - width : nodeX + CHIP_GAP;
+  const rectX = Math.min(
+    Math.max(anchoredX, CHIP_MARGIN),
+    VIEW_W - CHIP_MARGIN - width,
+  );
+  const clearance = side === "left" ? nodeX - (rectX + width) : rectX - nodeX;
+  return { rectX, clearance };
+}
+
+/** Geometría del chip de una zona: ancho por longitud de etiqueta y lado
+ *  preferido (CHIP_SIDE). Si en el lado preferido el chip no despeja el nodo
+ *  (clearance < CHIP_MIN_CLEAR) y en el opuesto despeja mejor, se cambia de
+ *  lado; el clamp mantiene el chip dentro del viewBox en ambos casos. */
+function buildChipModel(zone: BodyZone, label: string): ChipModel {
+  const width = Math.round(label.length * CHIP_CHAR_W + CHIP_PADDING_X * 2);
+  // El nodo vive en el sistema original; su X en el viewBox nuevo es cx + offset.
+  const nodeX = zone.cx + FIGURE_OFFSET_X;
+
+  let side = CHIP_SIDE[zone.id];
+  let placement = placeChip(nodeX, width, side);
+  if (placement.clearance < CHIP_MIN_CLEAR) {
+    const other = side === "left" ? "right" : "left";
+    const otherPlacement = placeChip(nodeX, width, other);
+    if (otherPlacement.clearance > placement.clearance) {
+      side = other;
+      placement = otherPlacement;
+    }
+  }
+
+  return {
+    id: zone.id,
+    label,
+    rectX: placement.rectX,
+    width,
+    cy: zone.cy,
+    dx: side === "left" ? "-4px" : "4px",
+  };
+}
+
+/**
+ * Chip de zona (modo "selected"). Entra y sale con fade + desplazamiento leve
+ * desde su lado (CSS en globals.css, clase body-figure__chip). El estado final
+ * queda fijado por `both`, y prefers-reduced-motion lo vuelve instantáneo por
+ * la regla global. La copia "exit" se autolimpia con onAnimationEnd.
+ */
+function Chip({
+  model,
+  kind,
+  onExited,
+}: {
+  model: ChipModel;
+  kind: "enter" | "exit";
+  onExited?: () => void;
+}) {
+  return (
+    <g
+      className={`body-figure__chip is-${kind}`}
+      style={{ "--chip-dx": model.dx } as CSSProperties}
+      onAnimationEnd={kind === "exit" ? onExited : undefined}
+    >
+      <rect
+        x={model.rectX}
+        y={model.cy - 14}
+        width={model.width}
+        height="28"
+        rx="14"
+        fill={INK}
+      />
+      <text
+        x={model.rectX + model.width / 2}
+        y={model.cy + 4.5}
+        textAnchor="middle"
+        fontFamily="inherit"
+        fontSize="12.5"
+        fontWeight="600"
+        fill={PAPER}
+      >
+        {model.label}
+      </text>
+    </g>
+  );
+}
 
 /** aria-label por defecto (contexto ES) cuando la figura no es decorativa. */
 const DEFAULT_ARIA =
@@ -121,7 +248,7 @@ interface BodyFigureSVGProps {
 }
 
 export default function BodyFigureSVG({
-  highlightedZone = "espalda-baja",
+  highlightedZone,
   mode = "ambient",
   className,
   zoneLabels,
@@ -132,8 +259,13 @@ export default function BodyFigureSVG({
   const ambient = mode === "ambient";
 
   // El servidor y el primer render del cliente parten de la misma zona, así
-  // que el tour puede arrancar después sin provocar hydration mismatch.
-  const tourStart = Math.max(0, AMBIENT_TOUR.indexOf(highlightedZone));
+  // que el tour puede arrancar después sin provocar hydration mismatch. En modo
+  // ambient sin zona explícita se conserva el arranque histórico (espalda-baja);
+  // en modo selected el valor es indiferente (no se usa el tour).
+  const tourStart = Math.max(
+    0,
+    AMBIENT_TOUR.indexOf(highlightedZone ?? "espalda-baja"),
+  );
   const [tourIndex, setTourIndex] = useState(tourStart);
 
   useEffect(() => {
@@ -173,20 +305,44 @@ export default function BodyFigureSVG({
 
   const activeZone = ambient ? AMBIENT_TOUR[tourIndex] : highlightedZone;
 
+  // Chip del modo "selected". Se calcula en el render (SSR-safe: el chip inicial
+  // sale ya pintado). Al cambiar de zona, el chip anterior se mantiene montado
+  // como copia "exit" para animar su salida mientras el nuevo entra.
+  const currentChip =
+    !ambient && hot ? buildChipModel(hot, zoneLabels?.[hot.id] ?? hot.label) : null;
+  const [exitingChip, setExitingChip] = useState<ChipModel | null>(null);
+  const prevChipRef = useRef<ChipModel | null>(currentChip);
+
+  useEffect(() => {
+    const prev = prevChipRef.current;
+    prevChipRef.current = currentChip;
+    // Solo hay salida que animar cuando cambia la zona (no en el primer montaje
+    // ni al re-renderizar la misma zona).
+    if (prev && prev.id !== (currentChip?.id ?? null)) {
+      setExitingChip(prev);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentChip?.id]);
+
   return (
     <svg
-      viewBox="0 0 220 540"
+      viewBox="0 0 300 540"
       className={className}
       {...(decorative
         ? { "aria-hidden": true }
         : { role: "img", "aria-label": ariaLabel ?? DEFAULT_ARIA })}
     >
-      {/* Silueta rellena, estilo diagrama clinico */}
-      <path
-        d={BODY_PATH}
-        fill={ACCENT}
-        opacity="0.16"
-      />
+      {/* La figura y sus nodos se dibujan en su sistema original (ancho 220) y
+          se centran en el viewBox de 300 desplazándose +40 en X. Los chips van
+          FUERA de este grupo, en coordenadas del viewBox nuevo, para poder usar
+          todo el ancho al posicionarse. */}
+      <g transform={`translate(${FIGURE_OFFSET_X},0)`}>
+        {/* Silueta rellena, estilo diagrama clinico */}
+        <path
+          d={BODY_PATH}
+          fill={ACCENT}
+          opacity="0.16"
+        />
       <path
         d={BODY_PATH}
         fill="none"
@@ -306,39 +462,27 @@ export default function BodyFigureSVG({
           )}
         </g>
       )}
+      </g>
 
-      {/* Chip de zona destacada. En zonas del lado derecho (cx > 110) se dibuja
-          a la izquierda del punto para no salirse del viewBox (ancho 220). */}
-      {!ambient &&
-        hot &&
-        (() => {
-          const hotLabel = zoneLabels?.[hot.id] ?? hot.label;
-          const chipWidth = Math.round(hotLabel.length * CHIP_CHAR_W + CHIP_PADDING_X * 2);
-          const anchoredX =
-            hot.cx > 110 ? hot.cx - CHIP_GAP - chipWidth : hot.cx + CHIP_GAP;
-          // Las etiquetas largas se salen del lienzo desde su anclaje: se
-          // corren hacia dentro en vez de recortarse.
-          const rectX = Math.min(
-            Math.max(anchoredX, CHIP_MARGIN),
-            VIEW_W - CHIP_MARGIN - chipWidth,
-          );
-          return (
-            <g>
-              <rect x={rectX} y={hot.cy - 14} width={chipWidth} height="28" rx="14" fill={INK} />
-              <text
-                x={rectX + chipWidth / 2}
-                y={hot.cy + 4.5}
-                textAnchor="middle"
-                fontFamily="inherit"
-                fontSize="12.5"
-                fontWeight="600"
-                fill={PAPER}
-              >
-                {hotLabel}
-              </text>
-            </g>
-          );
-        })()}
+      {/* Chip de zona destacada (lado por CHIP_SIDE + clamp). La copia saliente
+          va primero para quedar debajo del chip entrante durante el relevo. */}
+      {!ambient && (
+        <>
+          {exitingChip && (
+            <Chip
+              key={`exit-${exitingChip.id}`}
+              model={exitingChip}
+              kind="exit"
+              onExited={() =>
+                setExitingChip((c) => (c?.id === exitingChip.id ? null : c))
+              }
+            />
+          )}
+          {currentChip && (
+            <Chip key={`chip-${currentChip.id}`} model={currentChip} kind="enter" />
+          )}
+        </>
+      )}
     </svg>
   );
 }

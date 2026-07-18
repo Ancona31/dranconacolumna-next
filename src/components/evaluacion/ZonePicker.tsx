@@ -9,9 +9,12 @@ import type { Locale } from "@/lib/i18n/types";
 import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
 import { getZoneLabel } from "@/lib/i18n/zone-labels";
 
-// viewBox de BodyFigureSVG.
-const VIEW_W = 220;
+// viewBox de BodyFigureSVG tras F2.a: ancho 300, con la figura centrada por un
+// desplazamiento de +40 en X; alto sin cambios. Los botones táctiles se
+// posicionan sumando ese offset al cx del nodo.
+const VIEW_W = 300;
 const VIEW_H = 540;
+const FIGURE_OFFSET_X = 40;
 
 type ZonePickerProps = {
   /**
@@ -31,7 +34,9 @@ export default function ZonePicker({
   const [hovered, setHovered] = useState<BodyZoneId | null>(null);
   const ui = getEvaluationUi(locale).zonePicker;
 
-  const highlighted = hovered ?? availableZones[0] ?? "cadera";
+  // Al montar no hay zona resaltada: el chip solo aparece con hover/focus real
+  // del usuario (antes se defolteaba a la primera zona → chip fantasma "cadera").
+  const highlighted = hovered ?? undefined;
 
   // Etiquetas por locale para el chip de la silueta y los aria-label. En ES
   // resuelven a la etiqueta interna de BODY_ZONES (render byte-idéntico).
@@ -46,7 +51,10 @@ export default function ZonePicker({
       </h1>
       <p className="mt-2 font-body text-ink/70">{ui.subtitle}</p>
 
-      <div className="relative mx-auto mt-8 w-[62%] max-w-[300px]">
+      {/* Ancho escalado ×300/220 respecto a F2 para que la figura conserve su
+          tamaño aparente pese al viewBox más ancho; el margen extra es el aire
+          lateral de los chips. */}
+      <div className="relative mx-auto mt-8 w-[85%] max-w-[409px]">
         <BodyFigureSVG
           highlightedZone={highlighted}
           mode="selected"
@@ -71,7 +79,7 @@ export default function ZonePicker({
               onBlur={() => setHovered(null)}
               className="absolute h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               style={{
-                left: `${(zone.cx / VIEW_W) * 100}%`,
+                left: `${((zone.cx + FIGURE_OFFSET_X) / VIEW_W) * 100}%`,
                 top: `${(zone.cy / VIEW_H) * 100}%`,
               }}
             />

@@ -15,7 +15,7 @@ export const en: UiStrings = {
     { label: "About Me", href: "/en/about" },
     { label: "Contact", href: "/en/contact" },
   ],
-  tagline: "ORTHOPEDICS · TRAUMATOLOGY · SPINE",
+  tagline: { line1: "ORTHOPAEDIC SURGEON", line2: "SPINE SURGEON" },
   header: {
     logoAlt: "Dr. Angel Ancona logo — spine",
     whatsappLabel: "WhatsApp",

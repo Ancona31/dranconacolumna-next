@@ -147,6 +147,40 @@ html.js .reveal.revealed {
   transition: opacity 500ms ease;
 }
 
+/* Chip de zona (modo selected): entra y sale con fade + un desplazamiento leve
+   desde su lado (--chip-dx: -4px izquierda, 4px derecha). `both` fija el estado
+   final; con prefers-reduced-motion la regla global de más abajo colapsa la
+   duración y la aparición queda directa, sin animación. */
+@keyframes body-figure-chip-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--chip-dx, 0));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes body-figure-chip-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(var(--chip-dx, 0));
+  }
+}
+
+.body-figure__chip.is-enter {
+  animation: body-figure-chip-in 180ms ease-out both;
+}
+
+.body-figure__chip.is-exit {
+  animation: body-figure-chip-out 180ms ease-in both;
+}
+
 /* Respeto global a prefers-reduced-motion: neutraliza animaciones y
    transiciones (incluye Reveal, drawer, botones y page-enter). */
 @media (prefers-reduced-motion: reduce) {

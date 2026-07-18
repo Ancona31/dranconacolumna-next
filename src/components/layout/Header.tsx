@@ -10,7 +10,13 @@ import { trackEvent } from "@/lib/analytics";
 import type { Locale, UiStrings } from "@/lib/i18n/types";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 
-function Logo({ alt, tagline }: { alt: string; tagline: string }) {
+function Logo({
+  alt,
+  tagline,
+}: {
+  alt: string;
+  tagline: { line1: string; line2: string };
+}) {
   return (
     <Link href="/" className="flex min-w-0 items-center gap-2.5">
       <Image
@@ -26,9 +32,16 @@ function Logo({ alt, tagline }: { alt: string; tagline: string }) {
           Dr. Angel Ancona
         </span>
         {/* La bajada se oculta en móvil para que el header quepa en una sola
-            línea junto al chip de idioma; reaparece desde sm. */}
-        <span className="hidden truncate font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70 sm:block">
-          {tagline}
+            línea junto al chip de idioma; reaparece desde sm. Dos renglones,
+            cada uno sin envolver: el bloque crece en alto pero ocupa menos
+            ancho que la antigua línea única. */}
+        <span className="mt-0.5 hidden flex-col leading-tight sm:flex">
+          <span className="whitespace-nowrap font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70">
+            {tagline.line1}
+          </span>
+          <span className="whitespace-nowrap font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70">
+            {tagline.line2}
+          </span>
         </span>
       </span>
     </Link>
@@ -112,8 +125,11 @@ export default function Header({
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
           <Logo alt={strings.header.logoAlt} tagline={strings.tagline} />
 
-          {/* Navegación de escritorio */}
-          <nav className="hidden items-center gap-6 md:flex">
+          {/* Navegación de escritorio. gap reducido (antes gap-6) y cada enlace
+              en una sola línea (whitespace-nowrap) para que los 5 items quepan
+              sin envolver junto al selector y WhatsApp; el ancho lo cede el
+              tagline, ahora en dos renglones más estrechos. */}
+          <nav className="hidden items-center gap-4 md:flex">
             {strings.nav.map((item) => {
               const active = isActive(item.href);
               return (
@@ -121,7 +137,7 @@ export default function Header({
                   key={item.href}
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`nav-link font-body text-sm font-medium transition-colors duration-150 ${
+                  className={`nav-link whitespace-nowrap font-body text-sm font-medium transition-colors duration-150 ${
                     active ? "text-accent" : "text-ink hover:text-accent"
                   }`}
                 >

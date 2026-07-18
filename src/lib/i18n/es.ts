@@ -1,15 +1,15 @@
 import type { UiStrings } from "./types";
 import { MAIN_NAV, WHATSAPP_DEFAULT_MESSAGE } from "@/lib/nav";
-import { TAGLINE } from "@/lib/config";
+import { TAGLINE_LINES } from "@/lib/config";
 
 /**
  * Strings de UI en español. Fuente de verdad histórica: se reutilizan las
- * constantes existentes (MAIN_NAV, WHATSAPP_DEFAULT_MESSAGE, TAGLINE) para
+ * constantes existentes (MAIN_NAV, WHATSAPP_DEFAULT_MESSAGE, TAGLINE_LINES) para
  * garantizar que el render en español no cambie ni un carácter.
  */
 export const es: UiStrings = {
   nav: MAIN_NAV,
-  tagline: TAGLINE,
+  tagline: TAGLINE_LINES,
   header: {
     logoAlt: "Logotipo Dr. Angel Ancona — columna vertebral",
     whatsappLabel: "WhatsApp",

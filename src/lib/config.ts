@@ -12,7 +12,16 @@ export const SITE_URL = "https://www.dranconacolumna.com";
 /** Measurement ID de Google Analytics 4. Vacío = analítica desactivada. */
 export const GA_MEASUREMENT_ID = "G-T5VGBCGJC6";
 
-export const TAGLINE = "ORTOPEDIA · TRAUMATOLOGÍA · COLUMNA";
+/**
+ * Bajada del logotipo (header), en dos renglones. Antes era una sola línea
+ * ("ORTOPEDIA · TRAUMATOLOGÍA · COLUMNA") que se truncaba en el header. Único
+ * consumidor: el paquete de strings ES (@/lib/i18n/es). No se usa en metadata,
+ * JSON-LD, OG ni PDF, así que no hace falta conservar la versión de una línea.
+ */
+export const TAGLINE_LINES = {
+  line1: "ORTOPEDIA · TRAUMATOLOGÍA",
+  line2: "CIRUGÍA DE COLUMNA VERTEBRAL",
+};
 
 export const DOCTOR_FULL_NAME = "Dr. Angel M. Ancona Pérez";
 

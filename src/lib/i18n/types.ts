@@ -18,8 +18,8 @@ export interface UiStrings {
   /** Navegación principal: 5 items. */
   nav: NavItem[];
 
-  /** Bajada bajo el logotipo. */
-  tagline: string;
+  /** Bajada bajo el logotipo, en dos renglones (se apilan en el header). */
+  tagline: { line1: string; line2: string };
 
   header: {
     logoAlt: string;

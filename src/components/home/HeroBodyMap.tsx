@@ -54,7 +54,7 @@ export default function HeroBodyMap({ locale }: { locale: Locale }) {
           <Link
             href={evaluacionHref}
             aria-label={c.figureAria}
-            className="relative block w-[60%] max-w-[280px] md:w-full md:max-w-[360px]"
+            className="relative block w-[82%] max-w-[382px] md:w-full md:max-w-[491px]"
           >
             {/* El <Link> ya aporta el nombre accesible; la silueta va decorativa
                 (aria-hidden) para no duplicar la etiqueta. */}
