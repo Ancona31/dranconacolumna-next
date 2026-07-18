@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { trackEvent } from "@/lib/analytics";
+import { openWhatsAppInApp } from "@/lib/whatsapp";
 
 type StickyCtaBarProps = {
   nombre: string;
@@ -77,9 +78,10 @@ export default function StickyCtaBar({
             href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() =>
-              trackEvent("click_whatsapp", { origen: "padecimiento_barra" })
-            }
+            onClick={(e) => {
+              trackEvent("click_whatsapp", { origen: "padecimiento_barra" });
+              if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
+            }}
             className="inline-flex items-center justify-center rounded-full bg-whatsapp px-5 py-2.5 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
           >
             WhatsApp

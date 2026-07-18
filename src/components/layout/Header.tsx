@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { buildWhatsAppLink, openWhatsAppInApp } from "@/lib/whatsapp";
 import { trackEvent } from "@/lib/analytics";
 import type { Locale, UiStrings } from "@/lib/i18n/types";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
@@ -150,7 +150,10 @@ export default function Header({
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => trackEvent("click_whatsapp", { origen: "header" })}
+              onClick={(e) => {
+                trackEvent("click_whatsapp", { origen: "header" });
+                if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
+              }}
               className="rounded-full bg-whatsapp px-4 py-2 text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
             >
               {strings.header.whatsappLabel}
@@ -230,8 +233,9 @@ export default function Header({
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => {
+                onClick={(e) => {
                   trackEvent("click_whatsapp", { origen: "header" });
+                  if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
                   closeDrawer();
                 }}
                 className="mt-4 rounded-full bg-whatsapp px-4 py-3 text-center text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"

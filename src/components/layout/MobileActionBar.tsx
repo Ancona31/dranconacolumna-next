@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { buildWhatsAppLink, openWhatsAppInApp } from "@/lib/whatsapp";
 import type { Locale, UiStrings } from "@/lib/i18n/types";
 import { assessmentHref } from "@/lib/i18n/slug-map";
 import { getPadecimiento } from "@/lib/padecimientos";
@@ -51,7 +51,10 @@ export default function MobileActionBar({ strings }: { strings: UiStrings }) {
         href={whatsappLink}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => trackEvent("click_whatsapp", { origen: "mobile_bar" })}
+        onClick={(e) => {
+          trackEvent("click_whatsapp", { origen: "mobile_bar" });
+          if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
+        }}
         className="flex-1 bg-whatsapp py-4 text-center font-body text-sm font-semibold text-white transition duration-150 active:scale-[0.985]"
       >
         {strings.mobileBar.whatsappLabel}

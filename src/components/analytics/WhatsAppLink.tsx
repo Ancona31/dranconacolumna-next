@@ -1,6 +1,7 @@
 "use client";
 
 import { trackEvent, type WhatsAppOrigen } from "@/lib/analytics";
+import { openWhatsAppInApp } from "@/lib/whatsapp";
 
 type WhatsAppLinkProps = {
   href: string;
@@ -29,7 +30,10 @@ export default function WhatsAppLink({
       rel="noopener noreferrer"
       aria-label={ariaLabel}
       className={className}
-      onClick={() => trackEvent("click_whatsapp", { origen })}
+      onClick={(e) => {
+        trackEvent("click_whatsapp", { origen });
+        if (openWhatsAppInApp(href)) e.preventDefault();
+      }}
     >
       {children}
     </a>

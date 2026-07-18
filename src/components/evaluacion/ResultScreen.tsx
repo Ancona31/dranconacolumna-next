@@ -45,6 +45,7 @@ import { BODY_PATH, BODY_ZONES } from "@/components/home/BodyFigureSVG";
 import PdfDownload from "@/components/evaluacion/PdfDownload";
 import ShareButton from "@/components/share/ShareButton";
 import { trackEvent } from "@/lib/analytics";
+import { openWhatsAppInApp } from "@/lib/whatsapp";
 import { SITE_URL } from "@/lib/config";
 
 // Compartir el enlace a la evaluación (no el PDF): que otra persona haga su
@@ -322,11 +323,12 @@ function UnscorableScreen({
         href={getResultWhatsAppLink(result)}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() =>
+        onClick={(e) => {
           trackEvent("click_whatsapp", {
             origen: result.alertLevel === "urgente" ? "reporte_urgente" : "reporte",
-          })
-        }
+          });
+          if (openWhatsAppInApp(getResultWhatsAppLink(result))) e.preventDefault();
+        }}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
       >
         <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
@@ -550,12 +552,13 @@ export default function ResultScreen({
           href={whatsappLink}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() =>
+          onClick={(e) => {
             trackEvent("click_whatsapp", {
               origen:
                 result.alertLevel === "urgente" ? "reporte_urgente" : "reporte",
-            })
-          }
+            });
+            if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
+          }}
           className="flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
         >
           <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
