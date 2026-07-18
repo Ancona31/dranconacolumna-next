@@ -177,9 +177,73 @@ export default function ConditionTemplate({
         </div>
       </section>
 
-      {/* Síntomas comunes */}
+      {/* Qué puede estar pasando: solo en páginas que agrupan varias patologías
+          (codo, muñeca/mano). Se omite cuando p.patologias no existe → las 13
+          páginas de una sola patología renderizan idéntico. */}
+      {p.patologias && p.patologias.length > 0 && (
+        <section className="bg-background">
+          <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
+            <Reveal>
+              <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
+                {ui.causesEyebrow}
+              </p>
+              <h2 className="mt-2 font-heading text-3xl font-bold text-primary">
+                {ui.causesH2}
+              </h2>
+            </Reveal>
+
+            <div className="mt-8 space-y-6">
+              {p.patologias.map((pat, i) => (
+                <Reveal key={pat.nombre} delay={i * 80}>
+                  <article className="rounded-xl border border-primary/10 bg-primary-soft p-6 md:p-8">
+                    <h3 className="font-heading text-xl font-bold text-primary">
+                      {pat.nombre}
+                    </h3>
+                    <div className="mt-5 space-y-5">
+                      <div>
+                        <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                          {ui.pathoWhatLabel}
+                        </p>
+                        <p className="mt-1.5 font-body text-ink/75">
+                          {pat.queEs}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                          {ui.pathoFeelLabel}
+                        </p>
+                        <p className="mt-1.5 font-body text-ink/75">
+                          {pat.comoSeSiente}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                          {ui.pathoTreatLabel}
+                        </p>
+                        <p className="mt-1.5 font-body text-ink/75">
+                          {pat.comoSeTrata}
+                        </p>
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Síntomas comunes. Siempre bg-background. Cuando hay una sección de
+          patologías arriba (también bg-background) esta suelta su padding
+          superior para no duplicar el espacio: el bloque queda continuo y con
+          el mismo ritmo (80px) que Síntomas → Señales de alarma. Sin patologías
+          (las 13 páginas) conserva el py completo tras el hero primary-soft. */}
       <section className="bg-background">
-        <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
+        <div
+          className={`mx-auto max-w-3xl px-4 ${
+            p.patologias?.length ? "pb-14 md:pb-20" : "py-14 md:py-20"
+          }`}
+        >
           <Reveal>
             <h2 className="font-heading text-3xl font-bold text-primary">
               {ui.symptomsH2}

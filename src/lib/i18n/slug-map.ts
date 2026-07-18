@@ -39,10 +39,14 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
     es: "/padecimientos/dolor-de-hombro",
     en: "/en/conditions/shoulder-pain",
   },
+  { es: "/padecimientos/dolor-de-codo", en: "/en/conditions/elbow-pain" },
   { es: "/padecimientos/dolor-de-rodilla", en: "/en/conditions/knee-pain" },
   { es: "/padecimientos/dolor-de-cadera", en: "/en/conditions/hip-pain" },
   // FASE 2.C lote 2 (mano y paraguas: túnel, fracturas/esguinces, deportivas).
-  { es: "/padecimientos/tunel-del-carpo", en: "/en/conditions/carpal-tunnel" },
+  {
+    es: "/padecimientos/dolor-de-muneca-y-mano",
+    en: "/en/conditions/wrist-and-hand-pain",
+  },
   {
     es: "/padecimientos/fracturas-y-esguinces",
     en: "/en/conditions/fractures-sprains",
@@ -51,7 +55,7 @@ const PAIRS: ReadonlyArray<{ es: string; en: string }> = [
     es: "/padecimientos/lesiones-deportivas",
     en: "/en/conditions/sports-injuries",
   },
-  // Índice de padecimientos (los 13 padecimientos ya tienen par EN).
+  // Índice de padecimientos (los 14 padecimientos ya tienen par EN).
   { es: "/padecimientos", en: "/en/conditions" },
   // Evaluación (F3.A).
   { es: "/evaluacion", en: "/en/assessment" },

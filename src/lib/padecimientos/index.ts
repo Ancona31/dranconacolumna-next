@@ -4,6 +4,7 @@ import { canalLumbarEstrecho } from "./canal-lumbar-estrecho";
 import { ciatica } from "./ciatica";
 import { desviacionDeColumna } from "./desviacion-de-columna";
 import { dolorDeCadera } from "./dolor-de-cadera";
+import { dolorDeCodo } from "./dolor-de-codo";
 import { dolorDeCuello } from "./dolor-de-cuello";
 import { dolorDeHombro } from "./dolor-de-hombro";
 import { dolorDeRodilla } from "./dolor-de-rodilla";
@@ -11,7 +12,7 @@ import { fracturaDeColumna } from "./fractura-de-columna";
 import { fracturasYEsguinces } from "./fracturas-y-esguinces";
 import { herniaDeDisco } from "./hernia-de-disco";
 import { lesionesDeportivas } from "./lesiones-deportivas";
-import { tunelDelCarpo } from "./tunel-del-carpo";
+import { dolorDeMunecaYMano } from "./dolor-de-muneca-y-mano";
 import { vertebraDesplazada } from "./vertebra-desplazada";
 
 /**
@@ -29,9 +30,10 @@ export const PADECIMIENTOS: Partial<Record<ConditionSlug, Padecimiento>> = {
   "fractura-de-columna": fracturaDeColumna,
   "dolor-de-cuello": dolorDeCuello,
   "dolor-de-hombro": dolorDeHombro,
+  "dolor-de-codo": dolorDeCodo,
   "dolor-de-rodilla": dolorDeRodilla,
   "dolor-de-cadera": dolorDeCadera,
-  "tunel-del-carpo": tunelDelCarpo,
+  "dolor-de-muneca-y-mano": dolorDeMunecaYMano,
   "fracturas-y-esguinces": fracturasYEsguinces,
   "lesiones-deportivas": lesionesDeportivas,
 };

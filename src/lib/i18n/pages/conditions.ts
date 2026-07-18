@@ -16,6 +16,15 @@ export interface ConditionsUi {
   breadcrumbHref: string;
   /** Etiqueta del grupo, tras la migaja. */
   groupLabel: { columna: string; ortopedia: string };
+  /**
+   * Sección opcional "Qué puede estar pasando" (páginas con varias patologías):
+   * eyebrow, H2 y los tres labels de cada bloque de patología.
+   */
+  causesEyebrow: string;
+  causesH2: string;
+  pathoWhatLabel: string;
+  pathoFeelLabel: string;
+  pathoTreatLabel: string;
   /** H2 de la sección de síntomas. */
   symptomsH2: string;
   /** Puente al test tras los síntomas, alrededor de la zona en minúsculas. */
@@ -70,6 +79,11 @@ const CONDITIONS_ES: ConditionsUi = {
   breadcrumbLabel: "Padecimientos",
   breadcrumbHref: "/padecimientos",
   groupLabel: { columna: "Columna", ortopedia: "Ortopedia y traumatología" },
+  causesEyebrow: "Las causas más frecuentes",
+  causesH2: "Qué puede estar pasando",
+  pathoWhatLabel: "Qué es",
+  pathoFeelLabel: "Cómo se siente",
+  pathoTreatLabel: "Cómo se trata",
   symptomsH2: "Síntomas comunes",
   bridgeBefore:
     "¿Te reconociste en varios? Mide en 2 minutos cuánto está limitando tu ",
@@ -107,6 +121,11 @@ const CONDITIONS_EN: ConditionsUi = {
   breadcrumbLabel: "Conditions",
   breadcrumbHref: "/en/conditions",
   groupLabel: { columna: "Spine", ortopedia: "General orthopedics" },
+  causesEyebrow: "The most common causes",
+  causesH2: "What might be going on",
+  pathoWhatLabel: "What it is",
+  pathoFeelLabel: "How it feels",
+  pathoTreatLabel: "How it's treated",
   symptomsH2: "Common symptoms",
   bridgeBefore:
     "See yourself in several of these? In 2 minutes, measure how much it's limiting your ",

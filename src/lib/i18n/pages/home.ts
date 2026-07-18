@@ -154,7 +154,7 @@ const HOME_ES: HomeContent = {
     groupOrtho: "Ortopedia y traumatología",
     ctaCard: "¿No encuentras tu dolor? Haz la evaluación gratuita",
     ctaMobile: "¿No encuentras tu dolor? Haz la evaluación gratuita →",
-    legendMobile: "7 = Rodilla · ± = varias zonas",
+    legendMobile: "8 = Rodilla · ± = varias zonas",
     figureAria: "Silueta del cuerpo con las zonas de cada padecimiento",
     zoneAriaBefore: "Ir a padecimientos de esta zona",
     items: {
@@ -182,14 +182,18 @@ const HOME_ES: HomeContent = {
         nombre: "Dolor de hombro",
         detalle: "manguito rotador y más",
       },
+      "dolor-de-codo": {
+        nombre: "Dolor de codo",
+        detalle: "epicondilitis y bursitis",
+      },
       "dolor-de-rodilla": {
         nombre: "Dolor de rodilla",
         detalle: "desgaste y lesiones",
       },
       "dolor-de-cadera": { nombre: "Dolor de cadera" },
-      "tunel-del-carpo": {
-        nombre: "Túnel del carpo",
-        detalle: "adormecimiento de manos",
+      "dolor-de-muneca-y-mano": {
+        nombre: "Dolor de muñeca y mano",
+        detalle: "túnel del carpo, dedo en gatillo y más",
       },
       "lesiones-deportivas": { nombre: "Lesiones deportivas" },
     },
@@ -303,7 +307,7 @@ const HOME_EN: HomeContent = {
     // ctaMobile = variante móvil de ancho completo, con la flecha en el texto.
     ctaCard: "Don't see your condition? Take the free assessment",
     ctaMobile: "Don't see your condition? Take the free assessment →",
-    legendMobile: "7 = Knee · ± = multiple areas",
+    legendMobile: "8 = Knee · ± = multiple areas",
     figureAria: "Body silhouette showing the area of each condition",
     zoneAriaBefore: "Go to conditions for this area",
     items: {
@@ -331,14 +335,18 @@ const HOME_EN: HomeContent = {
         nombre: "Shoulder pain",
         detalle: "rotator cuff injuries and more",
       },
+      "dolor-de-codo": {
+        nombre: "Elbow pain",
+        detalle: "tennis & golfer's elbow",
+      },
       "dolor-de-rodilla": {
         nombre: "Knee pain",
         detalle: "injuries and arthritis",
       },
       "dolor-de-cadera": { nombre: "Hip pain" },
-      "tunel-del-carpo": {
-        nombre: "Carpal tunnel",
-        detalle: "numbness in the hands",
+      "dolor-de-muneca-y-mano": {
+        nombre: "Wrist and hand pain",
+        detalle: "carpal tunnel, trigger finger & more",
       },
       "lesiones-deportivas": { nombre: "Sports injuries" },
     },

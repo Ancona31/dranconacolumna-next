@@ -7,9 +7,10 @@ import { scoliosis } from "./scoliosis";
 import { spinalFractures } from "./spinal-fractures";
 import { neckPain } from "./neck-pain";
 import { shoulderPain } from "./shoulder-pain";
+import { elbowPain } from "./elbow-pain";
 import { kneePain } from "./knee-pain";
 import { hipPain } from "./hip-pain";
-import { carpalTunnel } from "./carpal-tunnel";
+import { wristAndHandPain } from "./wrist-and-hand-pain";
 import { fracturesSprains } from "./fractures-sprains";
 import { sportsInjuries } from "./sports-injuries";
 
@@ -19,8 +20,8 @@ import { sportsInjuries } from "./sports-injuries";
  * Un slug presente aquí se renderiza con `ConditionTemplate` en
  * /en/conditions/[slug]; un slug ausente cae en notFound().
  *
- * Los 13 padecimientos ya están traducidos: el índice /en/conditions y
- * ConditionsBodyMap enlazan 13/13 a su ruta EN.
+ * Los 14 padecimientos ya están traducidos: el índice /en/conditions y
+ * ConditionsBodyMap enlazan 14/14 a su ruta EN.
  */
 export const PADECIMIENTOS_EN: Record<string, Padecimiento> = {
   "herniated-disc": herniatedDisc,
@@ -31,9 +32,10 @@ export const PADECIMIENTOS_EN: Record<string, Padecimiento> = {
   "spinal-fractures": spinalFractures,
   "neck-pain": neckPain,
   "shoulder-pain": shoulderPain,
+  "elbow-pain": elbowPain,
   "knee-pain": kneePain,
   "hip-pain": hipPain,
-  "carpal-tunnel": carpalTunnel,
+  "wrist-and-hand-pain": wristAndHandPain,
   "fractures-sprains": fracturesSprains,
   "sports-injuries": sportsInjuries,
 };

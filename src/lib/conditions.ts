@@ -11,9 +11,10 @@ export type ConditionSlug =
   | "dolor-de-cuello"
   | "fracturas-y-esguinces"
   | "dolor-de-hombro"
+  | "dolor-de-codo"
   | "dolor-de-rodilla"
   | "dolor-de-cadera"
-  | "tunel-del-carpo"
+  | "dolor-de-muneca-y-mano"
   | "lesiones-deportivas";
 
 /**
@@ -41,9 +42,10 @@ const NODE_CUELLO: ConditionNode = { n: "1", cx: 100, cy: 85 }; // cuello
 const NODE_DORSAL: ConditionNode = { n: "2", cx: 100, cy: 127 }; // espalda-alta
 const NODE_LUMBAR: ConditionNode = { n: "3", cx: 100, cy: 233 }; // espalda-baja
 const NODE_HOMBRO: ConditionNode = { n: "4", cx: 47, cy: 107 }; // hombro
-const NODE_MUNECA: ConditionNode = { n: "5", cx: 54, cy: 286 }; // muñeca y mano
-const NODE_CADERA: ConditionNode = { n: "6", cx: 143, cy: 283 }; // cadera
-const NODE_RODILLA: ConditionNode = { n: "7", cx: 117, cy: 410 }; // rodilla
+const NODE_CODO: ConditionNode = { n: "5", cx: 47, cy: 183 }; // codo
+const NODE_MUNECA: ConditionNode = { n: "6", cx: 54, cy: 286 }; // muñeca y mano
+const NODE_CADERA: ConditionNode = { n: "7", cx: 143, cy: 283 }; // cadera
+const NODE_RODILLA: ConditionNode = { n: "8", cx: 117, cy: 410 }; // rodilla
 
 export const CONDITIONS: Condition[] = [
   // Columna
@@ -111,6 +113,13 @@ export const CONDITIONS: Condition[] = [
     node: NODE_HOMBRO,
   },
   {
+    slug: "dolor-de-codo",
+    nombre: "Dolor de codo",
+    detalle: "epicondilitis y bursitis",
+    grupo: "ortopedia",
+    node: NODE_CODO,
+  },
+  {
     slug: "dolor-de-rodilla",
     nombre: "Dolor de rodilla",
     detalle: "desgaste y lesiones",
@@ -124,9 +133,9 @@ export const CONDITIONS: Condition[] = [
     node: NODE_CADERA,
   },
   {
-    slug: "tunel-del-carpo",
-    nombre: "Túnel del carpo",
-    detalle: "adormecimiento de manos",
+    slug: "dolor-de-muneca-y-mano",
+    nombre: "Dolor de muñeca y mano",
+    detalle: "túnel del carpo, dedo en gatillo y más",
     grupo: "ortopedia",
     node: NODE_MUNECA,
   },

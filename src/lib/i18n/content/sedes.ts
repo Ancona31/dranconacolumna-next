@@ -23,6 +23,8 @@ export interface SedesCopy {
   bookingLabel: string;
   callButton: string;
   whatsappButton: string;
+  /** Mensaje predeterminado del CTA de WhatsApp de cada sede. */
+  whatsappMessage: string;
   /** Enlace de mapa en la tarjeta del home ("Cómo llegar →"). */
   directionsLink: string;
   /** Enlace de mapa en la página de contacto ("Ver en Google Maps →"). */
@@ -38,6 +40,7 @@ const SEDES_ES: SedesCopy = {
   bookingLabel: "Consulta con cita previa",
   callButton: "Llamar a la clínica",
   whatsappButton: "Agendar por WhatsApp",
+  whatsappMessage: "Hola, deseo agendar una cita con el Dr. Angel Ancona.",
   directionsLink: "Cómo llegar →",
   mapsLink: "Ver en Google Maps →",
   forOfficeInfo: "Para información de la sede",
@@ -60,6 +63,8 @@ const SEDES_EN: SedesCopy = {
   bookingLabel: "By appointment only",
   callButton: "Call the clinic",
   whatsappButton: "Book via WhatsApp",
+  whatsappMessage:
+    "Hello, I would like to schedule an appointment with Dr. Angel Ancona.",
   directionsLink: "Get directions →",
   mapsLink: "View on Google Maps →",
   forOfficeInfo: "For office information",

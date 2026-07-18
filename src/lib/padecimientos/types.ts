@@ -12,6 +12,19 @@ export type PadecimientoFaq = {
 };
 
 /**
+ * Una patología concreta dentro de una página que agrupa varias (p. ej. codo o
+ * muñeca/mano). Se lista en la sección opcional "Qué puede estar pasando", entre
+ * el hero y los síntomas. Las páginas de una sola patología no la usan.
+ */
+export type PatologiaBloque = {
+  /** Nombre de la patología, ej. 'Epicondilitis lateral — el "codo de tenista"'. */
+  nombre: string;
+  queEs: string;
+  comoSeSiente: string;
+  comoSeTrata: string;
+};
+
+/**
  * Contenido completo de una página de padecimiento. Los archivos de datos viven
  * en esta carpeta y se registran en index.ts; la plantilla de
  * /padecimientos/[slug] los renderiza sin lógica propia por padecimiento.
@@ -49,6 +62,13 @@ export type Padecimiento = {
   /** Párrafos en primera persona, voz del doctor. */
   comoLoTrato: string[];
   faq: PadecimientoFaq[];
+  /**
+   * Bloques de patología para las páginas que agrupan varias (codo, muñeca/mano).
+   * Opcional: cuando está presente, la plantilla muestra la sección "Qué puede
+   * estar pasando" entre el hero y los síntomas. Las 13 páginas de una sola
+   * patología lo dejan undefined y la sección no se renderiza.
+   */
+  patologias?: PatologiaBloque[];
   /**
    * Zona del test al que apunta el CTA final. Se omite en los padecimientos
    * paraguas —familias de lesiones sin zona única—: entonces el CTA lleva al

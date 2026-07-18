@@ -21,6 +21,12 @@ export type Sede = {
   telefono: string;
   /** Teléfono formateado para mostrar ("999 495 79 16"). */
   telefonoDisplay: string;
+  /**
+   * WhatsApp de la sede en formato wa.me (52 + 10 dígitos, "529994957916").
+   * Es el MISMO número que `telefono`; distinto del WhatsApp personal del
+   * doctor (config). Alimenta el CTA "Agendar por WhatsApp" de cada tarjeta.
+   */
+  whatsapp: string;
   lat: number;
   lng: number;
   /** Horario completo, en prosa ("Lunes a viernes, 9:00 a 11:00 h"). */
@@ -47,6 +53,7 @@ export const SEDES: Sede[] = [
     cp: "97156",
     telefono: "9994957916",
     telefonoDisplay: "999 495 79 16",
+    whatsapp: "529994957916",
     lat: 20.97978962216484,
     lng: -89.57207645354667,
     horario: "Lunes a viernes, 9:00 a 11:00 h",
@@ -67,6 +74,7 @@ export const SEDES: Sede[] = [
     cp: "97390",
     telefono: "9992223173",
     telefonoDisplay: "999 222 31 73",
+    whatsapp: "529992223173",
     lat: 20.87988952572975,
     lng: -89.7481702443132,
     horario: "Lunes a viernes, 17:00 a 20:00 h",

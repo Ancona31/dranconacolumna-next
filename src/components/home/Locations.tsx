@@ -6,24 +6,13 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { SEDES, type Sede } from "@/lib/sedes";
 import WhatsAppLink from "@/components/analytics/WhatsAppLink";
 import type { Locale } from "@/lib/i18n/types";
-import { waMessage } from "@/lib/i18n";
 import { getHomeContent } from "@/lib/i18n/pages/home";
 import { getSedesCopy, type SedesCopy } from "@/lib/i18n/content/sedes";
 import { routeFor } from "@/lib/i18n/slug-map";
 
-function SedeCard({
-  sede,
-  copy,
-  locale,
-}: {
-  sede: Sede;
-  copy: SedesCopy;
-  locale: Locale;
-}) {
+function SedeCard({ sede, copy }: { sede: Sede; copy: SedesCopy }) {
   const sc = copy.byId[sede.id];
-  const whatsappLink = buildWhatsAppLink(
-    waMessage(locale, `Hola Dr. Ancona, quiero agendar una consulta en ${sede.nombre}.`)
-  );
+  const whatsappLink = buildWhatsAppLink(copy.whatsappMessage, sede.whatsapp);
 
   return (
     <div className="flex flex-1 flex-col rounded-2xl border border-primary/10 bg-background p-6">
@@ -111,7 +100,7 @@ export default function Locations({ locale }: { locale: Locale }) {
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           {SEDES.map((sede, i) => (
             <Reveal key={sede.id} delay={i * 80} className="flex">
-              <SedeCard sede={sede} copy={copy} locale={locale} />
+              <SedeCard sede={sede} copy={copy} />
             </Reveal>
           ))}
         </div>
