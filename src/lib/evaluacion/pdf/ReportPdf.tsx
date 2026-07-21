@@ -72,7 +72,7 @@ const C = {
   muted: "#6B7A88",
 };
 
-const PHONE_DISPLAY = "999 636 4504";
+const PHONE_DISPLAY = "999 497 4956";
 
 // Estilo del QR en UN solo lugar: placa blanca con puntos azul tinta
 // (contraste correcto y detectable).
