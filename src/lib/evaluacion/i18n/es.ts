@@ -332,17 +332,17 @@ export const es: EngineCopy = {
       moderada: "en los proximos 3 dias",
       leve: "esta semana",
     },
-    qrShort: (folio, score, level, ventana) =>
-      `Quiero agendar una valoracion. ${folio}: ${score}/100, ${level}, valoracion ${ventana}.`,
-    qr: (zona, folio, score, level, ventana) =>
-      `Quiero agendar una valoracion. Evaluacion de ${zona} ${folio}: ${score}/100, limitacion ${level}. Recomendacion del test: valoracion ${ventana}.`,
+    qrShort: (folio, score) =>
+      `Quiero agendar una valoracion (folio ${folio} · resultado ${score}/100).`,
+    qr: (zona, folio, score) =>
+      `Quiero agendar una valoracion (folio ${folio} · zona ${zona} · resultado ${score}/100).`,
     qrAlarmSuffix: " Marque datos de alarma.",
     fullUrgente: (zoneLabel, folio) =>
-      `Hola Dr. Ancona, mi evaluación de ${zoneLabel} detectó datos de alarma (folio ${folio}). Acudiré a urgencias; le aviso de mi caso.`,
+      `Hola Dr. Ancona, hice la evaluación en el sitio (folio ${folio} · zona ${zoneLabel}) y detectó datos de alarma. Acudiré a urgencias; le aviso de mi caso.`,
     fullUnscorable: (zoneLabel, folio) =>
-      `Hola Dr. Ancona, respondí la evaluación de ${zoneLabel} (folio ${folio}), pero marqué todas las actividades como no aplicables y no obtuve resultado. Quiero agendar una valoración.`,
-    fullBase: (zoneLabel, folio, level, score) =>
-      `Hola Dr. Ancona, completé la evaluación de ${zoneLabel} (folio ${folio}). Resultado: limitación ${level}, ${score}/100. Quiero agendar una valoración.`,
+      `Hola Dr. Ancona, hice la evaluación en el sitio (folio ${folio} · zona ${zoneLabel}) pero marqué todas las actividades como no aplicables y no obtuve resultado. Quiero agendar una valoración.`,
+    fullBase: (zoneLabel, folio, score) =>
+      `Hola Dr. Ancona, hice la evaluación en el sitio (folio ${folio} · zona ${zoneLabel} · resultado ${score}/100) y quiero agendar una valoración`,
     fullPrecaucionSuffix: " Marqué datos de alarma en el cuestionario.",
   },
 };

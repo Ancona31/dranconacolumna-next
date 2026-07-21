@@ -52,7 +52,7 @@ export default function MobileActionBar({ strings }: { strings: UiStrings }) {
         target="_blank"
         rel="noopener noreferrer"
         onClick={(e) => {
-          trackEvent("click_whatsapp", { origen: "mobile_bar" });
+          trackEvent("whatsapp_click", { source_section: "barra_movil" });
           if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
         }}
         className="flex-1 bg-whatsapp py-4 text-center font-body text-sm font-semibold text-white transition duration-150 active:scale-[0.985]"

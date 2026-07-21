@@ -313,6 +313,9 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
           >
             {c.seeAll}
           </a>
+          <p className="mx-auto mt-8 max-w-2xl font-body text-xs leading-relaxed text-ink/45">
+            {c.disclaimer}
+          </p>
         </div>
       </div>
     </section>

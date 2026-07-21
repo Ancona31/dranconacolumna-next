@@ -269,12 +269,11 @@ export function buildWhatsAppMessage(
 ): string {
   const wa = getEngineCopy(locale).whatsapp;
   if (input.variant === "qr" || input.variant === "qr-short") {
-    const ventana = ventanaFromLevels(input.level, input.alertLevel, locale);
     if (input.variant === "qr-short") {
-      return wa.qrShort(input.folio, input.score, input.level, ventana);
+      return wa.qrShort(input.folio, input.score);
     }
     const zona = deburr(input.zoneLabel).toLowerCase();
-    let msg = wa.qr(zona, input.folio, input.score, input.level, ventana);
+    let msg = wa.qr(zona, input.folio, input.score);
     if (input.alertLevel === "urgente" || input.alertLevel === "precaucion") {
       msg += wa.qrAlarmSuffix;
     }
@@ -286,12 +285,7 @@ export function buildWhatsAppMessage(
   if (input.unscorable) {
     return wa.fullUnscorable(input.zoneLabel, input.folio);
   }
-  const base = wa.fullBase(
-    input.zoneLabel,
-    input.folio,
-    input.level,
-    input.score
-  );
+  const base = wa.fullBase(input.zoneLabel, input.folio, input.score);
   if (input.alertLevel === "precaucion") {
     return `${base}${wa.fullPrecaucionSuffix}`;
   }

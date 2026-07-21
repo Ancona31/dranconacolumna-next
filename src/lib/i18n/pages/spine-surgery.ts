@@ -35,7 +35,7 @@ const SPINE_ES: SpineContent = {
   hero: {
     eyebrow: "Mi subespecialidad",
     h1: "Cirugía de columna",
-    text: "La columna es mi alta especialidad: cervical, dorsal y lumbar. Mi trabajo es identificar con precisión qué necesita tu caso — y cuando la cirugía es la mejor opción para ti, la realizo con las técnicas de mínima invasión más avanzadas: incisiones milimétricas, menos dolor y una recuperación más rápida.",
+    text: "La columna es mi alta especialidad: cervical, dorsal y lumbar. Mi trabajo es identificar con precisión qué necesita tu caso — y cuando la cirugía es la mejor opción para ti, la realizo con las técnicas de mínima invasión más avanzadas: incisiones milimétricas que, en casos indicados, pueden permitir menos dolor y una recuperación más rápida.",
   },
   when: {
     h2: "Cuándo se considera la cirugía",
@@ -90,7 +90,7 @@ const SPINE_EN: SpineContent = {
   hero: {
     eyebrow: "My subspecialty",
     h1: "Spine surgery",
-    text: "The spine is my fellowship specialty: cervical, thoracic, and lumbar. My job is to identify precisely what your case needs — and when surgery is the best option for you, I perform it with the most advanced minimally invasive techniques: incisions measured in millimeters, less pain, and a faster recovery.",
+    text: "The spine is my fellowship specialty: cervical, thoracic, and lumbar. My job is to identify precisely what your case needs — and when surgery is the best option for you, I perform it with the most advanced minimally invasive techniques: incisions measured in millimeters that, in appropriate cases, may allow for less pain and a faster recovery.",
   },
   when: {
     h2: "When surgery is considered",

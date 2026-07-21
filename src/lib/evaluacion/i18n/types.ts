@@ -109,20 +109,9 @@ export interface EngineCopy {
       string
     >;
     /** Variante 'qr-short': recorte de densidad del QR. */
-    qrShort: (
-      folio: string,
-      score: number,
-      level: NonUrgentLevel,
-      ventana: string
-    ) => string;
+    qrShort: (folio: string, score: number) => string;
     /** Variante 'qr': mensaje del QR/Link del PDF (zona ya sin acentos). */
-    qr: (
-      zona: string,
-      folio: string,
-      score: number,
-      level: NonUrgentLevel,
-      ventana: string
-    ) => string;
+    qr: (zona: string, folio: string, score: number) => string;
     /** Sufijo del QR cuando hay datos de alarma. */
     qrAlarmSuffix: string;
     /** Variante 'full' con alertLevel 'urgente'. */
@@ -130,12 +119,7 @@ export interface EngineCopy {
     /** Variante 'full' cuando el resultado es unscorable. */
     fullUnscorable: (zoneLabel: string, folio: string) => string;
     /** Variante 'full' base (scorable, sin urgencia). */
-    fullBase: (
-      zoneLabel: string,
-      folio: string,
-      level: NonUrgentLevel,
-      score: number
-    ) => string;
+    fullBase: (zoneLabel: string, folio: string, score: number) => string;
     /** Sufijo de la variante 'full' cuando hay precaución. */
     fullPrecaucionSuffix: string;
   };

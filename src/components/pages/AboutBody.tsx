@@ -146,7 +146,7 @@ export default function AboutBody({ locale }: { locale: Locale }) {
               </Link>
               <WhatsAppLink
                 href={whatsappLink}
-                origen="sobre_mi"
+                section="sobre_mi"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-7 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
               >
                 {c.cta.whatsappCta}

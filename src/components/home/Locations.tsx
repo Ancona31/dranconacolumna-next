@@ -5,6 +5,7 @@ import Reveal from "@/components/ui/Reveal";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { SEDES, type Sede } from "@/lib/sedes";
 import WhatsAppLink from "@/components/analytics/WhatsAppLink";
+import PhoneLink from "@/components/analytics/PhoneLink";
 import type { Locale } from "@/lib/i18n/types";
 import { getHomeContent } from "@/lib/i18n/pages/home";
 import { getSedesCopy, type SedesCopy } from "@/lib/i18n/content/sedes";
@@ -53,17 +54,19 @@ function SedeCard({ sede, copy }: { sede: Sede; copy: SedesCopy }) {
       </p>
 
       <div className="mt-6 flex flex-1 flex-col justify-end gap-3">
-        <a
+        <PhoneLink
           href={`tel:+52${sede.telefono}`}
+          section={sede.section}
+          phoneNumber={sede.telefono}
           className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-transparent px-5 py-3 font-body text-sm font-semibold text-primary transition duration-150 hover:bg-primary hover:text-white active:scale-[0.985]"
         >
           <Phone className="h-4 w-4 shrink-0" strokeWidth={1.75} />
           {copy.callButton}
-        </a>
+        </PhoneLink>
 
         <WhatsAppLink
           href={whatsappLink}
-          origen={sede.origen}
+          section={sede.section}
           className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-5 py-3 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
         >
           <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={1.75} />

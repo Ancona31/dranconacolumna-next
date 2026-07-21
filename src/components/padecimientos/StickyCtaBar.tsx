@@ -79,7 +79,9 @@ export default function StickyCtaBar({
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => {
-              trackEvent("click_whatsapp", { origen: "padecimiento_barra" });
+              trackEvent("whatsapp_click", {
+                source_section: "padecimientos_barra",
+              });
               if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
             }}
             className="inline-flex items-center justify-center rounded-full bg-whatsapp px-5 py-2.5 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"

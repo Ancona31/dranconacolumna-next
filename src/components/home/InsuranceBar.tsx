@@ -1,5 +1,8 @@
 import Image from "next/image";
+import { MessageCircle } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
+import WhatsAppLink from "@/components/analytics/WhatsAppLink";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 import type { Locale } from "@/lib/i18n/types";
 import { getHomeContent } from "@/lib/i18n/pages/home";
 
@@ -17,6 +20,7 @@ const ASEGURADORAS: { nombre: string; archivo: string }[] = [
 
 export default function InsuranceBar({ locale }: { locale: Locale }) {
   const c = getHomeContent(locale).insurance;
+  const whatsappLink = buildWhatsAppLink(c.waMessage);
 
   return (
     <section className="border-t border-ink/10 bg-primary-soft">
@@ -57,6 +61,19 @@ export default function InsuranceBar({ locale }: { locale: Locale }) {
             </Reveal>
           ))}
         </div>
+
+        <Reveal>
+          <div className="mt-10 flex justify-center md:mt-12">
+            <WhatsAppLink
+              href={whatsappLink}
+              section="aseguradoras"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-7 py-4 text-center font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
+            >
+              <MessageCircle className="h-5 w-5 shrink-0" strokeWidth={1.75} />
+              {c.waCta}
+            </WhatsAppLink>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

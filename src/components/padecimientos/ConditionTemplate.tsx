@@ -155,7 +155,7 @@ export default function ConditionTemplate({
                   {ui.heroMetaLine}
                   <WhatsAppLink
                     href={whatsappLink}
-                    origen="padecimiento_cta"
+                    section="padecimientos"
                     className="font-semibold text-accent hover:underline"
                   >
                     {ui.heroWaLinkText}
@@ -468,7 +468,7 @@ export default function ConditionTemplate({
               </Link>
               <WhatsAppLink
                 href={whatsappLink}
-                origen="padecimiento_cta"
+                section="padecimientos"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-7 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
               >
                 {ui.finalWaButton}

@@ -2,19 +2,10 @@
  * Copy transversal del motor en INGLÉS.
  *
  * Contrapartida EN de es.ts: cada campo es el literal inglés, no una traducción
- * en vivo. Las claves de nivel siguen siendo internas en español
- * (leve/moderada/severa); LEVEL_EN las mapea a su forma inglesa dentro de las
- * plantillas que las interpolan (whatsapp.*). Es capa de copy, no lógica.
+ * en vivo. Es capa de copy, no lógica.
  */
 
-import type { NonUrgentLevel } from "../types";
 import type { EngineCopy } from "./types";
-
-const LEVEL_EN: Record<NonUrgentLevel, string> = {
-  leve: "mild",
-  moderada: "moderate",
-  severa: "severe",
-};
 
 export const en: EngineCopy = {
   recommendationEyebrow: "RECOMMENDED CONSULTATION",
@@ -337,17 +328,17 @@ export const en: EngineCopy = {
       moderada: "within the next 3 days",
       leve: "this week",
     },
-    qrShort: (folio, score, level, ventana) =>
-      `I'd like to schedule a consultation. ${folio}: ${score}/100, ${LEVEL_EN[level]}, consultation ${ventana}.`,
-    qr: (zona, folio, score, level, ventana) =>
-      `I'd like to schedule a consultation. ${zona} evaluation ${folio}: ${score}/100, ${LEVEL_EN[level]} limitation. Test recommendation: consultation ${ventana}.`,
+    qrShort: (folio, score) =>
+      `I'd like to schedule a consultation (folio ${folio} · result ${score}/100).`,
+    qr: (zona, folio, score) =>
+      `I'd like to schedule a consultation (folio ${folio} · area ${zona} · result ${score}/100).`,
     qrAlarmSuffix: " I marked warning signs.",
     fullUrgente: (zoneLabel, folio) =>
-      `Hello Dr. Ancona, my ${zoneLabel} assessment detected warning signs (folio ${folio}). I'm going to the ER; I'm letting you know about my case.`,
+      `Hello Dr. Ancona, I completed the evaluation on your website (folio ${folio} · area ${zoneLabel}) and it detected warning signs. I'm going to the ER; I'm letting you know about my case.`,
     fullUnscorable: (zoneLabel, folio) =>
-      `Hello Dr. Ancona, I answered the ${zoneLabel} assessment (folio ${folio}), but I marked every activity as not applicable and got no result. I'd like to schedule a consultation.`,
-    fullBase: (zoneLabel, folio, level, score) =>
-      `Hello Dr. Ancona, I completed the ${zoneLabel} assessment (folio ${folio}). Result: ${LEVEL_EN[level]} limitation, ${score}/100. I'd like to schedule a consultation.`,
+      `Hello Dr. Ancona, I completed the evaluation on your website (folio ${folio} · area ${zoneLabel}) but I marked every activity as not applicable and got no result. I'd like to book a consultation.`,
+    fullBase: (zoneLabel, folio, score) =>
+      `Hello Dr. Ancona, I completed the evaluation on your website (folio ${folio} · area ${zoneLabel} · result ${score}/100) and I'd like to book a consultation`,
     fullPrecaucionSuffix: " I marked warning signs in the questionnaire.",
   },
 };

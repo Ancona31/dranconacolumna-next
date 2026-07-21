@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { MapPin, Clock, Phone, MessageCircle } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import WhatsAppLink from "@/components/analytics/WhatsAppLink";
+import PhoneLink from "@/components/analytics/PhoneLink";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { SEDES, type Sede } from "@/lib/sedes";
 import {
@@ -159,13 +160,15 @@ function SedeCard({ sede, copy }: { sede: Sede; copy: SedesCopy }) {
 
       <div className="mt-6 flex flex-1 flex-col justify-end gap-3">
         <div>
-          <a
+          <PhoneLink
             href={`tel:+52${sede.telefono}`}
+            section={sede.section}
+            phoneNumber={sede.telefono}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-transparent px-5 py-3 font-body text-sm font-semibold text-primary transition duration-150 hover:bg-primary hover:text-white active:scale-[0.985]"
           >
             <Phone className="h-4 w-4 shrink-0" strokeWidth={1.75} />
             {copy.callButton}
-          </a>
+          </PhoneLink>
           <p className="mt-1.5 text-center font-body text-xs text-ink/55">
             {copy.forOfficeInfo}
           </p>
@@ -173,7 +176,7 @@ function SedeCard({ sede, copy }: { sede: Sede; copy: SedesCopy }) {
 
         <WhatsAppLink
           href={whatsappLink}
-          origen={sede.origen}
+          section={sede.section}
           className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-5 py-3 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
         >
           <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
@@ -222,7 +225,7 @@ export default function ContactBody({ locale }: { locale: Locale }) {
             <div className="rounded-2xl border border-whatsapp/25 bg-[#EAF4EF] p-6 text-center md:p-8">
               <WhatsAppLink
                 href={whatsappPrincipal}
-                origen="contacto"
+                section="ubicaciones"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-7 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
               >
                 <MessageCircle className="h-5 w-5 shrink-0" strokeWidth={1.75} />

@@ -42,7 +42,7 @@ const ABOUT_ES: AboutContent = {
     h2: "Mi manera de trabajar",
     paragraphs: [
       "Muchos problemas de columna y lesiones ortopédicas mejoran con tratamiento conservador bien dirigido, y siempre es el punto de partida. Pero cuando la cirugía es lo que tu caso necesita, cuentas con un cirujano de columna con alta especialidad para resolverlo. Si te digo que necesitas cirugía, es porque es la mejor decisión para tu caso — y te lo explicaré con claridad, con estudios en la mano.",
-      "Cuando operar es lo correcto, uso la técnica menos agresiva que tu caso permita. Mi alta especialidad me formó en cirugía de mínima invasión de columna: incisiones más pequeñas, menos daño muscular y recuperaciones más rápidas — siempre que el caso sea candidato.",
+      "Cuando operar es lo correcto, uso la técnica menos agresiva que tu caso permita. Mi alta especialidad me formó en cirugía de mínima invasión de columna: incisiones más pequeñas y menos daño muscular que, en casos indicados, pueden permitir una recuperación más rápida.",
       "Y te atiendo yo, en cada etapa. La valoración, la cirugía si hace falta y cada revisión posterior. Mi WhatsApp lo respondo personalmente, porque una duda a tiempo evita complicaciones.",
     ],
   },
@@ -91,7 +91,7 @@ const ABOUT_EN: AboutContent = {
     h2: "How I work",
     paragraphs: [
       "Many spine problems and orthopedic injuries improve with the right conservative (non-surgical) treatment, and that is always the starting point. But when surgery is what your case needs, you have a fellowship-trained spine surgeon to take care of it. If I tell you that you need surgery, it's because it's the best decision for your case — and I'll walk you through it clearly, with your scans in front of us.",
-      "When surgery is the right call, I use the least invasive technique your case allows. My fellowship trained me in minimally invasive spine surgery: smaller incisions, less muscle damage, and a faster recovery — whenever your case is a candidate.",
+      "When surgery is the right call, I use the least invasive technique your case allows. My fellowship trained me in minimally invasive spine surgery: smaller incisions and less muscle damage that, in appropriate cases, may allow for a faster recovery.",
       "And I see you myself, at every stage. The consultation, the surgery if needed, and every follow-up visit. I answer my WhatsApp personally, because a question answered early can prevent a complication.",
     ],
   },

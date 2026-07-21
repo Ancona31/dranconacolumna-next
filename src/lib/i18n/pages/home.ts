@@ -73,8 +73,18 @@ export interface HomeContent {
     nextAria: string;
     /** Prefijo del aria-label de cada punto: `${goToReview} ${i + 1}`. */
     goToReview: string;
+    /** Nota legal en tipografía pequeña bajo la lista de reseñas. */
+    disclaimer: string;
   };
-  insurance: { eyebrow: string; h2: string; sub: string };
+  insurance: {
+    eyebrow: string;
+    h2: string;
+    sub: string;
+    /** Texto del botón de WhatsApp bajo los logos. */
+    waCta: string;
+    /** Mensaje precargado del CTA de seguros (al WhatsApp personal). */
+    waMessage: string;
+  };
   locations: { h2: string; seeContact: string };
 }
 
@@ -125,7 +135,7 @@ const HOME_ES: HomeContent = {
     cards: [
       {
         title: "Alta especialidad en cirugía de columna",
-        text: "No todos los ortopedistas operan columna. Cursé una alta especialidad dedicada exclusivamente a ella, y cuando el caso lo permite uso técnicas de mínima invasión: incisiones más pequeñas, menos dolor y una recuperación más rápida.",
+        text: "No todos los ortopedistas operan columna. Cursé una alta especialidad dedicada exclusivamente a ella, y cuando el caso lo permite uso técnicas de mínima invasión: incisiones más pequeñas que, en casos indicados, pueden permitir menos dolor y una recuperación más rápida.",
         linkLabel: "Conocer más",
       },
       {
@@ -216,11 +226,16 @@ const HOME_ES: HomeContent = {
     prevAria: "Opinión anterior",
     nextAria: "Opinión siguiente",
     goToReview: "Ir a la opinión",
+    disclaimer:
+      "Opiniones reales de pacientes en Google. Los resultados y tiempos de recuperación varían en cada caso; toda decisión de tratamiento requiere valoración individual.",
   },
   insurance: {
     eyebrow: "Cobertura",
     h2: "Trabajo con tu Seguro de Gastos Médicos Mayores",
     sub: "¿Tienes seguro de gastos médicos? Te ayudo con el trámite.",
+    waCta: "¿Tienes seguro de gastos médicos? Te ayudamos con el trámite",
+    waMessage:
+      "Hola Dr. Ancona, tengo seguro de gastos médicos y quiero información para agendar una valoración",
   },
   locations: {
     h2: "Dónde atiendo",
@@ -276,7 +291,7 @@ const HOME_EN: HomeContent = {
     cards: [
       {
         title: "Fellowship-trained spine surgeon",
-        text: "Not every orthopedic surgeon operates on the spine. I completed a fellowship dedicated exclusively to spine surgery, and when your case allows, I use minimally invasive techniques: smaller incisions, less pain, and a faster recovery.",
+        text: "Not every orthopedic surgeon operates on the spine. I completed a fellowship dedicated exclusively to spine surgery, and when your case allows, I use minimally invasive techniques: smaller incisions that, in appropriate cases, may allow for less pain and a faster recovery.",
         linkLabel: "Learn more",
       },
       {
@@ -369,11 +384,16 @@ const HOME_EN: HomeContent = {
     prevAria: "Previous review",
     nextAria: "Next review",
     goToReview: "Go to review",
+    disclaimer:
+      "Real patient reviews from Google. Results and recovery times vary from case to case; every treatment decision requires an individual assessment.",
   },
   insurance: {
     eyebrow: "Coverage",
     h2: "I work with private health insurance",
     sub: "Have health insurance? I'll help you with the paperwork.",
+    waCta: "Have private medical insurance? We'll help with the paperwork",
+    waMessage:
+      "Hello Dr. Ancona, I have private medical insurance and I'd like information to book a consultation",
   },
   locations: {
     h2: "Where I practice",

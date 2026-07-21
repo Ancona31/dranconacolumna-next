@@ -6,8 +6,6 @@
 
 /** Nivel funcional del reporte, con "urgente" cuando la alerta escala. */
 type Nivel = "leve" | "moderada" | "severa" | "urgente";
-/** Nivel de alerta independiente del score. */
-type Alerta = "none" | "precaucion" | "urgente";
 
 /** Método por el que se compartió contenido (ShareButton). */
 export type ShareMetodo =
@@ -17,28 +15,34 @@ export type ShareMetodo =
   | "correo"
   | "copiar";
 
-/** Ubicación desde donde se disparó un click de WhatsApp. */
-export type WhatsAppOrigen =
-  | "header"
-  | "mobile_bar"
+/**
+ * Sección del sitio desde donde se disparó un contacto (WhatsApp o teléfono).
+ * VOCABULARIO CONGELADO: estos valores se importan a Google Ads por nombre —
+ * no renombrar ni traducir sin coordinar con la cuenta de Ads.
+ */
+export type WhatsAppSection =
   | "hero"
-  | "padecimiento_cta"
-  | "padecimiento_barra"
-  | "reporte"
-  | "reporte_urgente"
-  | "contacto"
-  | "sede_merida"
-  | "sede_uman"
-  | "cirugia_cta"
-  | "sobre_mi"
-  | "flotante";
+  | "evaluacion"
+  | "padecimientos"
+  | "padecimientos_barra"
+  | "cirugia"
+  | "aseguradoras"
+  | "ubicaciones"
+  | "footer"
+  | "header"
+  | "flotante"
+  | "barra_movil"
+  | "sede_medclinik"
+  | "sede_celus"
+  | "sobre_mi";
 
 /** Eventos del embudo y sus parámetros. */
 type EventParams = {
   evaluacion_iniciada: { zona: string };
-  evaluacion_completada: { zona: string; nivel: Nivel; alerta: Alerta };
+  evaluacion_completada: { zona: string };
   reporte_pdf_descargado: { zona: string; nivel: Nivel };
-  click_whatsapp: { origen: WhatsAppOrigen };
+  whatsapp_click: { source_section: WhatsAppSection };
+  phone_click: { source_section: WhatsAppSection; phone_number: string };
   contenido_compartido: { origen: string; metodo: ShareMetodo };
 };
 

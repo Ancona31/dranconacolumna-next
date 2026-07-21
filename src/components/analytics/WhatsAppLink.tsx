@@ -1,11 +1,11 @@
 "use client";
 
-import { trackEvent, type WhatsAppOrigen } from "@/lib/analytics";
+import { trackEvent, type WhatsAppSection } from "@/lib/analytics";
 import { openWhatsAppInApp } from "@/lib/whatsapp";
 
 type WhatsAppLinkProps = {
   href: string;
-  origen: WhatsAppOrigen;
+  section: WhatsAppSection;
   children: React.ReactNode;
   className?: string;
   ariaLabel?: string;
@@ -18,7 +18,7 @@ type WhatsAppLinkProps = {
  */
 export default function WhatsAppLink({
   href,
-  origen,
+  section,
   children,
   className,
   ariaLabel,
@@ -31,7 +31,7 @@ export default function WhatsAppLink({
       aria-label={ariaLabel}
       className={className}
       onClick={(e) => {
-        trackEvent("click_whatsapp", { origen });
+        trackEvent("whatsapp_click", { source_section: section });
         if (openWhatsAppInApp(href)) e.preventDefault();
       }}
     >

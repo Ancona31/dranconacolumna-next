@@ -38,8 +38,8 @@ export type Sede = {
   /** Cierre en formato 24h, para openingHoursSpecification ("11:00"). */
   closes: string;
   mapsUrl: string;
-  /** Origen de analítica del CTA de WhatsApp de esta sede. */
-  origen: "sede_merida" | "sede_uman";
+  /** Sección de analítica de los CTA (WhatsApp y teléfono) de esta sede. */
+  section: "sede_medclinik" | "sede_celus";
 };
 
 export const SEDES: Sede[] = [
@@ -62,7 +62,7 @@ export const SEDES: Sede[] = [
     closes: "11:00",
     mapsUrl:
       "https://www.google.com/maps/search/?api=1&query=20.97978962216484,-89.57207645354667",
-    origen: "sede_merida",
+    section: "sede_medclinik",
   },
   {
     id: "uman",
@@ -83,6 +83,6 @@ export const SEDES: Sede[] = [
     closes: "20:00",
     mapsUrl:
       "https://www.google.com/maps/search/?api=1&query=20.87988952572975,-89.7481702443132",
-    origen: "sede_uman",
+    section: "sede_celus",
   },
 ];

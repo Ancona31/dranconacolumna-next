@@ -8,7 +8,7 @@ export default function WhatsAppFloat({ strings }: { strings: UiStrings }) {
   return (
     <WhatsAppLink
       href={whatsappLink}
-      origen="flotante"
+      section="flotante"
       ariaLabel={strings.whatsappFloat.ariaLabel}
       className="fixed bottom-6 right-6 z-40 hidden h-14 w-14 items-center justify-center rounded-full bg-whatsapp text-white shadow-lg transition-transform duration-200 ease-out hover:scale-105 active:scale-[0.985] md:flex"
     >

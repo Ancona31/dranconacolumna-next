@@ -41,7 +41,7 @@ export default function HeroBodyMap({ locale }: { locale: Locale }) {
           </p>
           <WhatsAppLink
             href={whatsappLink}
-            origen="hero"
+            section="hero"
             className="mt-2 inline-block font-body text-sm text-accent underline underline-offset-4 hover:opacity-80"
           >
             {c.whatsappLink}

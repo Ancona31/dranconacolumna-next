@@ -324,9 +324,7 @@ function UnscorableScreen({
         target="_blank"
         rel="noopener noreferrer"
         onClick={(e) => {
-          trackEvent("click_whatsapp", {
-            origen: result.alertLevel === "urgente" ? "reporte_urgente" : "reporte",
-          });
+          trackEvent("whatsapp_click", { source_section: "evaluacion" });
           if (openWhatsAppInApp(getResultWhatsAppLink(result))) e.preventDefault();
         }}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
@@ -361,8 +359,6 @@ export default function ResultScreen({
   useEffect(() => {
     trackEvent("evaluacion_completada", {
       zona: result.test.zoneId,
-      nivel: result.alertLevel === "urgente" ? "urgente" : result.level,
-      alerta: result.alertLevel,
     });
   }, [result]);
 
@@ -553,10 +549,7 @@ export default function ResultScreen({
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => {
-            trackEvent("click_whatsapp", {
-              origen:
-                result.alertLevel === "urgente" ? "reporte_urgente" : "reporte",
-            });
+            trackEvent("whatsapp_click", { source_section: "evaluacion" });
             if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
           }}
           className="flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
