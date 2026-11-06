@@ -2,10 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 
+const MAX_DELAY_MS = 240;
+
 type RevealProps = {
   children: React.ReactNode;
   className?: string;
-  /** Retraso de entrada en milisegundos (para escalonar grids). */
+  /** Retraso de entrada en milisegundos (para escalonar grids). Solo aplica
+   *  en md+ y se limita a 240ms para que un grid largo no se arrastre. */
   delay?: number;
 };
 
@@ -36,7 +39,7 @@ export default function Reveal({
           }
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     );
 
     observer.observe(el);
@@ -49,7 +52,13 @@ export default function Reveal({
       className={`reveal${revealed ? " revealed" : ""}${
         className ? ` ${className}` : ""
       }`}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+      style={
+        delay
+          ? ({
+              "--reveal-delay": `${Math.min(delay, MAX_DELAY_MS)}ms`,
+            } as React.CSSProperties)
+          : undefined
+      }
     >
       {children}
     </div>

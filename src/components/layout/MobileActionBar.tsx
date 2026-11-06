@@ -8,6 +8,7 @@ import { assessmentHref } from "@/lib/i18n/slug-map";
 import { getPadecimiento } from "@/lib/padecimientos";
 import { getPadecimientoEn } from "@/lib/padecimientos/en";
 import { trackEvent } from "@/lib/analytics";
+import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
 
 export default function MobileActionBar({ strings }: { strings: UiStrings }) {
   const pathname = usePathname();
@@ -40,10 +41,16 @@ export default function MobileActionBar({ strings }: { strings: UiStrings }) {
     : strings.mobileBar.evaluationHref;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink/10 md:hidden">
+    // data-mobile-action-bar: globals.css reserva su alto en el body solo
+    // mientras la barra existe. El padding inferior suma la zona segura del
+    // iPhone para que los botones no queden bajo la barra de inicio.
+    <div
+      data-mobile-action-bar
+      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink/10 md:hidden"
+    >
       <Link
         href={evaluacionHref}
-        className="flex-1 bg-primary py-4 text-center font-body text-sm font-semibold text-white transition duration-150 active:scale-[0.985]"
+        className="flex flex-1 items-center justify-center bg-primary pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 text-center font-body text-sm font-semibold text-white transition-[filter] duration-150 ease-out active:brightness-90"
       >
         {strings.mobileBar.evaluationCta}
       </Link>
@@ -55,8 +62,9 @@ export default function MobileActionBar({ strings }: { strings: UiStrings }) {
           trackEvent("whatsapp_click", { source_section: "barra_movil" });
           if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
         }}
-        className="flex-1 bg-whatsapp py-4 text-center font-body text-sm font-semibold text-white transition duration-150 active:scale-[0.985]"
+        className="flex flex-1 items-center justify-center gap-2 bg-background pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 text-center font-body text-sm font-semibold text-primary transition-[filter] duration-150 ease-out active:brightness-95"
       >
+        <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp-strong" />
         {strings.mobileBar.whatsappLabel}
       </a>
     </div>

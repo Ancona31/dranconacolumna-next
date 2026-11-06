@@ -4,9 +4,11 @@
  * Cada campo alimenta tanto la UI como el JSON-LD, sin duplicar datos.
  */
 
+const LUNES_A_VIERNES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
 export type Sede = {
   /** Identificador estable, usado en anclas y llaves. */
-  id: "merida" | "uman";
+  id: "merida" | "uman" | "prostasur";
   nombre: string;
   /** Calle y colonia, sin ciudad. */
   direccion: string;
@@ -29,6 +31,9 @@ export type Sede = {
   whatsapp: string;
   lat: number;
   lng: number;
+  /** Días de consulta en inglés, para openingHoursSpecification de schema.org
+   *  (["Tuesday", "Thursday"]). */
+  dias: string[];
   /** Horario completo, en prosa ("Lunes a viernes, 9:00 a 11:00 h"). */
   horario: string;
   /** Etiqueta corta para el chip ("Mañanas · Lun a Vie"). */
@@ -39,7 +44,7 @@ export type Sede = {
   closes: string;
   mapsUrl: string;
   /** Sección de analítica de los CTA (WhatsApp y teléfono) de esta sede. */
-  section: "sede_medclinik" | "sede_celus";
+  section: "sede_medclinik" | "sede_celus" | "sede_prostasur";
 };
 
 export const SEDES: Sede[] = [
@@ -56,8 +61,9 @@ export const SEDES: Sede[] = [
     whatsapp: "529994957916",
     lat: 20.97978962216484,
     lng: -89.57207645354667,
-    horario: "Lunes a viernes, 9:00 a 11:00 h",
-    horarioCorto: "Mañanas · Lun a Vie",
+    dias: ["Monday", "Wednesday", "Friday"],
+    horario: "Lunes, miércoles y viernes, 9:00 a 11:00 h",
+    horarioCorto: "Mañanas · Lun, Mié y Vie",
     opens: "09:00",
     closes: "11:00",
     mapsUrl:
@@ -77,6 +83,7 @@ export const SEDES: Sede[] = [
     whatsapp: "529992223173",
     lat: 20.87988952572975,
     lng: -89.7481702443132,
+    dias: LUNES_A_VIERNES,
     horario: "Lunes a viernes, 17:00 a 20:00 h",
     horarioCorto: "Tardes · Lun a Vie",
     opens: "17:00",
@@ -84,5 +91,27 @@ export const SEDES: Sede[] = [
     mapsUrl:
       "https://www.google.com/maps/search/?api=1&query=20.87988952572975,-89.7481702443132",
     section: "sede_celus",
+  },
+  {
+    id: "prostasur",
+    nombre: "Prostasur",
+    direccion: "C. 32 #198 × 17 y 21, García Ginerés",
+    ciudad: "Mérida, Yucatán",
+    localidad: "Mérida",
+    region: "Yucatán",
+    cp: "97070",
+    telefono: "9995143165",
+    telefonoDisplay: "999 514 31 65",
+    whatsapp: "529995143165",
+    lat: 20.9904344,
+    lng: -89.6384806,
+    dias: ["Tuesday", "Thursday"],
+    horario: "Martes y jueves, 9:00 a 12:00 h",
+    horarioCorto: "Mañanas · Mar y Jue",
+    opens: "09:00",
+    closes: "12:00",
+    // Ficha de Google Maps del lugar (cid), no solo el pin de coordenadas.
+    mapsUrl: "https://www.google.com/maps?cid=18369633801198173940",
+    section: "sede_prostasur",
   },
 ];

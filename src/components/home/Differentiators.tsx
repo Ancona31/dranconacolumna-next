@@ -42,13 +42,13 @@ export default function Differentiators({ locale }: { locale: Locale }) {
   return (
     <section className="bg-primary-soft">
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
-        <Reveal>
-          <p className="text-center font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-left">
-            {c.eyebrow}
-          </p>
-        </Reveal>
+        <p className="text-center font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-left">
+          {c.eyebrow}
+        </p>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
+        {/* Tablet: tarjetas horizontales (foto a la izquierda) una por fila; a
+            768px tres columnas dejaban el texto en ~200px de ancho. */}
+        <div className="mt-8 grid gap-6 lg:grid-cols-3">
           {c.cards.map((card, i) => {
             const meta = CARD_META[i];
             const { Icon, image } = meta;
@@ -58,8 +58,10 @@ export default function Differentiators({ locale }: { locale: Locale }) {
                 : null;
             return (
               <Reveal key={card.title} delay={i * 80} className="flex">
-                <div className="group flex flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 bg-background transition duration-200 ease-out md:hover:-translate-y-[3px] md:hover:shadow-lg">
-                  <div className="relative aspect-[4/3] w-full">
+                {/* Sin elevación en hover: la tarjeta no es un enlace (solo su
+                    "Ver más" lo es) y no debe prometer un clic que no existe. */}
+                <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 bg-background md:flex-row lg:flex-col">
+                  <div className="relative aspect-[4/3] w-full md:aspect-auto md:min-h-64 md:w-2/5 md:shrink-0 lg:aspect-[4/3] lg:min-h-0 lg:w-full">
                     <Image
                       src={image.src}
                       alt={c.imageAlts[i]}
@@ -70,7 +72,7 @@ export default function Differentiators({ locale }: { locale: Locale }) {
                           ? { objectPosition: image.objectPosition }
                           : undefined
                       }
-                      sizes="(max-width: 768px) 100vw, 33vw"
+                      sizes="(max-width: 767px) 100vw, (max-width: 1023px) 40vw, 33vw"
                     />
                   </div>
                   <div className="flex flex-1 flex-col p-6">
@@ -89,7 +91,7 @@ export default function Differentiators({ locale }: { locale: Locale }) {
                     {href && card.linkLabel && (
                       <Link
                         href={href}
-                        className="group/arrow mt-5 inline-flex items-center gap-1 font-body text-sm font-semibold text-accent hover:opacity-80"
+                        className="group/arrow mt-5 inline-flex min-h-11 items-center gap-1 self-start font-body text-sm font-semibold text-accent hover:opacity-80"
                       >
                         {card.linkLabel}
                         <span

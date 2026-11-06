@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { MapPin, Clock, Phone, MessageCircle } from "lucide-react";
+import { MapPin, Clock, Phone } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import WhatsAppLink from "@/components/analytics/WhatsAppLink";
 import PhoneLink from "@/components/analytics/PhoneLink";
@@ -15,13 +15,15 @@ import type { Locale } from "@/lib/i18n/types";
 import { waMessage } from "@/lib/i18n";
 import { getContactContent } from "@/lib/i18n/pages/contact";
 import { getSedesCopy, type SedesCopy } from "@/lib/i18n/content/sedes";
+import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+import SedeMap from "@/components/ui/SedeMap";
 
-// Días laborables para openingHoursSpecification (schema.org acepta el nombre
-// en inglés). Ambas sedes atienden de lunes a viernes.
-const DIAS_LABORABLES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+// Con tres sedes, en tablet (2 columnas) la última tarjeta quedaría sola en
+// media fila: ocupa el ancho completo. En lg las tres van en una fila.
+const ORPHAN_SPAN = "md:last:odd:col-span-2 lg:last:odd:col-span-1";
 
 /**
- * Grafo JSON-LD para SEO local: el médico y sus dos consultorios, construido
+ * Grafo JSON-LD para SEO local: el médico y sus consultorios, construido
  * desde SEDES y la config para no duplicar los datos de contacto.
  *
  * Es la MISMA entidad real en ambos idiomas, así que los @id no cambian por
@@ -84,7 +86,7 @@ function buildContactJsonLd(locale: Locale) {
     telephone: `+52${sede.telefono}`,
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
-      dayOfWeek: DIAS_LABORABLES,
+      dayOfWeek: sede.dias,
       opens: sede.opens,
       closes: sede.closes,
     },
@@ -139,15 +141,7 @@ function SedeCard({ sede, copy }: { sede: Sede; copy: SedesCopy }) {
         </span>
       </p>
 
-      <div className="mt-6 overflow-hidden rounded-xl">
-        <iframe
-          src={`https://maps.google.com/maps?q=${sede.lat},${sede.lng}&z=16&output=embed`}
-          title={`${copy.mapTitlePrefix} ${sede.nombre}`}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="aspect-video w-full border-0"
-        />
-      </div>
+      <SedeMap sede={sede} titlePrefix={copy.mapTitlePrefix} className="mt-6" />
 
       <a
         href={sede.mapsUrl}
@@ -164,24 +158,29 @@ function SedeCard({ sede, copy }: { sede: Sede; copy: SedesCopy }) {
             href={`tel:+52${sede.telefono}`}
             section={sede.section}
             phoneNumber={sede.telefono}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-transparent px-5 py-3 font-body text-sm font-semibold text-primary transition duration-150 hover:bg-primary hover:text-white active:scale-[0.985]"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-transparent px-5 py-3 font-body text-sm font-semibold text-primary transition-[transform,background-color,color] duration-150 ease-out hover:bg-primary hover:text-white active:scale-[0.97]"
           >
             <Phone className="h-4 w-4 shrink-0" strokeWidth={1.75} />
             {copy.callButton}
           </PhoneLink>
-          <p className="mt-1.5 text-center font-body text-xs text-ink/55">
+          <p className="mt-1.5 text-center font-body text-xs text-muted">
             {copy.forOfficeInfo}
           </p>
         </div>
 
-        <WhatsAppLink
-          href={whatsappLink}
-          section={sede.section}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-5 py-3 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
-        >
-          <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-          {copy.whatsappButton}
-        </WhatsAppLink>
+        <div>
+          <WhatsAppLink
+            href={whatsappLink}
+            section={sede.section}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-body text-sm font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+          >
+            <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp" />
+            {copy.whatsappButton}
+          </WhatsAppLink>
+          <p className="mt-1.5 text-center font-body text-xs text-muted">
+            {copy.clinicWhatsappNote} · {sede.telefonoDisplay}
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -206,50 +205,57 @@ export default function ContactBody({ locale }: { locale: Locale }) {
       {/* Hero de página */}
       <section className="bg-primary-soft">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <Reveal>
+          <div className="load-enter">
             <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
               {c.hero.eyebrow}
             </p>
-            <h1 className="mt-2 font-heading text-4xl font-extrabold text-primary sm:text-5xl">
+            <h1 className="mt-2 font-heading text-[clamp(2.25rem,1.6rem+2.6vw,3rem)] font-extrabold leading-tight text-primary">
               {c.hero.h1}
             </h1>
             <p className="mt-5 font-body text-lg text-ink/80">{c.hero.text}</p>
-          </Reveal>
+          </div>
         </div>
       </section>
 
       {/* CTA WhatsApp principal */}
       <section className="bg-background">
         <div className="mx-auto max-w-3xl px-4 pt-14 md:pt-20">
-          <Reveal>
-            <div className="rounded-2xl border border-whatsapp/25 bg-[#EAF4EF] p-6 text-center md:p-8">
+          <div
+            className="load-enter"
+            style={{ "--load-delay": "120ms" } as React.CSSProperties}
+          >
+            <div className="rounded-2xl border border-primary/10 bg-primary-soft p-6 text-center md:p-8">
               <WhatsAppLink
                 href={whatsappPrincipal}
                 section="ubicaciones"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-7 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
               >
-                <MessageCircle className="h-5 w-5 shrink-0" strokeWidth={1.75} />
+                <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
                 {c.cta.button}
               </WhatsAppLink>
               <p className="mt-4 font-body text-sm text-ink/70">{c.cta.sub}</p>
             </div>
-          </Reveal>
+          </div>
         </div>
       </section>
 
       {/* Grid de sedes */}
       <section className="bg-background">
         <div className="mx-auto max-w-5xl px-4 py-14 md:py-20">
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {SEDES.map((sede, i) => (
-              <Reveal key={sede.id} delay={i * 80} className="flex">
+              <Reveal
+                key={sede.id}
+                delay={i * 80}
+                className={`flex ${ORPHAN_SPAN}`}
+              >
                 <SedeCard sede={sede} copy={copy} />
               </Reveal>
             ))}
           </div>
 
           {/* Nota de cierre */}
-          <p className="mx-auto mt-12 max-w-xl text-center font-body text-sm text-ink/60">
+          <p className="mx-auto mt-12 max-w-xl text-center font-body text-sm text-muted">
             {c.closing}
           </p>
         </div>

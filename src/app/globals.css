@@ -1,21 +1,52 @@
 @import "tailwindcss";
 
 @theme {
-  /* Paleta de marca */
-  --color-primary: #0b3c5d; /* azul tinta profundo */
-  --color-primary-soft: #e8f1f8; /* fondos de sección alternados */
-  --color-accent: #1b6ca8; /* enlaces e interactivos */
+  /* Paleta de marca. Proporción guía: ~75–80 % neutros (background,
+     primary-soft, blanco), 15–20 % primary y ≤5 % accent; los colores de
+     estado solo dentro del evaluador. Contrastes WCAG sobre background. */
+  --color-primary: #0b3c5d; /* azul tinta profundo · 11.1:1 */
+  --color-primary-soft: #edf2f5; /* fondos de sección alternados (azul apagado) */
+  --color-accent: #1a6299; /* enlaces e interactivos · 6.2:1 */
   --color-background: #fbfbf9; /* blanco cálido */
-  --color-ink: #16232e; /* texto principal */
-  --color-success: #2e7d5b; /* severidad leve */
-  --color-warning: #c77d1f; /* severidad moderada */
-  --color-danger: #c0453a; /* severidad severa */
-  --color-pain: #d64541; /* nodo de dolor en el mapa corporal */
-  --color-whatsapp: #25d366; /* SOLO botones de WhatsApp */
+  --color-ink: #16232e; /* texto principal · 15.4:1 */
+  --color-muted: #5f6b76; /* texto secundario · 5.3:1 (ink/60 daba 4.3) */
+  --color-success: #2e7d5b; /* severidad leve · 4.8:1 */
+  --color-warning: #9a5b0e; /* severidad moderada · 5.2:1 */
+  --color-danger: #b23b30; /* severidad severa · 5.7:1 */
+  --color-pain: #d64541; /* nodo de dolor del mapa corporal (gráfico, no texto) */
+  /* WhatsApp: los botones van en primary y solo el ícono lleva el verde, para
+     que el sitio tenga un único color dominante. --color-whatsapp sobre
+     primary da 5.8:1; sobre fondos claros se usa whatsapp-strong (5.0:1). */
+  --color-whatsapp: #25d366;
+  --color-whatsapp-strong: #15803d;
+  --color-star: #a87a2a; /* estrellas sobre claro: dorado apagado · 3.8:1 */
+  --color-star-on-dark: #d9b26a; /* estrellas sobre primary · 5.8:1 */
 
   /* Tipografías conectadas a next/font */
   --font-heading: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Curvas de movimiento. --ease-out e --ease-in-out reemplazan las de
+     Tailwind, así que las utilidades `ease-out`/`ease-in-out` usan estas.
+     --ease-drawer (`ease-drawer`) es la curva de iOS para paneles y sheets. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Tres niveles de profundidad, todos tintados con el azul de marca:
+     `shadow-card` (reposo), `shadow-raised` (hover) y `shadow-overlay`
+     (menús, drawers y barras flotantes). */
+  --shadow-card: 0 1px 2px rgba(11, 60, 93, 0.06), 0 4px 16px rgba(11, 60, 93, 0.08);
+  --shadow-raised: 0 2px 4px rgba(11, 60, 93, 0.06), 0 10px 28px rgba(11, 60, 93, 0.14);
+  --shadow-overlay: 0 8px 40px rgba(11, 60, 93, 0.18);
+}
+
+html {
+  color-scheme: light;
+  /* Sin destello gris al tocar ni reescalado de texto al girar el teléfono. */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -34,16 +65,61 @@ h4,
 h5,
 h6 {
   font-family: var(--font-heading);
+  text-wrap: balance;
 }
 
-/* Compensa la barra de acción fija en móvil para no tapar contenido.
-   Se anula en pantallas md+ donde la barra no existe. */
-body {
-  padding-bottom: 4.5rem;
+/* El tracking se ajusta al tamaño: los títulos grandes se cierran un poco. */
+h1 {
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  letter-spacing: -0.015em;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Sin el retardo de doble toque y sin seleccionar el texto de un botón al
+   mantenerlo presionado. */
+a,
+button,
+summary,
+[role="button"],
+[role="link"] {
+  touch-action: manipulation;
+}
+
+button,
+summary,
+[role="button"] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Anillo de foco solo para teclado. Sobre fondos de marca (bg-primary) se
+   vuelve blanco para que se distinga. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.bg-primary :focus-visible,
+.bg-primary:focus-visible,
+.focus-ring-light:focus-visible {
+  outline-color: #fff;
+}
+
+/* Compensa la barra de acción fija en móvil para no tapar contenido. Solo
+   cuando la barra existe (no en el flujo de evaluación) y sumando la zona
+   segura inferior del iPhone. Se anula en md+, donde la barra no existe. */
+body:has([data-mobile-action-bar]) {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
 }
 
 @media (min-width: 768px) {
-  body {
+  body:has([data-mobile-action-bar]) {
     padding-bottom: 0;
   }
 }
@@ -57,19 +133,43 @@ body {
 
 /* Sistema de animación de entrada (Reveal).
    Sin la clase .js (no-JS / SEO) todo se muestra: no se aplica ningún estado
-   oculto. Con .js los elementos .reveal entran de forma sutil. */
+   oculto. Con .js los elementos .reveal entran de forma sutil. El escalonado
+   (--reveal-delay) solo aplica en md+: en una columna cada elemento entra al
+   viewport por separado y esperar su índice solo lo retrasa. */
 html.js .reveal {
+  transition:
+    opacity 400ms var(--ease-out),
+    transform 400ms var(--ease-out);
+}
+
+html.js .reveal:not(.revealed) {
   opacity: 0;
   transform: translateY(12px);
-  transition:
-    opacity 500ms ease-out,
-    transform 500ms ease-out;
   will-change: opacity, transform;
 }
 
-html.js .reveal.revealed {
-  opacity: 1;
-  transform: none;
+@media (min-width: 768px) {
+  html.js .reveal {
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+}
+
+/* Entrada al cargar, solo CSS: no espera a que React hidrate. Para lo que se
+   ve primero (hero), donde un Reveal dejaría el LCP en opacity 0. */
+@keyframes load-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.load-enter {
+  animation: load-enter 400ms var(--ease-out) both;
+  animation-delay: var(--load-delay, 0ms);
 }
 
 /* Transición de entrada entre páginas (template.tsx se re-monta al navegar). */
@@ -85,11 +185,12 @@ html.js .reveal.revealed {
 }
 
 .page-enter {
-  animation: page-enter 250ms ease-out;
+  animation: page-enter 250ms var(--ease-out);
 }
 
 /* Subrayado animado de los enlaces del nav de escritorio.
-   Pseudo-elemento con scale-x de 0 a 1 desde la izquierda. */
+   Pseudo-elemento con scale-x de 0 a 1 desde la izquierda. El hover se limita
+   a punteros finos para que no se quede pegado en un iPad táctil. */
 .nav-link {
   position: relative;
 }
@@ -104,20 +205,52 @@ html.js .reveal.revealed {
   background-color: var(--color-accent);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 200ms ease-out;
+  transition: transform 200ms var(--ease-out);
 }
 
-.nav-link:hover::after,
 .nav-link[aria-current="page"]::after {
   transform: scaleX(1);
 }
 
-/* Motor de evaluación: transiciones de entrada entre pantallas y bottom sheet.
-   El bloque global de prefers-reduced-motion las neutraliza. */
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Botón flotante de WhatsApp: sube cuando aparece la StickyCtaBar de
+   padecimientos para no taparle su propio botón de WhatsApp. */
+.wa-float {
+  transition: transform 300ms var(--ease-drawer);
+}
+
+html[data-cta-bar] .wa-float {
+  transform: translateY(-4.5rem);
+}
+
+/* Popovers (idioma, compartir): nacen desde su botón con fade + escala leve.
+   @starting-style anima la entrada sin JS; si el navegador no lo soporta,
+   simplemente aparecen. */
+.popover-in {
+  transition:
+    opacity 150ms var(--ease-out),
+    scale 150ms var(--ease-out);
+}
+
+@starting-style {
+  .popover-in {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+
+/* Motor de evaluación: transiciones de entrada entre pantallas. --eval-dx la
+   fija EvaluationFlow: 10px al avanzar, -10px al retroceder, para que cada
+   pantalla llegue desde el lado hacia el que se navega. */
 @keyframes eval-screen-in {
   from {
     opacity: 0;
-    transform: translateX(10px);
+    transform: translateX(var(--eval-dx, 10px));
   }
   to {
     opacity: 1;
@@ -126,7 +259,7 @@ html.js .reveal.revealed {
 }
 
 .eval-screen {
-  animation: eval-screen-in 200ms ease-out;
+  animation: eval-screen-in 200ms var(--ease-out);
 }
 
 /* Mapa corporal (BodyFigureSVG). En la home el nodo de dolor recorre las
@@ -147,10 +280,59 @@ html.js .reveal.revealed {
   transition: opacity 500ms ease;
 }
 
+/* Latidos (antes SMIL sobre `r`, que repintaba en cada frame). Ahora escalan
+   sobre su propia caja: 11→15 en reposo y 15→21 en dolor, con la opacidad de
+   los valores originales. .is-idle congela el latido oculto en su fase y
+   .is-paused (en el <svg>) congela toda la figura fuera de pantalla. */
+@keyframes body-figure-beat-rest {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.3636);
+    opacity: 0.06;
+  }
+}
+
+@keyframes body-figure-beat-pain {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.06;
+  }
+}
+
+.body-figure__beat {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.body-figure__beat--rest {
+  animation-name: body-figure-beat-rest;
+  animation-duration: 3.2s;
+}
+
+.body-figure__beat--pain {
+  animation-name: body-figure-beat-pain;
+  animation-duration: 2.6s;
+}
+
+.body-figure__beat.is-idle,
+.is-paused .body-figure__beat {
+  animation-play-state: paused;
+}
+
 /* Chip de zona (modo selected): entra y sale con fade + un desplazamiento leve
    desde su lado (--chip-dx: -4px izquierda, 4px derecha). `both` fija el estado
-   final; con prefers-reduced-motion la regla global de más abajo colapsa la
-   duración y la aparición queda directa, sin animación. */
+   final; con prefers-reduced-motion queda solo el fade. */
 @keyframes body-figure-chip-in {
   from {
     opacity: 0;
@@ -174,28 +356,53 @@ html.js .reveal.revealed {
 }
 
 .body-figure__chip.is-enter {
-  animation: body-figure-chip-in 180ms ease-out both;
+  animation: body-figure-chip-in 180ms var(--ease-out) both;
 }
 
 .body-figure__chip.is-exit {
-  animation: body-figure-chip-out 180ms ease-in both;
+  animation: body-figure-chip-out 150ms var(--ease-out) both;
 }
 
-/* Respeto global a prefers-reduced-motion: neutraliza animaciones y
-   transiciones (incluye Reveal, drawer, botones y page-enter). */
+/* Con reduced-motion los latidos se ocultan: los halos estáticos que van
+   debajo permanecen y la figura se ve completa y quieta. */
 @media (prefers-reduced-motion: reduce) {
-  html.js .reveal {
-    opacity: 1;
-    transform: none;
-  }
-
-  /* Los halos del mapa corporal laten con SMIL (<animate>), que no responde
-     a las reglas de animation-* de abajo. Se ocultan; los halos estáticos
-     que van debajo permanecen y la figura se ve completa. */
-  .body-figure__pulse {
+  .body-figure__beat {
     display: none;
   }
+}
 
+/* Preguntas frecuentes (<details class="faq-item">): la respuesta se despliega
+   en vez de aparecer de golpe. Mejora progresiva: sin soporte de
+   ::details-content / interpolate-size se comporta como antes. */
+:root {
+  interpolate-size: allow-keywords;
+}
+
+.faq-item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 250ms var(--ease-out),
+    content-visibility 250ms allow-discrete;
+}
+
+.faq-item[open]::details-content {
+  block-size: auto;
+}
+
+/* Respeto a prefers-reduced-motion: se elimina el desplazamiento (translate,
+   scale, rotate) pero se conservan los fundidos cortos, que orientan sin
+   mover nada. */
+@keyframes rm-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
@@ -203,5 +410,32 @@ html.js .reveal.revealed {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Excepciones: solo opacidad, 150ms. */
+  html.js .reveal {
+    transform: none !important;
+    transition: opacity 150ms ease !important;
+  }
+
+  .load-enter,
+  .page-enter,
+  .eval-screen,
+  .body-figure__chip.is-enter {
+    animation: rm-fade-in 150ms ease both !important;
+  }
+
+  .popover-in {
+    transition: opacity 150ms ease !important;
+  }
+
+  @starting-style {
+    .popover-in {
+      scale: 1;
+    }
+  }
+
+  .wa-float {
+    transition: none !important;
   }
 }

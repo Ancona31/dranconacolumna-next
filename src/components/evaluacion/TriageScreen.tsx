@@ -67,7 +67,7 @@ export default function TriageScreen({
 
   return (
     <div className="mx-auto w-full max-w-xl">
-      <span className="font-body text-sm text-ink/60">
+      <span className="font-body text-sm text-muted">
         {ui.eyebrow(index + 1, triage.length)}
       </span>
       <h1 className="mt-1 font-heading text-2xl font-bold text-primary sm:text-3xl">
@@ -80,7 +80,7 @@ export default function TriageScreen({
             <button
               type="button"
               onClick={() => handleAction(opt.action)}
-              className="w-full rounded-2xl border border-ink/15 bg-background p-4 text-left font-body text-lg font-medium text-ink transition duration-150 hover:border-accent hover:bg-primary-soft active:scale-[0.99]"
+              className="w-full rounded-2xl border border-ink/15 bg-background p-4 text-left font-body text-lg font-medium text-ink transition-[transform,background-color,border-color] duration-150 ease-out hover:border-accent hover:bg-primary-soft active:scale-[0.98]"
             >
               {opt.label}
             </button>

@@ -11,11 +11,9 @@ export default function HowItWorks({ locale }: { locale: Locale }) {
   return (
     <section className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
-        <Reveal>
-          <h2 className="text-center font-heading text-3xl font-bold text-primary">
-            {c.h2}
-          </h2>
-        </Reveal>
+        <h2 className="text-center font-heading text-3xl font-bold text-primary">
+          {c.h2}
+        </h2>
 
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {c.steps.map((step, i) => {

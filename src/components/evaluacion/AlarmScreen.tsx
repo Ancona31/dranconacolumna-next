@@ -77,7 +77,7 @@ export default function AlarmScreen({
         {ui.alarm.h1}
       </h1>
       <p className="mt-2 font-body text-ink/70">{ui.alarm.subtitle}</p>
-      <p className="mt-1 font-body text-sm text-ink/50">
+      <p className="mt-1 font-body text-sm text-muted">
         {durationLabel(test, ui)}
       </p>
 
@@ -96,7 +96,7 @@ export default function AlarmScreen({
                 type="button"
                 onClick={() => toggle(item.id)}
                 aria-pressed={active}
-                className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left font-body transition duration-150 active:scale-[0.99] ${
+                className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left font-body transition-[transform,background-color,border-color] duration-150 ease-out active:scale-[0.98] ${
                   active
                     ? "border-accent bg-primary-soft text-ink"
                     : "border-ink/15 bg-background text-ink/80 hover:border-accent/60"
@@ -122,7 +122,7 @@ export default function AlarmScreen({
         type="button"
         onClick={handleContinue}
         disabled={!hasSelection}
-        className="mt-6 w-full rounded-full bg-primary px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-40"
+        className="mt-6 w-full rounded-full bg-primary px-6 py-4 font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97] disabled:active:scale-100 disabled:cursor-not-allowed disabled:opacity-40"
       >
         {ui.alarm.continue}
       </button>

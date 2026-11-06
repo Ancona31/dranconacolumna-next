@@ -13,13 +13,15 @@ export default function AboutDoctor({ locale }: { locale: Locale }) {
     <section className="bg-primary-soft">
       <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 md:grid-cols-2 md:py-20">
         <Reveal>
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl">
+          {/* En una columna (< md) se acota a max-w-md: a ancho completo la
+              foto 4/5 llegaba a ~875px de alto entre 640 y 767px. */}
+          <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl md:max-w-none">
             <Image
               src="/images/dr-ancona-perfil.jpg"
               alt={c.imageAlt}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="(max-width: 767px) 100vw, 560px"
             />
           </div>
         </Reveal>

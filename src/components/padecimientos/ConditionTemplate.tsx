@@ -19,6 +19,7 @@ import type { Locale } from "@/lib/i18n/types";
 import { assessmentHref } from "@/lib/i18n/slug-map";
 import { getConditionsUi, type ConditionsUi } from "@/lib/i18n/pages/conditions";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
 
 // Foto real del bloque "Cómo lo trato yo", según el grupo del padecimiento.
 const COMO_LO_TRATO_FOTO: Record<Padecimiento["grupo"], string> = {
@@ -112,7 +113,9 @@ export default function ConditionTemplate({
                 : "max-w-3xl"
             }
           >
-            <Reveal>
+            {/* Lo primero que se ve: entra con CSS al cargar, sin esperar a
+                que React hidrate (un Reveal lo dejaría en opacity 0). */}
+            <div className="load-enter">
               <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
                 <Link href={ui.breadcrumbHref} className="hover:underline">
                   {ui.breadcrumbLabel}
@@ -120,7 +123,7 @@ export default function ConditionTemplate({
                 <span aria-hidden="true"> · </span>
                 {ui.groupLabel[p.grupo]}
               </p>
-              <h1 className="mt-2 font-heading text-4xl font-extrabold text-primary sm:text-5xl">
+              <h1 className="mt-2 font-heading text-[clamp(2.25rem,1.6rem+2.6vw,3rem)] font-extrabold leading-tight text-primary">
                 {p.nombre}
               </h1>
 
@@ -151,7 +154,7 @@ export default function ConditionTemplate({
                 <ButtonLink href={evaluacionHref} size="lg">
                   {p.testCtaLabel}
                 </ButtonLink>
-                <p className="mt-3 font-body text-sm text-ink/60">
+                <p className="mt-3 font-body text-sm text-muted">
                   {ui.heroMetaLine}
                   <WhatsAppLink
                     href={whatsappLink}
@@ -162,16 +165,19 @@ export default function ConditionTemplate({
                   </WhatsAppLink>
                 </p>
               </div>
-            </Reveal>
+            </div>
 
             {p.testZone && (
-              <Reveal delay={120}>
+              <div
+                className="load-enter"
+                style={{ "--load-delay": "120ms" } as React.CSSProperties}
+              >
                 <HeroZoneFigure
                   testZone={p.testZone}
                   caption={zoneCaption}
                   ariaLabel={zoneAria}
                 />
-              </Reveal>
+              </div>
             )}
           </div>
         </div>
@@ -183,18 +189,18 @@ export default function ConditionTemplate({
       {p.patologias && p.patologias.length > 0 && (
         <section className="bg-background">
           <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-            <Reveal>
-              <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
-                {ui.causesEyebrow}
-              </p>
-              <h2 className="mt-2 font-heading text-3xl font-bold text-primary">
-                {ui.causesH2}
-              </h2>
-            </Reveal>
+            <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
+              {ui.causesEyebrow}
+            </p>
+            <h2 className="mt-2 font-heading text-3xl font-bold text-primary">
+              {ui.causesH2}
+            </h2>
 
             <div className="mt-8 space-y-6">
-              {p.patologias.map((pat, i) => (
-                <Reveal key={pat.nombre} delay={i * 80}>
+              {/* Una sola columna: cada tarjeta entra al viewport por separado,
+                  así que no se escalona. */}
+              {p.patologias.map((pat) => (
+                <Reveal key={pat.nombre}>
                   <article className="rounded-xl border border-primary/10 bg-primary-soft p-6 md:p-8">
                     <h3 className="font-heading text-xl font-bold text-primary">
                       {pat.nombre}
@@ -244,36 +250,34 @@ export default function ConditionTemplate({
             p.patologias?.length ? "pb-14 md:pb-20" : "py-14 md:py-20"
           }`}
         >
-          <Reveal>
-            <h2 className="font-heading text-3xl font-bold text-primary">
-              {ui.symptomsH2}
-            </h2>
-            <ul className="mt-6 space-y-4">
-              {p.sintomas.map((sintoma) => (
-                <li key={sintoma} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full bg-primary-soft text-primary">
-                    <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
-                  </span>
-                  <span className="font-body text-ink/75">{sintoma}</span>
-                </li>
-              ))}
-            </ul>
+          <h2 className="font-heading text-3xl font-bold text-primary">
+            {ui.symptomsH2}
+          </h2>
+          <ul className="mt-6 space-y-4">
+            {p.sintomas.map((sintoma) => (
+              <li key={sintoma} className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full bg-primary-soft text-primary">
+                  <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                </span>
+                <span className="font-body text-ink/75">{sintoma}</span>
+              </li>
+            ))}
+          </ul>
 
-            {/* Puente al test: mide limitación, no confirma diagnóstico. */}
-            <div className="mt-10 flex flex-col gap-4 rounded-xl bg-primary-soft p-6 sm:flex-row sm:items-center sm:justify-between">
-              <p className="font-body text-ink/80">
-                {ui.bridgeBefore}
-                {zonaMinuscula}
-                {ui.bridgeAfter}
-              </p>
-              <Link
-                href={evaluacionHref}
-                className="inline-flex flex-none items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
-              >
-                {p.testCtaLabel}
-              </Link>
-            </div>
-          </Reveal>
+          {/* Puente al test: mide limitación, no confirma diagnóstico. */}
+          <div className="mt-10 flex flex-col gap-4 rounded-xl bg-primary-soft p-6 sm:flex-row sm:items-center sm:justify-between">
+            <p className="font-body text-ink/80">
+              {ui.bridgeBefore}
+              {zonaMinuscula}
+              {ui.bridgeAfter}
+            </p>
+            <Link
+              href={evaluacionHref}
+              className="inline-flex flex-none items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-sm font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+            >
+              {p.testCtaLabel}
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -321,12 +325,10 @@ export default function ConditionTemplate({
       {/* Opciones de tratamiento: escalera conectada, del más simple al último */}
       <section className="bg-primary-soft">
         <div className="mx-auto max-w-5xl px-4 py-14 md:py-20">
-          <Reveal>
-            <h2 className="font-heading text-3xl font-bold text-primary">
-              {ui.treatmentH2}
-            </h2>
-            <p className="mt-2 font-body text-ink/70">{ui.treatmentIntro}</p>
-          </Reveal>
+          <h2 className="font-heading text-3xl font-bold text-primary">
+            {ui.treatmentH2}
+          </h2>
+          <p className="mt-2 font-body text-ink/70">{ui.treatmentIntro}</p>
 
           <div className="relative mt-8">
             {/* Conector sutil entre pasos (solo desktop). */}
@@ -370,7 +372,7 @@ export default function ConditionTemplate({
                   alt={`${ui.imageAltBefore}${p.nombre}`}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes="(max-width: 767px) 100vw, 560px"
                 />
               </div>
             </Reveal>
@@ -407,36 +409,36 @@ export default function ConditionTemplate({
       {/* Preguntas frecuentes */}
       <section className="bg-background">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <Reveal>
-            <h2 className="font-heading text-3xl font-bold text-primary">
-              {ui.faqH2}
-            </h2>
-          </Reveal>
+          <h2 className="font-heading text-3xl font-bold text-primary">
+            {ui.faqH2}
+          </h2>
 
           <div className="mt-6 divide-y divide-ink/10 border-y border-ink/10">
-            {p.faq.map((item, i) => (
-              <Reveal key={item.pregunta} delay={i * 60}>
-                <details className="group py-5">
-                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-heading text-base font-semibold text-primary [&::-webkit-details-marker]:hidden">
-                    {item.pregunta}
-                    <span
-                      aria-hidden="true"
-                      className="mt-0.5 flex-none font-body text-xl leading-none text-accent transition-transform duration-200 group-open:rotate-45"
-                    >
-                      +
-                    </span>
-                  </summary>
-                  <p className="mt-3 pr-8 font-body text-ink/75">
-                    {item.respuesta}
-                  </p>
-                </details>
-              </Reveal>
+            {/* Sin Reveal ni escalonado: la lista ya está a la vista al llegar
+                al encabezado. La respuesta se despliega con .faq-item
+                (globals.css). El padding vive en el summary para que toda la
+                fila sea área de toque. */}
+            {p.faq.map((item) => (
+              <details key={item.pregunta} className="faq-item group pb-2">
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-4 pt-5 pb-3 font-heading text-base font-semibold text-primary [&::-webkit-details-marker]:hidden">
+                  {item.pregunta}
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 flex-none font-body text-xl leading-none text-accent transition-transform duration-200 ease-out group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="pr-8 pb-3 font-body text-ink/75">
+                  {item.respuesta}
+                </p>
+              </details>
             ))}
           </div>
 
           {/* Compartir discreto: cerca del final del contenido, antes del CTA. */}
           <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-6">
-            <p className="font-body text-sm text-ink/60">{ui.sharePrompt}</p>
+            <p className="font-body text-sm text-muted">{ui.sharePrompt}</p>
             <ShareButton
               url={`${SITE_URL}${ui.pathBase}/${p.slug}`}
               title={`${p.nombre}${ui.shareTitleAfter}`}
@@ -451,30 +453,29 @@ export default function ConditionTemplate({
       {/* CTA final */}
       <section className="bg-primary">
         <div className="mx-auto max-w-3xl px-4 py-14 text-center md:py-20">
-          <Reveal>
-            <h2 className="font-heading text-3xl font-bold text-white">
-              {ui.finalCtaH2}
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl font-body text-white/80">
-              {p.testCtaQuestion}
-              {ui.finalCtaSubSuffix}
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href={evaluacionHref}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-4 font-body text-base font-semibold text-primary transition duration-150 hover:opacity-90 active:scale-[0.985]"
-              >
-                {p.testCtaLabel}
-              </Link>
-              <WhatsAppLink
-                href={whatsappLink}
-                section="padecimientos"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-7 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
-              >
-                {ui.finalWaButton}
-              </WhatsAppLink>
-            </div>
-          </Reveal>
+          <h2 className="font-heading text-3xl font-bold text-white">
+            {ui.finalCtaH2}
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl font-body text-white/80">
+            {p.testCtaQuestion}
+            {ui.finalCtaSubSuffix}
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href={evaluacionHref}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-4 font-body text-base font-semibold text-primary transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+            >
+              {p.testCtaLabel}
+            </Link>
+            <WhatsAppLink
+              href={whatsappLink}
+              section="padecimientos"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-7 py-4 font-body text-base font-semibold text-white transition-[transform,background-color] duration-150 ease-out hover:bg-white/10 active:scale-[0.97]"
+            >
+              <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
+              {ui.finalWaButton}
+            </WhatsAppLink>
+          </div>
         </div>
       </section>
 

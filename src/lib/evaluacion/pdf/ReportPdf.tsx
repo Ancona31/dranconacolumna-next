@@ -59,17 +59,17 @@ Font.registerHyphenationCallback((word) => [word]);
 
 const C = {
   primary: "#0B3C5D",
-  accent: "#1B6CA8",
+  accent: "#1A6299",
   bg: "#FBFBF9",
   ink: "#16232E",
   success: "#2E7D5B",
-  warning: "#C77D1F",
-  danger: "#C0453A",
+  warning: "#9A5B0E",
+  danger: "#B23B30",
   whatsapp: "#25D366",
   line: "#D8DEE4",
   amberBg: "#F7ECD9",
   coralBg: "#F7E4E2",
-  muted: "#6B7A88",
+  muted: "#5F6B76",
 };
 
 const PHONE_DISPLAY = "999 497 4956";

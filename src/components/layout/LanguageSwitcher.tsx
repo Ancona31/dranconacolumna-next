@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Check } from "lucide-react";
@@ -25,7 +31,8 @@ const OPTIONS: Option[] = [
 
 /** Bandera a ~20×14 px con esquinas redondeadas y borde sutil (que la franja
  *  blanca no se pierda sobre fondo claro). */
-const FLAG_CLASS = "h-[14px] w-[20px] shrink-0 rounded-[2px] ring-1 ring-black/10";
+const FLAG_CLASS =
+  "h-[14px] w-[20px] shrink-0 rounded-[2px] ring-1 ring-black/10";
 
 /**
  * Selector de idioma estilo desplegable (bandera + código en el botón; bandera
@@ -38,22 +45,61 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
   const pathname = usePathname() ?? (locale === "es" ? "/" : "/en");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
+  // Abierto: el foco pasa a la primera opción; toque/clic fuera cierra
+  // (pointerdown cubre ratón y táctil) y Escape cierra devolviendo el foco al
+  // botón.
   useEffect(() => {
     if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    menuRef.current
+      ?.querySelector<HTMLElement>('[role="menuitem"]')
+      ?.focus({ preventScroll: true });
+    const onDown = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
     };
-    document.addEventListener("mousedown", onDown);
+    document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("pointerdown", onDown);
       document.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
+  // Navegación del menú con flechas, Inicio y Fin (patrón ARIA menu). Tab
+  // cierra y deja que el foco siga su curso.
+  function onMenuKeyDown(e: ReactKeyboardEvent<HTMLDivElement>) {
+    if (e.key === "Tab") {
+      setOpen(false);
+      return;
+    }
+    const items = Array.from(
+      menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
+    );
+    if (items.length === 0) return;
+    const index = items.indexOf(document.activeElement as HTMLElement);
+    const next =
+      e.key === "ArrowDown"
+        ? (index + 1) % items.length
+        : e.key === "ArrowUp"
+          ? (index - 1 + items.length) % items.length
+          : e.key === "Home"
+            ? 0
+            : e.key === "End"
+              ? items.length - 1
+              : null;
+    if (next === null) return;
+    e.preventDefault();
+    items[next].focus();
+  }
 
   const current = OPTIONS.find((o) => o.code === locale) ?? OPTIONS[0];
   // Ruta de cada opción: la actual se queda en su sitio; la otra usa el mapa.
@@ -63,17 +109,21 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
   return (
     <div ref={ref} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Idioma / Language: ${current.label}`}
-        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-ink/15 px-2.5 font-body text-xs font-semibold text-ink transition-colors hover:border-accent"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-ink/15 px-2 font-body min-[400px]:px-2.5 text-xs font-semibold text-ink transition-[transform,border-color,background-color,color] duration-150 ease-out hover:border-accent active:scale-[0.97]"
       >
         <current.Flag className={FLAG_CLASS} />
-        <span>{current.short}</span>
+        {/* En teléfonos de 320px basta la bandera (el aria-label nombra el
+            idioma); así el nombre del doctor cabe completo en el header. */}
+        <span className="hidden min-[360px]:inline">{current.short}</span>
+        {/* Sin chevron en teléfonos angostos: deja sitio al nombre del header. */}
         <ChevronDown
-          className={`h-3.5 w-3.5 text-ink/60 transition-transform duration-150 ${
+          className={`hidden h-3.5 w-3.5 text-muted transition-transform min-[400px]:block duration-150 ${
             open ? "rotate-180" : ""
           }`}
           strokeWidth={2}
@@ -83,9 +133,11 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
 
       {open && (
         <div
+          ref={menuRef}
           role="menu"
           aria-label="Idioma / Language"
-          className="absolute right-0 top-full z-[70] mt-2 min-w-[168px] overflow-hidden rounded-xl border border-ink/10 bg-background py-1 shadow-lg"
+          onKeyDown={onMenuKeyDown}
+          className="popover-in absolute right-0 top-full z-[70] mt-2 min-w-[168px] origin-top-right overflow-hidden rounded-xl border border-ink/10 bg-background py-1 shadow-overlay"
         >
           {OPTIONS.map((o) => {
             const active = o.code === locale;

@@ -1,14 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@/app/globals.css";
-import { SITE_URL } from "@/lib/config";
+import { SITE_URL, SITE_VIEWPORT } from "@/lib/config";
 import { fontVariables } from "@/lib/fonts";
 import BodyShell from "@/components/layout/BodyShell";
 
-const SITE_NAME_EN =
-  "Dr. Angel Ancona · Orthopedics & Spine Surgery";
+const SITE_NAME_EN = "Dr. Angel Ancona · Orthopedics & Spine Surgery";
 
 const SITE_DESCRIPTION_EN =
   "Spine surgery in Mérida, Mexico. Guided self-assessment and consultation with Dr. Angel M. Ancona Pérez.";
+
+export const viewport: Viewport = SITE_VIEWPORT;
 
 export const metadata: Metadata = {
   // Necesario para que las URLs relativas (og:image) se resuelvan a absolutas.
@@ -44,7 +45,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fontVariables} h-full`}>
+    <html
+      lang="en"
+      className={`${fontVariables} h-full`}
+      // BodyShell añade la clase "js" antes de hidratar (ver su script inline).
+      suppressHydrationWarning
+    >
       <body className="flex min-h-full flex-col">
         <BodyShell locale="en">{children}</BodyShell>
       </body>

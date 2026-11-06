@@ -22,7 +22,11 @@ export interface SedesCopy {
   /** Prefijo del renglón de horario ("Consulta con cita previa"). */
   bookingLabel: string;
   callButton: string;
+  /** CTA de WhatsApp de la sede. Debe dejar claro que escribe a la clínica,
+   *  no al WhatsApp personal del doctor. */
   whatsappButton: string;
+  /** Pie del botón de WhatsApp de la sede; se le añade el número. */
+  clinicWhatsappNote: string;
   /** Mensaje predeterminado del CTA de WhatsApp de cada sede. */
   whatsappMessage: string;
   /** Enlace de mapa en la tarjeta del home ("Cómo llegar →"). */
@@ -39,7 +43,8 @@ export interface SedesCopy {
 const SEDES_ES: SedesCopy = {
   bookingLabel: "Consulta con cita previa",
   callButton: "Llamar a la clínica",
-  whatsappButton: "Agendar por WhatsApp",
+  whatsappButton: "Agendar con la clínica",
+  clinicWhatsappNote: "WhatsApp de la clínica",
   whatsappMessage: "Hola, deseo agendar una cita con el Dr. Angel Ancona.",
   directionsLink: "Cómo llegar →",
   mapsLink: "Ver en Google Maps →",
@@ -48,13 +53,21 @@ const SEDES_ES: SedesCopy = {
   byId: {
     merida: {
       addressLines: ["Esquina C. 34 × C. 13, Los Reyes", "Mérida, Yucatán · C.P. 97156"],
-      horario: "Lunes a viernes, 9:00 a 11:00 h",
-      horarioCorto: "Mañanas · Lun a Vie",
+      horario: "Lunes, miércoles y viernes, 9:00 a 11:00 h",
+      horarioCorto: "Mañanas · Lun, Mié y Vie",
     },
     uman: {
       addressLines: ["C. 20 × 23 y 25, Centro", "Umán, Yucatán · C.P. 97390"],
       horario: "Lunes a viernes, 17:00 a 20:00 h",
       horarioCorto: "Tardes · Lun a Vie",
+    },
+    prostasur: {
+      addressLines: [
+        "C. 32 #198 × 17 y 21, García Ginerés",
+        "Mérida, Yucatán · C.P. 97070",
+      ],
+      horario: "Martes y jueves, 9:00 a 12:00 h",
+      horarioCorto: "Mañanas · Mar y Jue",
     },
   },
 };
@@ -62,7 +75,8 @@ const SEDES_ES: SedesCopy = {
 const SEDES_EN: SedesCopy = {
   bookingLabel: "By appointment only",
   callButton: "Call the clinic",
-  whatsappButton: "Book via WhatsApp",
+  whatsappButton: "Book with the clinic",
+  clinicWhatsappNote: "Clinic's WhatsApp",
   whatsappMessage:
     "Hello, I would like to schedule an appointment with Dr. Angel Ancona.",
   directionsLink: "Get directions →",
@@ -72,13 +86,20 @@ const SEDES_EN: SedesCopy = {
   byId: {
     merida: {
       addressLines: ["Corner of Calle 34 and Calle 13, Los Reyes, Mérida, Yucatán 97156"],
-      horario: "Monday–Friday, 9:00–11:00 AM",
-      horarioCorto: "Mornings · Mon–Fri",
+      horario: "Monday, Wednesday and Friday, 9:00–11:00 AM",
+      horarioCorto: "Mornings · Mon, Wed & Fri",
     },
     uman: {
       addressLines: ["Calle 20 between Calles 23 and 25, Centro, Umán, Yucatán 97390"],
       horario: "Monday–Friday, 5:00–8:00 PM",
       horarioCorto: "Afternoons · Mon–Fri",
+    },
+    prostasur: {
+      addressLines: [
+        "Calle 32 #198 between Calles 17 and 21, García Ginerés, Mérida, Yucatán 97070",
+      ],
+      horario: "Tuesday and Thursday, 9:00 AM–12:00 PM",
+      horarioCorto: "Mornings · Tue & Thu",
     },
   },
 };

@@ -55,12 +55,12 @@ export default function QuestionScreen({
         <button
           type="button"
           onClick={onBack}
-          className="-ml-1 inline-flex items-center gap-1 font-body text-sm text-ink/60 transition-colors duration-150 hover:text-accent"
+          className="-ml-3 inline-flex min-h-11 items-center gap-1 px-2 font-body text-sm text-muted transition-[transform,color] duration-150 ease-out hover:text-accent active:scale-[0.97]"
         >
           <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
           {ui.back}
         </button>
-        <span className="font-body text-sm text-ink/60">
+        <span className="font-body text-sm tabular-nums text-muted">
           {ui.header(nounLabel, index + 1, total, timeLabel)}
         </span>
       </div>
@@ -76,8 +76,9 @@ export default function QuestionScreen({
 
       {question.kind === "scale" ? (
         <div className="mt-6">
-          {/* Escala 0-10: 11 botones de ancho uniforme, alto táctil ≥48px. */}
-          <div className="grid grid-cols-11 gap-1 sm:gap-1.5">
+          {/* Escala 0-10, alto táctil ≥48px. En pantallas angostas va en dos
+              filas (0-5 y 6-10): 11 columnas a 320px dejan botones de ~22px. */}
+          <div className="grid grid-cols-6 gap-2 sm:grid-cols-11 sm:gap-1.5">
             {Array.from({ length: 11 }, (_, value) => {
               const active = picked === value;
               return (
@@ -86,7 +87,7 @@ export default function QuestionScreen({
                   type="button"
                   onClick={() => choose(value)}
                   aria-label={`${value}`}
-                  className={`flex min-h-12 items-center justify-center rounded-lg border font-body text-sm font-semibold tabular-nums transition duration-150 active:scale-[0.97] sm:text-base ${
+                  className={`flex min-h-12 items-center justify-center rounded-lg border font-body text-sm font-semibold tabular-nums transition-[transform,background-color,border-color,color] duration-150 ease-out active:scale-[0.97] sm:text-base ${
                     active
                       ? "border-accent bg-primary-soft text-primary"
                       : "border-ink/15 bg-background text-ink hover:border-accent hover:bg-primary-soft"
@@ -98,7 +99,7 @@ export default function QuestionScreen({
             })}
           </div>
           {question.anchors && (
-            <div className="mt-2 flex justify-between font-body text-xs text-ink/50">
+            <div className="mt-2 flex justify-between font-body text-xs text-muted">
               <span>{question.anchors.min}</span>
               <span className="text-right">{question.anchors.max}</span>
             </div>
@@ -114,7 +115,7 @@ export default function QuestionScreen({
                   <button
                     type="button"
                     onClick={() => choose(opt.value)}
-                    className={`w-full rounded-2xl border p-4 text-left font-body text-lg font-medium transition duration-150 active:scale-[0.99] ${
+                    className={`w-full rounded-2xl border p-4 text-left font-body text-lg font-medium transition-[transform,background-color,border-color,color] duration-150 ease-out active:scale-[0.98] ${
                       active
                         ? "border-accent bg-primary-soft text-primary"
                         : "border-ink/15 bg-background text-ink hover:border-accent hover:bg-primary-soft"
@@ -132,10 +133,10 @@ export default function QuestionScreen({
             <button
               type="button"
               onClick={() => choose(NA)}
-              className={`mt-4 w-full rounded-xl border border-dashed p-3 text-left font-body text-sm transition duration-150 active:scale-[0.99] ${
+              className={`mt-4 w-full rounded-xl border border-dashed p-3 text-left font-body text-sm transition-[transform,background-color,border-color,color] duration-150 ease-out active:scale-[0.98] ${
                 picked === NA
                   ? "border-accent bg-primary-soft text-primary"
-                  : "border-ink/25 bg-transparent text-ink/60 hover:border-accent hover:text-accent"
+                  : "border-ink/25 bg-transparent text-muted hover:border-accent hover:text-accent"
               }`}
             >
               {`${ui.naLead}${naZoneFragment ?? ""}`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -9,6 +9,7 @@ import { buildWhatsAppLink, openWhatsAppInApp } from "@/lib/whatsapp";
 import { trackEvent } from "@/lib/analytics";
 import type { Locale, UiStrings } from "@/lib/i18n/types";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
+import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
 
 function Logo({
   alt,
@@ -18,28 +19,30 @@ function Logo({
   tagline: { line1: string; line2: string };
 }) {
   return (
-    <Link href="/" className="flex min-w-0 items-center gap-2.5">
+    <Link href="/" className="flex min-w-0 items-center gap-2 min-[400px]:gap-2.5">
       <Image
         src="/logo.png"
         alt={alt}
         width={527}
         height={512}
         priority
-        className="h-10 w-auto shrink-0 md:h-11"
+        className="h-9 w-auto shrink-0 min-[400px]:h-10 lg:h-11"
       />
       <span className="flex min-w-0 flex-col leading-none">
-        <span className="truncate font-heading text-lg font-bold text-primary">
+        <span className="truncate font-heading text-base font-bold text-primary min-[400px]:text-lg lg:text-base xl:text-lg">
           Dr. Angel Ancona
         </span>
         {/* La bajada se oculta en móvil para que el header quepa en una sola
-            línea junto al chip de idioma; reaparece desde sm. Dos renglones,
+            línea junto al chip de idioma; reaparece desde sm. Entre lg y xl
+            se oculta otra vez: ahí entra el nav de escritorio y a 1024px no
+            caben logo con bajada, 5 enlaces, idioma y WhatsApp. Dos renglones,
             cada uno sin envolver: el bloque crece en alto pero ocupa menos
             ancho que la antigua línea única. */}
-        <span className="mt-0.5 hidden flex-col leading-tight sm:flex">
-          <span className="whitespace-nowrap font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70">
+        <span className="mt-0.5 hidden flex-col leading-tight sm:flex lg:hidden xl:flex">
+          <span className="whitespace-nowrap font-body text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-ink/70">
             {tagline.line1}
           </span>
-          <span className="whitespace-nowrap font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-ink/70">
+          <span className="whitespace-nowrap font-body text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-ink/70">
             {tagline.line2}
           </span>
         </span>
@@ -60,9 +63,14 @@ export default function Header({
 
   // Drawer: `mounted` = presente en el DOM; `entered` = en posición abierta.
   // El cierre no desmonta de golpe: se dispara la salida y se desmonta al
-  // terminar la transición (onTransitionEnd) con fallback de setTimeout.
+  // terminar la transición (onTransitionEnd) con fallback de setTimeout. Abrir
+  // durante la salida cancela ese fallback y la transición CSS retoma desde la
+  // posición actual (interrumpible).
   const [mounted, setMounted] = useState(false);
   const [entered, setEntered] = useState(false);
+  const unmountTimer = useRef<number | null>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   const whatsappLink = buildWhatsAppLink(strings.whatsappDefaultMessage);
 
@@ -73,36 +81,91 @@ export default function Header({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Tras montar, en el siguiente frame pasamos a estado "abierto" para que la
-  // transición de entrada se anime desde la posición cerrada.
-  useEffect(() => {
-    if (!mounted) return;
-    const id = requestAnimationFrame(() => setEntered(true));
-    return () => cancelAnimationFrame(id);
-  }, [mounted]);
+  const openDrawer = useCallback(() => {
+    if (unmountTimer.current !== null) {
+      clearTimeout(unmountTimer.current);
+      unmountTimer.current = null;
+    }
+    setMounted(true);
+    // En el siguiente frame pasamos a "abierto" para que la entrada se anime
+    // desde la posición cerrada; si ya estaba montado (salida en curso), la
+    // transición se revierte desde donde va.
+    requestAnimationFrame(() => {
+      setEntered(true);
+      drawerRef.current
+        ?.querySelector<HTMLElement>("a[href]")
+        ?.focus({ preventScroll: true });
+    });
+  }, []);
 
-  // Bloquea el scroll del body mientras el drawer esté presente.
+  const closeDrawer = useCallback(() => {
+    setEntered(false);
+    toggleRef.current?.focus({ preventScroll: true });
+    // Fallback por si onTransitionEnd no dispara (algo más que la salida).
+    if (unmountTimer.current !== null) clearTimeout(unmountTimer.current);
+    unmountTimer.current = window.setTimeout(() => {
+      unmountTimer.current = null;
+      setMounted(false);
+    }, 250);
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (unmountTimer.current !== null) clearTimeout(unmountTimer.current);
+    },
+    [],
+  );
+
+  // Bloquea el scroll mientras el drawer esté presente. Va en <html> y <body>:
+  // iOS Safari ignora overflow:hidden si solo está en el body. No se fija el
+  // body con position:fixed porque el header sticky se iría con él.
   useEffect(() => {
     if (!mounted) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const html = document.documentElement.style;
+    const body = document.body.style;
+    const previous = { html: html.overflow, body: body.overflow };
+    html.overflow = "hidden";
+    body.overflow = "hidden";
     return () => {
-      document.body.style.overflow = previous;
+      html.overflow = previous.html;
+      body.overflow = previous.body;
     };
   }, [mounted]);
 
-  function openDrawer() {
-    setMounted(true);
-  }
-
-  function closeDrawer() {
-    setEntered(false);
-    // Fallback por si onTransitionEnd no dispara (misma duración que la salida).
-    window.setTimeout(() => setMounted(false), 250);
-  }
+  // Con el drawer abierto: Escape cierra y Tab queda atrapado entre el botón
+  // de cerrar (en el header) y los enlaces del drawer.
+  useEffect(() => {
+    if (!entered) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeDrawer();
+        return;
+      }
+      if (e.key !== "Tab" || !drawerRef.current || !toggleRef.current) return;
+      const focusables = [
+        toggleRef.current,
+        ...drawerRef.current.querySelectorAll<HTMLElement>("a[href], button"),
+      ];
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!focusables.includes(active as HTMLElement)) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [entered, closeDrawer]);
 
   function toggleDrawer() {
-    if (mounted) {
+    if (entered) {
       closeDrawer();
     } else {
       openDrawer();
@@ -117,19 +180,24 @@ export default function Header({
 
   return (
     <>
+      {/* Material translúcido: el contenido pasa por debajo desenfocado. El
+          borde y la sombra solo aparecen al hacer scroll. Con
+          prefers-reduced-transparency el fondo vuelve a ser sólido. */}
       <header
-        className={`sticky top-0 z-[60] border-b border-ink/10 bg-background transition-shadow duration-200 ${
-          scrolled ? "shadow-sm" : "shadow-none"
+        className={`sticky top-0 z-[60] border-b bg-background/80 backdrop-blur-md backdrop-saturate-150 transition-[border-color,box-shadow] duration-200 [@media(prefers-reduced-transparency:reduce)]:bg-background ${
+          scrolled
+            ? "border-ink/10 shadow-sm"
+            : "border-transparent shadow-none"
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 py-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
           <Logo alt={strings.header.logoAlt} tagline={strings.tagline} />
 
           {/* Navegación de escritorio. gap reducido (antes gap-6) y cada enlace
               en una sola línea (whitespace-nowrap) para que los 5 items quepan
               sin envolver junto al selector y WhatsApp; el ancho lo cede el
               tagline, ahora en dos renglones más estrechos. */}
-          <nav className="hidden items-center gap-4 md:flex">
+          <nav className="hidden items-center gap-3 lg:flex xl:gap-4">
             {strings.nav.map((item) => {
               const active = isActive(item.href);
               return (
@@ -154,8 +222,9 @@ export default function Header({
                 trackEvent("whatsapp_click", { source_section: "header" });
                 if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
               }}
-              className="rounded-full bg-whatsapp px-4 py-2 text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-[transform,background-color,color,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
             >
+              <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp" />
               {strings.header.whatsappLabel}
             </a>
           </nav>
@@ -164,14 +233,17 @@ export default function Header({
               (no dentro del drawer). El botón de WhatsApp del top bar se retira
               en móvil para dar espacio: sigue disponible en la barra inferior
               fija (MobileActionBar) y en el drawer. */}
-          <div className="flex shrink-0 items-center gap-2 md:hidden">
+          <div className="flex shrink-0 items-center gap-1.5 min-[400px]:gap-2 lg:hidden">
             <LanguageSwitcher locale={locale} />
             <button
+              ref={toggleRef}
               type="button"
-              aria-label={mounted ? strings.header.closeMenu : strings.header.openMenu}
-              aria-expanded={mounted}
+              aria-label={
+                entered ? strings.header.closeMenu : strings.header.openMenu
+              }
+              aria-expanded={entered}
               onClick={toggleDrawer}
-              className="relative flex h-9 w-9 items-center justify-center rounded-md border border-ink/15 text-ink"
+              className="relative flex h-11 w-11 items-center justify-center rounded-full border border-ink/15 text-ink transition-[transform,background-color,color,opacity] duration-150 ease-out active:scale-[0.97]"
             >
               {/* Ícono hamburguesa ⇄ X: rotación + fade cruzado */}
               <Menu
@@ -195,27 +267,38 @@ export default function Header({
 
       {/* Drawer móvil (bajo el header z-[60], que queda siempre accesible) */}
       {mounted && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className={`absolute inset-0 bg-ink/40 transition-opacity duration-200 ${
-              entered ? "opacity-100" : "opacity-0"
+            className={`absolute inset-0 bg-ink/40 transition-opacity ease-drawer ${
+              entered ? "opacity-100 duration-300" : "opacity-0 duration-200"
             }`}
             onClick={closeDrawer}
             aria-hidden="true"
           />
           <div
+            ref={drawerRef}
             role="dialog"
             aria-modal="true"
             aria-label={strings.header.menuLabel}
             onTransitionEnd={(e) => {
-              if (e.propertyName === "transform" && !entered) {
+              if (
+                e.target === e.currentTarget &&
+                e.propertyName === "transform" &&
+                !entered
+              ) {
+                if (unmountTimer.current !== null) {
+                  clearTimeout(unmountTimer.current);
+                  unmountTimer.current = null;
+                }
                 setMounted(false);
               }
             }}
-            className={`absolute right-0 top-0 flex h-full w-72 max-w-[80%] flex-col bg-background pt-16 shadow-xl transition-transform ${
+            // Misma curva de iOS en ambos sentidos: entra en 300ms y sale en
+            // 200ms. ease-in en la salida hacía que el cierre se sintiera lento.
+            className={`absolute right-0 top-0 flex h-full w-72 max-w-[80%] flex-col overflow-y-auto overscroll-contain bg-background pb-[env(safe-area-inset-bottom)] pt-[4.5rem] shadow-overlay transition-transform ease-drawer ${
               entered
-                ? "translate-x-0 duration-[250ms] ease-out"
-                : "translate-x-full duration-200 ease-in"
+                ? "translate-x-0 duration-300"
+                : "translate-x-full duration-200"
             }`}
           >
             <nav className="flex flex-col p-4">
@@ -238,8 +321,9 @@ export default function Header({
                   if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
                   closeDrawer();
                 }}
-                className="mt-4 rounded-full bg-whatsapp px-4 py-3 text-center text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
+                className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-center text-sm font-semibold text-white transition-[transform,background-color,color,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
               >
+                <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp" />
                 {strings.header.whatsappLabel}
               </a>
             </nav>

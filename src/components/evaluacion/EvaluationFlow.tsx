@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { BodyZoneId } from "@/components/home/BodyFigureSVG";
 import { trackEvent } from "@/lib/analytics";
 import type {
@@ -22,6 +22,15 @@ import QuestionScreen from "@/components/evaluacion/QuestionScreen";
 import ResultScreen from "@/components/evaluacion/ResultScreen";
 
 type Step = "zona" | "alarma" | "triaje" | "test" | "resultado";
+
+/** id que recibe el h1 de la pantalla activa; nombra al diálogo. */
+const SCREEN_TITLE_ID = "eval-screen-title";
+
+/** Confirmación al salir con avance: las respuestas no se guardan. */
+const EXIT_CONFIRM: Record<Locale, string> = {
+  es: "¿Salir de la evaluación? Se perderán tus respuestas.",
+  en: "Leave the assessment? Your answers will be lost.",
+};
 
 function timeLabel(test: TestDefinition, ui: EvaluationUi) {
   return test.estimatedMinutes <= 1
@@ -52,6 +61,11 @@ export default function EvaluationFlow({
   const [qIndex, setQIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [result, setResult] = useState<EvaluationResult | null>(null);
+  // Sentido de la navegación: la pantalla nueva llega desde el lado hacia el
+  // que se avanza (derecha) o se retrocede (izquierda).
+  const [direction, setDirection] = useState<1 | -1>(1);
+  const screenRef = useRef<HTMLDivElement>(null);
+  const overlay = step !== "zona";
 
   // Entrada por deep-link (?zona=): el flujo arranca solo, sin pasar por el
   // ZonePicker, así que el inicio se registra aquí al montar.
@@ -62,7 +76,43 @@ export default function EvaluationFlow({
     // Solo al montar: startTest se fija una vez desde initialZone.
   }, [startTest]);
 
+  // Cada pantalla nueva recibe el foco en su h1: el lector de pantalla la
+  // anuncia y el teclado no queda perdido en el <body> tras el re-montaje.
+  useEffect(() => {
+    if (!overlay) return;
+    const h1 = screenRef.current?.querySelector("h1");
+    if (!h1) return;
+    h1.id = SCREEN_TITLE_ID;
+    h1.tabIndex = -1;
+    h1.focus({ preventScroll: true });
+  }, [overlay, step, qIndex]);
+
+  // Mientras el flujo cubre la pantalla, la página de atrás no se desplaza.
+  // position: fixed (y no solo overflow: hidden) porque iOS Safari ignora el
+  // overflow del body; se restaura el scroll guardado al cerrar.
+  useEffect(() => {
+    if (!overlay) return;
+    const { body } = document;
+    const scrollY = window.scrollY;
+    const prev = {
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+    };
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    return () => {
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.width = prev.width;
+      // instant: el scroll suave global animaría el regreso a la posición.
+      window.scrollTo({ top: scrollY, behavior: "instant" });
+    };
+  }, [overlay]);
+
   function reset() {
+    setDirection(-1);
     setStep("zona");
     setTest(null);
     setAlarmFlags([]);
@@ -81,17 +131,20 @@ export default function EvaluationFlow({
     setTriageFlags([]);
     setAnswers({});
     setQIndex(0);
+    setDirection(1);
     setStep("alarma");
   }
 
   function handleAlarmContinue(flagIds: string[]) {
     setAlarmFlags(flagIds);
+    setDirection(1);
     setStep("triaje");
   }
 
   function handleTriageComplete(flags: string[]) {
     setTriageFlags(flags);
     setQIndex(0);
+    setDirection(1);
     setStep("test");
   }
 
@@ -101,6 +154,7 @@ export default function EvaluationFlow({
     const q = test.questions[qIndex];
     const nextAnswers = { ...answers, [q.id]: value };
     setAnswers(nextAnswers);
+    setDirection(1);
     if (qIndex + 1 >= test.questions.length) {
       setResult(
         computeResult(test, nextAnswers, [...alarmFlags, ...triageFlags], locale)
@@ -112,9 +166,20 @@ export default function EvaluationFlow({
   }
 
   function handleBack() {
+    setDirection(-1);
     if (qIndex > 0) setQIndex(qIndex - 1);
     else setStep("triaje");
   }
+
+  /** Desde el triaje en adelante hay avance que se perdería: se confirma. */
+  function handleExit() {
+    if (step !== "alarma" && !window.confirm(EXIT_CONFIRM[locale])) return;
+    reset();
+  }
+
+  const screenStyle = {
+    "--eval-dx": `${direction * 10}px`,
+  } as React.CSSProperties;
 
   const total = test?.questions.length ?? 0;
   const progress = (() => {
@@ -136,7 +201,7 @@ export default function EvaluationFlow({
   if (step === "zona") {
     return (
       <section className="px-4 py-12 md:py-16">
-        <div key="zona" className="eval-screen">
+        <div key="zona" className="eval-screen" style={screenStyle}>
           <ZonePicker
             availableZones={AVAILABLE_ZONES}
             onSelect={handleZoneSelect}
@@ -149,7 +214,12 @@ export default function EvaluationFlow({
 
   // El resto del flujo toma toda la pantalla para dar foco total.
   return (
-    <div className="fixed inset-0 z-[70] flex flex-col overflow-y-auto bg-background">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={SCREEN_TITLE_ID}
+      className="fixed inset-0 z-[70] flex flex-col overflow-y-auto overscroll-contain bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+    >
       <div className="h-1 w-full shrink-0 bg-ink/10">
         <div
           className="h-full origin-left bg-accent transition-transform duration-200 ease-out"
@@ -157,19 +227,21 @@ export default function EvaluationFlow({
         />
       </div>
 
-      <div className="mx-auto flex w-full max-w-2xl items-center justify-end px-4 pt-3">
+      <div className="mx-auto flex w-full max-w-2xl items-center justify-end px-4 pt-1">
         <button
           type="button"
-          onClick={reset}
-          className="font-body text-sm text-ink/50 transition-colors duration-150 hover:text-ink"
+          onClick={handleExit}
+          className="-mr-3 inline-flex min-h-11 items-center px-3 font-body text-sm text-muted transition-[transform,color] duration-150 ease-out hover:text-ink active:scale-[0.97]"
         >
           {ui.flow.exit}
         </button>
       </div>
 
       <div
+        ref={screenRef}
         key={`${step}-${qIndex}`}
-        className="eval-screen flex-1 px-4 py-8 sm:py-10"
+        className="eval-screen flex-1 px-4 py-8 sm:py-10 [&_h1:focus]:outline-none"
+        style={screenStyle}
       >
         {step === "alarma" && test && (
           <AlarmScreen

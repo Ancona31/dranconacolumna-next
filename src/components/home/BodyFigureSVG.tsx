@@ -268,11 +268,34 @@ export default function BodyFigureSVG({
   );
   const [tourIndex, setTourIndex] = useState(tourStart);
 
+  // Fuera de pantalla o con la pestaña oculta la figura se congela: los latidos
+  // CSS se pausan (clase is-paused) y el intervalo del tour se detiene. Arranca
+  // en false para que el primer render coincida con el del servidor.
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return;
+    let inView = true;
+    const sync = () => setPaused(!inView || document.hidden);
+    const observer = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      sync();
+    });
+    observer.observe(el);
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, []);
+
   useEffect(() => {
     if (!ambient) return;
 
-    // SMIL y este intervalo ignoran prefers-reduced-motion por su cuenta:
-    // con reduce, el recorrido no arranca y la figura se queda quieta.
+    // El intervalo ignora prefers-reduced-motion por su cuenta: con reduce, el
+    // recorrido no arranca y la figura se queda quieta.
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     let timer: ReturnType<typeof setInterval> | undefined;
 
@@ -289,6 +312,7 @@ export default function BodyFigureSVG({
         setTourIndex(tourStart);
         return;
       }
+      if (paused) return;
       timer = setInterval(
         () => setTourIndex((i) => (i + 1) % AMBIENT_TOUR.length),
         TOUR_STEP_MS,
@@ -301,7 +325,7 @@ export default function BodyFigureSVG({
       stop();
       reduced.removeEventListener("change", sync);
     };
-  }, [ambient, tourStart]);
+  }, [ambient, tourStart, paused]);
 
   const activeZone = ambient ? AMBIENT_TOUR[tourIndex] : highlightedZone;
 
@@ -326,8 +350,9 @@ export default function BodyFigureSVG({
 
   return (
     <svg
+      ref={svgRef}
       viewBox="0 0 300 540"
-      className={className}
+      className={`${className ?? ""}${paused ? " is-paused" : ""}`}
       {...(decorative
         ? { "aria-hidden": true }
         : { role: "img", "aria-label": ariaLabel ?? DEFAULT_ARIA })}
@@ -368,12 +393,15 @@ export default function BodyFigureSVG({
           ocultar los pulsos con prefers-reduced-motion la figura siga entera. */}
       {ambient ? (
         <g>
-          {/* Cada nodo lleva sus dos pulsos siempre corriendo y cruza opacidad
-              al entrar o salir del recorrido: así el rojo nunca salta de golpe.
-              Ambos pulsos son SMIL, la misma técnica en toda la figura. */}
+          {/* Cada nodo lleva sus dos latidos y cruza opacidad al entrar o salir
+              del recorrido: así el rojo nunca salta de golpe. Los latidos son
+              keyframes CSS sobre transform/opacity (compositor, no repintado
+              por frame); el que está oculto queda en pausa (is-idle), congelado
+              en su fase, de modo que al reaparecer continúa sin saltar. */}
           {BODY_ZONES.map((z, i) => {
             const active = z.id === activeZone;
-            const stagger = `${(i * 0.35).toFixed(2)}s`;
+            // Delay negativo: cada nodo arranca ya desfasado, sin espera inicial.
+            const stagger = { animationDelay: `-${(i * 0.35).toFixed(2)}s` };
 
             return (
               <g key={z.id}>
@@ -389,35 +417,27 @@ export default function BodyFigureSVG({
 
                 {/* Latido azul de reposo, escalonado por índice. */}
                 <g className="body-figure__pulse" opacity={active ? 0 : 1}>
-                  <circle cx={z.cx} cy={z.cy} r="11" fill={ACCENT} opacity="0.2">
-                    <animate
-                      attributeName="r"
-                      values="11;15;11"
-                      dur="3.2s"
-                      begin={stagger}
-                      repeatCount="indefinite"
-                    />
-                    <animate
-                      attributeName="opacity"
-                      values="0.2;0.06;0.2"
-                      dur="3.2s"
-                      begin={stagger}
-                      repeatCount="indefinite"
-                    />
-                  </circle>
+                  <circle
+                    className={`body-figure__beat body-figure__beat--rest${active ? " is-idle" : ""}`}
+                    cx={z.cx}
+                    cy={z.cy}
+                    r="11"
+                    fill={ACCENT}
+                    opacity="0.2"
+                    style={stagger}
+                  />
                 </g>
 
                 {/* Pulso de dolor, visible solo mientras la zona es la activa. */}
                 <g className="body-figure__pulse" opacity={active ? 1 : 0}>
-                  <circle cx={z.cx} cy={z.cy} r="15" fill={PAIN} opacity="0.3">
-                    <animate attributeName="r" values="15;21;15" dur="2.6s" repeatCount="indefinite" />
-                    <animate
-                      attributeName="opacity"
-                      values="0.3;0.06;0.3"
-                      dur="2.6s"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
+                  <circle
+                    className={`body-figure__beat body-figure__beat--pain${active ? "" : " is-idle"}`}
+                    cx={z.cx}
+                    cy={z.cy}
+                    r="15"
+                    fill={PAIN}
+                    opacity="0.3"
+                  />
                 </g>
 
                 <circle
@@ -447,16 +467,13 @@ export default function BodyFigureSVG({
             <g>
               <circle cx={hot.cx} cy={hot.cy} r="15" fill={ACCENT} opacity="0.22" />
               <circle
-                className="body-figure__pulse"
+                className="body-figure__pulse body-figure__beat body-figure__beat--pain"
                 cx={hot.cx}
                 cy={hot.cy}
                 r="15"
                 fill={ACCENT}
                 opacity="0.3"
-              >
-                <animate attributeName="r" values="15;21;15" dur="2.6s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.3;0.06;0.3" dur="2.6s" repeatCount="indefinite" />
-              </circle>
+              />
               <circle cx={hot.cx} cy={hot.cy} r="6.5" fill={INK} stroke={PAPER} strokeWidth="2.2" />
             </g>
           )}

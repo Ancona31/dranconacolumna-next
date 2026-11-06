@@ -13,12 +13,12 @@ export default function Footer({ strings }: { strings: UiStrings }) {
   return (
     <footer className="bg-primary text-white/90">
       <div className="mx-auto max-w-6xl px-4 py-12">
-        <nav className="flex flex-wrap gap-x-6 gap-y-3">
+        <nav className="flex flex-wrap gap-x-6 gap-y-1">
           {strings.nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="font-body text-sm text-white/90 transition-colors hover:text-white"
+              className="inline-flex min-h-11 items-center font-body text-sm text-white/90 transition-colors hover:text-white"
             >
               {item.label}
             </Link>

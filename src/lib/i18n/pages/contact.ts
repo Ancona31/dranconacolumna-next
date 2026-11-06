@@ -26,7 +26,7 @@ const CONTACT_ES: ContactContent = {
   hero: {
     eyebrow: "Contacto",
     h1: "Agenda tu consulta",
-    text: "Atiendo con cita previa en dos sedes: Medclinik Mérida por las mañanas y Clínica Celus en Umán por las tardes. Los espacios de consulta son limitados y se agendan con anticipación — escríbeme por WhatsApp y te comparto la próxima disponibilidad.",
+    text: "Atiendo con cita previa en tres sedes: Medclinik Mérida los lunes, miércoles y viernes por la mañana, Prostasur (Mérida, García Ginerés) los martes y jueves por la mañana, y Clínica Celus en Umán por las tardes. Los espacios de consulta son limitados y se agendan con anticipación — escríbeme por WhatsApp y te comparto la próxima disponibilidad.",
   },
   cta: {
     button: "Agendar por WhatsApp",
@@ -48,7 +48,7 @@ const CONTACT_EN: ContactContent = {
   hero: {
     eyebrow: "Contact",
     h1: "Book your consultation",
-    text: "I see patients by appointment at two locations: Medclinik in Mérida in the mornings and Clínica Celus in Umán in the afternoons. Appointments are limited and fill up well in advance — message me on WhatsApp and I'll send you the next available time.",
+    text: "I see patients by appointment at three locations: Medclinik in Mérida on Monday, Wednesday and Friday mornings, Prostasur (García Ginerés, Mérida) on Tuesday and Thursday mornings, and Clínica Celus in Umán in the afternoons. Appointments are limited and fill up well in advance — message me on WhatsApp and I'll send you the next available time.",
   },
   cta: {
     button: "Book via WhatsApp",

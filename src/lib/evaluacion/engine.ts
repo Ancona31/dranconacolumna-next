@@ -86,8 +86,8 @@ export const NIVEL_BADGE_COLORS: Record<
   { bg: string; strong: string }
 > = {
   leve: { bg: "#EAF4EF", strong: "#2E7D5B" },
-  moderada: { bg: "#FAF1E3", strong: "#C77D1F" },
-  severa: { bg: "#F9EAE8", strong: "#C0453A" },
+  moderada: { bg: "#FAF1E3", strong: "#9A5B0E" },
+  severa: { bg: "#F9EAE8", strong: "#B23B30" },
 };
 
 /**
@@ -100,8 +100,8 @@ export const RECOMMENDATION_COLORS: Record<
   "standard" | "urgente",
   { bg: string; strong: string }
 > = {
-  standard: { bg: "#E8F1F8", strong: "#0B3C5D" },
-  urgente: { bg: "#F9EAE8", strong: "#C0453A" },
+  standard: { bg: "#EDF2F5", strong: "#0B3C5D" },
+  urgente: { bg: "#F9EAE8", strong: "#B23B30" },
 };
 
 /** Par de color del bloque a partir de su variante. */

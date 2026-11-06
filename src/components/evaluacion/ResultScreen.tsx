@@ -12,7 +12,6 @@ import {
   Dumbbell,
   Footprints,
   Heart,
-  MessageCircle,
   Minus,
   MoreHorizontal,
   Stethoscope,
@@ -47,6 +46,7 @@ import ShareButton from "@/components/share/ShareButton";
 import { trackEvent } from "@/lib/analytics";
 import { openWhatsAppInApp } from "@/lib/whatsapp";
 import { SITE_URL } from "@/lib/config";
+import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
 
 // Compartir el enlace a la evaluación (no el PDF): que otra persona haga su
 // test. Mismo bloque en el reporte scorable y en el no-scorable.
@@ -99,6 +99,8 @@ const STATE_GLYPH: Record<DomainState, typeof Check> = {
   na: Minus,
 };
 
+/** Logo de WhatsApp (el mismo del botón flotante) en vez de un globo genérico. */
+
 // Geometría del medidor semicircular.
 function polar(score: number) {
   const angle = (180 - (score / 100) * 180) * (Math.PI / 180);
@@ -133,7 +135,8 @@ function Gauge({
           transformBox: "view-box",
           transformOrigin: "120px 120px",
           transform: `rotate(${ready ? needleDeg : -90}deg)`,
-          transition: "transform 800ms ease-out",
+          // Curva con fuerza: la aguja llega rápido y se asienta suave.
+          transition: "transform 800ms cubic-bezier(0.23, 1, 0.32, 1)",
         }}
       >
         <line x1="120" y1="120" x2="120" y2="34" stroke="var(--color-ink)" strokeWidth={3} strokeLinecap="round" />
@@ -208,7 +211,7 @@ function CapacityCard({
           </span>
         </span>
       </div>
-      <p className="mt-1 font-body text-xs italic text-ink/50">
+      <p className="mt-1 font-body text-xs italic text-muted">
         {domain.examples}
       </p>
       <p className="mt-1.5 font-body text-sm text-ink/80">{domain.fullPhrase}</p>
@@ -232,7 +235,7 @@ function ResultHeader({
         <h1 className="font-heading text-2xl font-bold text-primary sm:text-3xl">
           {ui.headerTitle(result.zoneLabel)}
         </h1>
-        <p className="mt-1 font-body text-sm text-ink/50">
+        <p className="mt-1 font-body text-sm text-muted">
           {ui.folioLabel} {result.folio}
         </p>
       </div>
@@ -327,16 +330,16 @@ function UnscorableScreen({
           trackEvent("whatsapp_click", { source_section: "evaluacion" });
           if (openWhatsAppInApp(getResultWhatsAppLink(result))) e.preventDefault();
         }}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
       >
-        <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
+        <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
         {result.alertLevel === "urgente" ? ui.ctaUrgent : ui.ctaNormal}
       </a>
 
       {/* Compartir la evaluación (secundario: no compite con el CTA de WhatsApp). */}
       <ShareEvaluation locale={locale} />
 
-      <p className="mt-6 font-body text-xs text-ink/45">{ui.disclaimer}</p>
+      <p className="mt-6 font-body text-xs text-muted">{ui.disclaimer}</p>
     </div>
   );
 }
@@ -388,19 +391,19 @@ export default function ResultScreen({
       {/* Medidor + score */}
       <div className="mt-6 flex flex-col items-center">
         <Gauge score={result.score} ready={ready} ariaLabel={ui.gaugeAria(result.score)} />
-        <p className="-mt-2 font-heading text-5xl font-extrabold text-primary">
+        <p className="-mt-2 font-heading text-5xl font-extrabold tabular-nums text-primary">
           {result.score}
-          <span className="text-2xl text-ink/50">{ui.per100}</span>
+          <span className="text-2xl text-muted">{ui.per100}</span>
         </p>
-        <p className="font-body text-sm text-ink/60">{ui.indexCaption}</p>
-        <p className="mt-1 font-body text-xs text-ink/45">{ui.cutsLegend}</p>
+        <p className="font-body text-sm text-muted">{ui.indexCaption}</p>
+        <p className="mt-1 font-body text-xs text-muted">{ui.cutsLegend}</p>
         <span
           className={`mt-3 rounded-full px-4 py-1 font-body text-sm font-semibold ${LEVEL_PILL[result.level]}`}
         >
           {ui.levelPill[result.level]}
         </span>
         {partialNote && (
-          <p className="mt-3 max-w-md text-center font-body text-xs text-ink/50">
+          <p className="mt-3 max-w-md text-center font-body text-xs text-muted">
             {partialNote}
           </p>
         )}
@@ -476,7 +479,7 @@ export default function ResultScreen({
               </li>
             ))}
           </ul>
-          <p className="mt-3 font-body text-sm italic text-ink/60">
+          <p className="mt-3 font-body text-sm italic text-muted">
             {copy.evaluationSignature}
           </p>
         </div>
@@ -552,9 +555,9 @@ export default function ResultScreen({
             trackEvent("whatsapp_click", { source_section: "evaluacion" });
             if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
           }}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-6 py-4 font-body text-base font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
         >
-          <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
+          <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
           {result.alertLevel === "urgente" ? ui.ctaUrgent : ui.ctaNormal}
         </a>
         {result.alertLevel === "urgente" && (
@@ -568,7 +571,7 @@ export default function ResultScreen({
       {/* Compartir la evaluación (secundario: no compite con el CTA de WhatsApp). */}
       <ShareEvaluation locale={locale} />
 
-      <p className="mt-6 font-body text-xs text-ink/45">{ui.disclaimer}</p>
+      <p className="mt-6 font-body text-xs text-muted">{ui.disclaimer}</p>
     </div>
   );
 }

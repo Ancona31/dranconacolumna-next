@@ -1,5 +1,4 @@
 import { Star } from "lucide-react";
-import Reveal from "@/components/ui/Reveal";
 import { CEDULA_PROFESIONAL, CEDULA_ESPECIALIDAD } from "@/lib/config";
 import type { Locale } from "@/lib/i18n/types";
 import { getHomeContent } from "@/lib/i18n/pages/home";
@@ -19,7 +18,7 @@ export default function TrustBar({ locale }: { locale: Locale }) {
 
   return (
     <section className="bg-primary text-white">
-      <Reveal className="mx-auto max-w-6xl px-4 py-3">
+      <div className="mx-auto max-w-6xl px-4 py-3">
         {/* Móvil: grid 2x2 */}
         <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-center font-body text-xs text-white/90 md:hidden">
           {items.map((item) => (
@@ -42,7 +41,7 @@ export default function TrustBar({ locale }: { locale: Locale }) {
             </li>
           ))}
         </ul>
-      </Reveal>
+      </div>
     </section>
   );
 }
@@ -51,9 +50,10 @@ function RatingItem({ label }: { label: string }) {
   return (
     <span className="flex items-center gap-1">
       <Star
-        className="h-4 w-4 text-[#E9B44C]"
+        className="h-4 w-4 text-star-on-dark"
         strokeWidth={1.5}
         fill="currentColor"
+        aria-hidden="true"
       />
       <span>{label}</span>
     </span>

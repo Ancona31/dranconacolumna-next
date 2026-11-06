@@ -16,7 +16,8 @@ const variants: Record<Variant, string> = {
   primary: "bg-primary text-white hover:opacity-90",
   outline:
     "border border-primary text-primary bg-transparent hover:bg-primary hover:text-white",
-  whatsapp: "bg-whatsapp text-white hover:opacity-90",
+  // WhatsApp va en el azul de marca; el ícono verde lo identifica.
+  whatsapp: "bg-primary text-white hover:opacity-90",
 };
 
 const sizes: Record<Size, string> = {
@@ -33,7 +34,7 @@ export default function ButtonLink({
   external = false,
   className = "",
 }: ButtonLinkProps) {
-  const classes = `inline-flex items-center justify-center gap-2 rounded-full font-body font-semibold transition duration-150 active:scale-[0.985] ${variants[variant]} ${sizes[size]} ${className}`;
+  const classes = `inline-flex items-center justify-center gap-2 rounded-full font-body font-semibold transition-[transform,background-color,color,opacity] duration-150 ease-out active:scale-[0.97] ${variants[variant]} ${sizes[size]} ${className}`;
 
   if (external) {
     return (

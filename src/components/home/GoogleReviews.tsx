@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { REVIEWS, type Review } from "@/lib/reviews";
 import type { Locale } from "@/lib/i18n/types";
@@ -11,8 +11,12 @@ const GOOGLE_REVIEWS_URL = "https://share.google/F6JriyuEKHSREzTfi";
 /** Longitud a la que se trunca el texto antes de "Leer más". */
 const TRUNCATE_AT = 200;
 
-/** Colores oficiales de Google; el borde de cada tarjeta rota en este orden. */
-const GOOGLE_COLORS = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
+/** Intervalo del autoplay. */
+const AUTOPLAY_MS = 5000;
+
+/** Duración del fundido con el que el bucle vuelve al inicio (en vez de
+ *  rebobinar todas las tarjetas de golpe). */
+const WRAP_FADE_MS = 200;
 
 /** Logotipo "G" de Google en sus 4 colores oficiales (SVG inline). */
 function GoogleG({ className = "h-5 w-5" }: { className?: string }) {
@@ -55,7 +59,7 @@ function Stars({
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={`${className} text-[#E9B44C]`}
+          className={`${className} text-star`}
           fill="currentColor"
           strokeWidth={0}
           aria-hidden="true"
@@ -68,14 +72,12 @@ function Stars({
 /** Tarjeta con expansión local de "Leer más". */
 function ReviewCard({
   review,
-  borderColor,
   cardLabel,
   readMore,
   readLess,
   starsAria,
 }: {
   review: Review;
-  borderColor: string;
   cardLabel: string;
   readMore: string;
   readLess: string;
@@ -89,16 +91,14 @@ function ReviewCard({
       : `${review.text.slice(0, TRUNCATE_AT).trimEnd()}…`;
   const initial = review.author.charAt(0).toUpperCase();
 
+  // Sin escala en hover/press: agrandar al presionar contradice la respuesta
+  // esperada y emborrona el texto. En md+ la tarjeta se eleva 2px.
   return (
-    <div
-      style={{ borderColor }}
-      className="flex h-full min-h-[340px] flex-col rounded-2xl border-2 bg-white p-7 shadow-[0_4px_16px_rgba(11,60,93,0.10)] transition-[transform,box-shadow] duration-200 hover:scale-[1.02] hover:shadow-[0_10px_28px_rgba(11,60,93,0.16)] active:scale-[1.02] md:min-h-[330px]"
-    >
+    <div className="flex h-full min-h-[340px] flex-col rounded-2xl border border-ink/10 bg-white p-7 shadow-card transition-[translate,box-shadow] duration-300 ease-drawer hover:shadow-raised md:min-h-[330px] md:hover:-translate-y-0.5">
       <div className="flex items-center gap-3">
         <div
           aria-hidden="true"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-heading text-base font-bold text-white"
-          style={{ backgroundColor: "#0B3C5D" }}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary font-heading text-base font-bold text-white"
         >
           {initial}
         </div>
@@ -118,10 +118,11 @@ function ReviewCard({
       <p className="mt-3 font-body text-[14.5px] leading-[1.7] text-ink/[0.78]">
         {shown}
         {isLong && (
+          // El padding negativo agranda el área de toque sin mover la línea.
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            className="ml-1 font-body text-[13px] font-semibold text-accent hover:underline"
+            className="-my-2 ml-1 py-2 font-body text-[13px] font-semibold text-accent hover:underline"
           >
             {expanded ? readLess : readMore}
           </button>
@@ -131,65 +132,134 @@ function ReviewCard({
   );
 }
 
+/** Distancia entre el inicio de dos tarjetas consecutivas (ancho + gap). */
+function stepOf(el: HTMLElement): number {
+  const [first, second] = el.children as unknown as HTMLElement[];
+  if (!first || !second) return el.clientWidth;
+  return second.offsetLeft - first.offsetLeft;
+}
+
 export default function GoogleReviews({ locale }: { locale: Locale }) {
   const c = getHomeContent(locale).reviews;
-  const [index, setIndex] = useState(0);
-  const [visible, setVisible] = useState(3);
-  const [cardWidth, setCardWidth] = useState(0);
+  const [current, setCurrent] = useState(0);
+  const [perView, setPerView] = useState(1);
   const [reduced, setReduced] = useState(false);
-  // `tick` sirve solo para reiniciar el autoplay tras una navegación manual.
-  const [tick, setTick] = useState(0);
+  // El autoplay se apaga para siempre en cuanto el usuario toca, enfoca o
+  // desliza el carrusel: a partir de ahí manda él.
+  const [stopped, setStopped] = useState(false);
+  const [fading, setFading] = useState(false);
 
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const pausedRef = useRef(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const scrollerRef = useRef<HTMLUListElement>(null);
+  const hoverRef = useRef(false);
+  const inViewRef = useRef(false);
+  const fadeTimerRef = useRef<number | undefined>(undefined);
 
-  const gap = visible === 1 ? 16 : 24;
-  const positions = Math.max(1, REVIEWS.length - visible + 1);
-  // Índice efectivo: al pasar de móvil (más posiciones) a desktop, el índice
-  // guardado puede quedar fuera de rango; se acota aquí en vez de en un efecto.
-  const current = Math.min(index, positions - 1);
+  const positions = Math.max(1, REVIEWS.length - perView + 1);
+  // Al pasar de móvil (más posiciones) a desktop el índice puede quedar fuera
+  // de rango; se acota aquí en vez de en un efecto.
+  const shown = Math.min(current, positions - 1);
 
-  // Mide el ancho de tarjeta y decide cuántas caben, según el breakpoint md.
+  // Tarjetas por vista (1 / 2 en md / 3 en lg) y prefers-reduced-motion.
   useEffect(() => {
-    const mqDesktop = window.matchMedia("(min-width: 768px)");
+    const mqMd = window.matchMedia("(min-width: 768px)");
+    const mqLg = window.matchMedia("(min-width: 1024px)");
     const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    const measure = () => {
-      const v = mqDesktop.matches ? 3 : 1;
-      const g = v === 1 ? 16 : 24;
-      setVisible(v);
-      const el = viewportRef.current;
-      if (el) setCardWidth((el.clientWidth - (v - 1) * g) / v);
+    const sync = () => {
+      setPerView(mqLg.matches ? 3 : mqMd.matches ? 2 : 1);
+      setReduced(mqReduce.matches);
     };
-    const syncReduced = () => setReduced(mqReduce.matches);
 
-    measure();
-    syncReduced();
-    window.addEventListener("resize", measure);
-    mqReduce.addEventListener("change", syncReduced);
+    sync();
+    mqMd.addEventListener("change", sync);
+    mqLg.addEventListener("change", sync);
+    mqReduce.addEventListener("change", sync);
     return () => {
-      window.removeEventListener("resize", measure);
-      mqReduce.removeEventListener("change", syncReduced);
+      mqMd.removeEventListener("change", sync);
+      mqLg.removeEventListener("change", sync);
+      mqReduce.removeEventListener("change", sync);
     };
   }, []);
 
-  // Autoplay: avanza cada 4 s, en bucle. Se detiene con hover (pausedRef) y se
-  // reinicia con cada navegación manual (tick). Nunca corre con reduced-motion.
+  // El índice sale de la posición real del scroll (deslizar con el dedo, el
+  // trackpad o las flechas), así los puntos siempre reflejan lo que se ve.
   useEffect(() => {
-    if (reduced) return;
-    const id = window.setInterval(() => {
-      if (!pausedRef.current) setIndex((i) => (i + 1) % positions);
-    }, 4000);
-    return () => window.clearInterval(id);
-  }, [positions, reduced, tick]);
+    const el = scrollerRef.current;
+    if (!el) return;
+    let frame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const step = stepOf(el);
+        if (step > 0) setCurrent(Math.round(el.scrollLeft / step));
+      });
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      el.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
-  const go = (next: number) => {
-    setIndex(((next % positions) + positions) % positions);
-    setTick((t) => t + 1);
+  // El autoplay solo corre con la sección a la vista.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        inViewRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => () => window.clearTimeout(fadeTimerRef.current), []);
+
+  const goTo = (target: number) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const step = stepOf(el);
+
+    if (target >= 0 && target < positions) {
+      el.scrollTo({ left: target * step, behavior: reduced ? "auto" : "smooth" });
+      return;
+    }
+
+    // Bucle: en vez de rebobinar todas las tarjetas, fundido corto y salto.
+    const wrapped = target < 0 ? positions - 1 : 0;
+    if (reduced) {
+      el.scrollTo({ left: wrapped * step, behavior: "auto" });
+      return;
+    }
+    setFading(true);
+    window.clearTimeout(fadeTimerRef.current);
+    fadeTimerRef.current = window.setTimeout(() => {
+      el.scrollTo({ left: wrapped * step, behavior: "auto" });
+      setFading(false);
+    }, WRAP_FADE_MS);
   };
 
+  const stop = () => setStopped(true);
+
+  // Autoplay: avanza cada 5 s en bucle. Se salta el paso con hover, con la
+  // sección fuera de vista o la pestaña oculta; nunca corre con reduced-motion
+  // ni después de que el usuario interactúe.
+  const onTick = useEffectEvent(() => {
+    if (hoverRef.current || !inViewRef.current || document.hidden) return;
+    goTo(shown + 1);
+  });
+
+  useEffect(() => {
+    if (reduced || stopped) return;
+    const id = window.setInterval(() => onTick(), AUTOPLAY_MS);
+    return () => window.clearInterval(id);
+  }, [reduced, stopped]);
+
   return (
-    <section className="bg-background">
+    <section ref={sectionRef} className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-20">
         {/* Encabezado */}
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -204,100 +274,107 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
 
           <div className="md:text-right">
             <div className="flex items-center gap-3 md:justify-end">
-              <span className="font-heading text-[32px] font-bold leading-none text-primary">
+              <span className="font-heading text-[32px] font-bold leading-none text-primary tabular-nums">
                 {c.ratingNumber}
               </span>
               <Stars className="h-5 w-5" label={c.starsAria} />
             </div>
-            <p className="mt-2 font-body text-[13px] text-ink/60">
+            <p className="mt-2 font-body text-[13px] text-muted">
               {c.ratingCaption}
             </p>
           </div>
         </div>
 
-        {/* Carrusel */}
-        <div className="mt-12 md:mt-14">
-          {/* py-3 siempre: deja aire vertical para la sombra y el scale(1.02).
-              El sangrado horizontal (-mx-3/px-3) es solo md+: en móvil cada
-              tarjeta debe llenar el 100% del viewport para quedar centrada, sin
-              una ventana lateral por la que se asome la tarjeta vecina. */}
-          <div
-            className="overflow-hidden py-3 md:-mx-3 md:px-3"
-            onMouseEnter={() => {
-              pausedRef.current = true;
+        {/* Carrusel: scroll nativo con snap, así en móvil se desliza con el
+            dedo con la inercia del sistema. py-3 deja aire para la sombra y la
+            elevación en hover; el sangrado horizontal (-mx-3/px-3 con
+            scroll-px-3) es solo md+: en móvil cada tarjeta llena el 100%. */}
+        <div
+          className="mt-12 md:mt-14"
+          onMouseEnter={() => {
+            hoverRef.current = true;
+          }}
+          onMouseLeave={() => {
+            hoverRef.current = false;
+          }}
+        >
+          <ul
+            ref={scrollerRef}
+            onPointerDown={stop}
+            onFocusCapture={stop}
+            onWheel={(e) => {
+              if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) stop();
             }}
-            onMouseLeave={() => {
-              pausedRef.current = false;
-            }}
+            className={`relative flex list-none snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-3 [scrollbar-width:none] md:-mx-3 md:scroll-px-3 md:gap-6 md:px-3 [&::-webkit-scrollbar]:hidden transition-opacity duration-200 ease-out ${
+              fading ? "opacity-0" : ""
+            }`}
           >
-            <div ref={viewportRef}>
-              <ul
-                className="flex list-none"
-                style={{
-                  gap: `${gap}px`,
-                  transform: `translateX(-${current * (cardWidth + gap)}px)`,
-                  transition: reduced
-                    ? "none"
-                    : "transform 700ms cubic-bezier(0.25, 0.8, 0.35, 1)",
-                }}
+            {REVIEWS.map((review, i) => (
+              <li
+                key={review.author}
+                // Las tarjetas fuera de vista no reciben foco ni lector de
+                // pantalla; se llega a ellas con flechas, puntos o deslizando.
+                inert={i < shown || i >= shown + perView}
+                className="min-w-0 shrink-0 basis-full snap-start md:basis-[calc((100%-1.5rem)/2)] lg:basis-[calc((100%-3rem)/3)]"
               >
-                {REVIEWS.map((review, i) => (
-                  <li
-                    key={review.author}
-                    className="min-w-0"
-                    style={{
-                      flex: `0 0 calc((100% - ${(visible - 1) * gap}px) / ${visible})`,
-                    }}
-                  >
-                    <ReviewCard
-                      review={review}
-                      borderColor={GOOGLE_COLORS[i % GOOGLE_COLORS.length]}
-                      cardLabel={c.cardLabel}
-                      readMore={c.readMore}
-                      readLess={c.readLess}
-                      starsAria={c.starsAria}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+                <ReviewCard
+                  review={review}
+                  cardLabel={c.cardLabel}
+                  readMore={c.readMore}
+                  readLess={c.readLess}
+                  starsAria={c.starsAria}
+                />
+              </li>
+            ))}
+          </ul>
 
           {/* Flechas (desktop) */}
           <div className="mt-8 hidden items-center justify-center gap-4 md:flex">
             <button
               type="button"
               aria-label={c.prevAria}
-              onClick={() => go(current - 1)}
-              className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-primary text-primary transition-colors duration-150 hover:bg-primary hover:text-white"
+              onClick={() => {
+                stop();
+                goTo(shown - 1);
+              }}
+              className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-primary text-primary transition-[background-color,color,scale] duration-150 ease-out hover:bg-primary hover:text-white active:scale-[0.97]"
             >
               <ChevronLeft className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             </button>
             <button
               type="button"
               aria-label={c.nextAria}
-              onClick={() => go(current + 1)}
-              className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-primary text-primary transition-colors duration-150 hover:bg-primary hover:text-white"
+              onClick={() => {
+                stop();
+                goTo(shown + 1);
+              }}
+              className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-primary text-primary transition-[background-color,color,scale] duration-150 ease-out hover:bg-primary hover:text-white active:scale-[0.97]"
             >
               <ChevronRight className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             </button>
           </div>
 
-          {/* Puntos (móvil) */}
-          <div className="mt-6 flex items-center justify-center gap-2 md:hidden">
+          {/* Puntos (móvil): punto de 8px dentro de un área táctil de 44px. */}
+          <div className="mt-4 flex items-center justify-center md:hidden">
             {Array.from({ length: positions }).map((_, i) => (
               <button
                 key={i}
                 type="button"
                 aria-label={`${c.goToReview} ${i + 1}`}
-                aria-current={i === current ? "true" : undefined}
-                onClick={() => go(i)}
-                className="h-2 w-2 rounded-full transition-colors duration-150"
-                style={{
-                  backgroundColor:
-                    i === current ? "#0B3C5D" : "rgba(11, 60, 93, 0.25)",
+                aria-current={i === shown ? "true" : undefined}
+                onClick={() => {
+                  stop();
+                  goTo(i);
                 }}
-              />
+                className="grid h-11 w-11 place-items-center"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`h-2 w-2 rounded-full transition-colors duration-150 ${
+                    i === shown ? "bg-primary" : "bg-primary/25"
+                  }`}
+                />
+              </button>
             ))}
           </div>
         </div>
@@ -308,12 +385,11 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
             href={GOOGLE_REVIEWS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-full px-[30px] py-[14px] font-body text-[15px] font-semibold text-white transition-opacity duration-150 hover:opacity-90"
-            style={{ backgroundColor: "#0B3C5D" }}
+            className="inline-flex items-center justify-center rounded-full bg-primary px-[30px] py-[14px] font-body text-[15px] font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
           >
             {c.seeAll}
           </a>
-          <p className="mx-auto mt-8 max-w-2xl font-body text-xs leading-relaxed text-ink/45">
+          <p className="mx-auto mt-8 max-w-2xl font-body text-xs leading-relaxed text-muted">
             {c.disclaimer}
           </p>
         </div>

@@ -34,6 +34,7 @@ export type WhatsAppSection =
   | "barra_movil"
   | "sede_medclinik"
   | "sede_celus"
+  | "sede_prostasur"
   | "sobre_mi";
 
 /** Eventos del embudo y sus parámetros. */

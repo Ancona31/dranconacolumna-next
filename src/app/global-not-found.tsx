@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@/app/globals.css";
+import { SITE_VIEWPORT } from "@/lib/config";
 import { fontVariables } from "@/lib/fonts";
 import BodyShell from "@/components/layout/BodyShell";
 import NotFoundView from "@/components/layout/NotFoundView";
@@ -16,13 +17,20 @@ import { getUiStrings } from "@/lib/i18n";
  */
 const strings = getUiStrings("es");
 
+export const viewport: Viewport = SITE_VIEWPORT;
+
 export const metadata: Metadata = {
   title: `${strings.notFound.metaTitle} | Dr. Ancona Cirugía de Columna`,
 };
 
 export default function GlobalNotFound() {
   return (
-    <html lang="es-MX" className={`${fontVariables} h-full`}>
+    <html
+      lang="es-MX"
+      className={`${fontVariables} h-full`}
+      // BodyShell añade la clase "js" antes de hidratar (ver su script inline).
+      suppressHydrationWarning
+    >
       <body className="flex min-h-full flex-col">
         <BodyShell locale="es">
           <NotFoundView strings={strings} />

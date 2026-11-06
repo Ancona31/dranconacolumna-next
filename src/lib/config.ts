@@ -1,3 +1,5 @@
+import type { Viewport } from "next";
+
 /**
  * Configuración central del sitio.
  * Fuente única de verdad para datos de contacto y credenciales legales.
@@ -38,3 +40,14 @@ export const CEDULA_ESPECIALIDAD = "12085805";
 
 export const CERTIFICACION =
   "Certificado por el Consejo Mexicano de Ortopedia y Traumatología, A.C.";
+
+// Viewport compartido por los root layouts y el 404 global. viewport-fit=cover
+// habilita env(safe-area-inset-*) (muesca y barra de inicio del iPhone);
+// themeColor tiñe la barra del navegador con el fondo del header.
+export const SITE_VIEWPORT: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
+  themeColor: "#fbfbf9",
+};

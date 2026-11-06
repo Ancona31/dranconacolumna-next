@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import { MapPin, Clock, Phone, MessageCircle, Navigation } from "lucide-react";
+import { MapPin, Clock, Phone, Navigation } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { SEDES, type Sede } from "@/lib/sedes";
@@ -10,6 +10,12 @@ import type { Locale } from "@/lib/i18n/types";
 import { getHomeContent } from "@/lib/i18n/pages/home";
 import { getSedesCopy, type SedesCopy } from "@/lib/i18n/content/sedes";
 import { routeFor } from "@/lib/i18n/slug-map";
+import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+import SedeMap from "@/components/ui/SedeMap";
+
+// Con tres sedes, en tablet (2 columnas) la última tarjeta quedaría sola en
+// media fila: ocupa el ancho completo. En lg las tres van en una fila.
+const ORPHAN_SPAN = "md:last:odd:col-span-2 lg:last:odd:col-span-1";
 
 function SedeCard({ sede, copy }: { sede: Sede; copy: SedesCopy }) {
   const sc = copy.byId[sede.id];
@@ -53,31 +59,38 @@ function SedeCard({ sede, copy }: { sede: Sede; copy: SedesCopy }) {
         </span>
       </p>
 
+      <SedeMap sede={sede} titlePrefix={copy.mapTitlePrefix} className="mt-5" />
+
       <div className="mt-6 flex flex-1 flex-col justify-end gap-3">
         <PhoneLink
           href={`tel:+52${sede.telefono}`}
           section={sede.section}
           phoneNumber={sede.telefono}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-transparent px-5 py-3 font-body text-sm font-semibold text-primary transition duration-150 hover:bg-primary hover:text-white active:scale-[0.985]"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-transparent px-5 py-3 font-body text-sm font-semibold text-primary transition duration-150 hover:bg-primary hover:text-white active:scale-[0.97]"
         >
           <Phone className="h-4 w-4 shrink-0" strokeWidth={1.75} />
           {copy.callButton}
         </PhoneLink>
 
-        <WhatsAppLink
-          href={whatsappLink}
-          section={sede.section}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-whatsapp px-5 py-3 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.985]"
-        >
-          <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-          {copy.whatsappButton}
-        </WhatsAppLink>
+        <div>
+          <WhatsAppLink
+            href={whatsappLink}
+            section={sede.section}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-body text-sm font-semibold text-white transition duration-150 hover:opacity-90 active:scale-[0.97]"
+          >
+            <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp" />
+            {copy.whatsappButton}
+          </WhatsAppLink>
+          <p className="mt-1.5 text-center font-body text-xs text-muted">
+            {copy.clinicWhatsappNote} · {sede.telefonoDisplay}
+          </p>
+        </div>
 
         <a
           href={sede.mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-1.5 font-body text-sm font-semibold text-accent hover:underline"
+          className="inline-flex min-h-11 items-center justify-center gap-1.5 font-body text-sm font-semibold text-accent hover:underline"
         >
           <Navigation className="h-4 w-4 shrink-0" strokeWidth={1.75} />
           {copy.directionsLink}
@@ -94,15 +107,17 @@ export default function Locations({ locale }: { locale: Locale }) {
   return (
     <section className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
-        <Reveal>
-          <h2 className="text-center font-heading text-3xl font-bold text-primary">
-            {c.h2}
-          </h2>
-        </Reveal>
+        <h2 className="text-center font-heading text-3xl font-bold text-primary">
+          {c.h2}
+        </h2>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
+        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {SEDES.map((sede, i) => (
-            <Reveal key={sede.id} delay={i * 80} className="flex">
+            <Reveal
+              key={sede.id}
+              delay={i * 80}
+              className={`flex ${ORPHAN_SPAN}`}
+            >
               <SedeCard sede={sede} copy={copy} />
             </Reveal>
           ))}
@@ -111,7 +126,7 @@ export default function Locations({ locale }: { locale: Locale }) {
         <div className="mt-8 text-center">
           <Link
             href={routeFor("/contacto", locale)}
-            className="inline-flex font-body text-sm font-semibold text-accent hover:underline"
+            className="inline-flex min-h-11 items-center font-body text-sm font-semibold text-accent hover:underline"
           >
             {c.seeContact}
           </Link>

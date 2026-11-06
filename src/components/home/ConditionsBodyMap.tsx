@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Reveal from "@/components/ui/Reveal";
 import { BODY_PATH } from "@/components/home/BodyFigureSVG";
 import { CONDITIONS, type Condition, type ConditionSlug } from "@/lib/conditions";
 import type { Locale } from "@/lib/i18n/types";
@@ -90,6 +89,12 @@ export default function ConditionsBodyMap({
     const nodeR = isTorso ? 10 : 12;
     const haloR = isTorso ? 18 : 20;
     const fontSize = isTorso ? 11 : 13;
+    // Radio del área táctil invisible (unidades del viewBox). El torso se pinta
+    // a 190px de ancho (escala ~1.06) y la figura completa a ≥1.4x: con estos
+    // radios cada nodo ofrece ≥44px de toque aunque el punto se vea más
+    // pequeño. Tope: 21 = la mitad de la distancia cuello–dorsal (42), para que
+    // las áreas de nodos vecinos no se pisen.
+    const hitR = isTorso ? 21 : 18;
     const figureNodes = isTorso
       ? nodes.filter(
           (nd) =>
@@ -101,15 +106,17 @@ export default function ConditionsBodyMap({
       : nodes;
 
     return (
+      // role="group" y no "img": un img oculta a sus hijos al lector de
+      // pantalla, y los nodos son enlaces que deben poder anunciarse.
       <svg
         viewBox={viewBox}
         className="h-auto w-full"
-        role="img"
+        role="group"
         aria-label={cc.figureAria}
       >
         <path
           d={BODY_PATH}
-          fill="var(--color-accent, #1b6ca8)"
+          fill="var(--color-accent, #1a6299)"
           opacity="0.12"
         />
 
@@ -140,9 +147,11 @@ export default function ConditionsBodyMap({
                 transformBox: "fill-box",
                 transformOrigin: "center",
                 transform: isActive && !reduced ? "scale(1.12)" : "scale(1)",
-                transition: reduced ? undefined : "transform 150ms ease-out",
+                transition: reduced ? undefined : "transform 150ms var(--ease-out)",
               }}
             >
+              {/* Área táctil: transparente pero pintada, así recibe el toque. */}
+              <circle cx={node.cx} cy={node.cy} r={hitR} fill="transparent" />
               {painHalo && (
                 <circle
                   cx={node.cx}
@@ -157,10 +166,10 @@ export default function ConditionsBodyMap({
                 cx={node.cx}
                 cy={node.cy}
                 r={haloR}
-                fill="var(--color-accent, #1b6ca8)"
+                fill="var(--color-accent, #1a6299)"
                 style={{
                   opacity: isActive ? 0.25 : 0,
-                  transition: reduced ? undefined : "opacity 150ms ease-out",
+                  transition: reduced ? undefined : "opacity 150ms var(--ease-out)",
                 }}
               />
               <circle
@@ -203,9 +212,9 @@ export default function ConditionsBodyMap({
         onMouseLeave={() => setActive(null)}
         onFocus={() => setActive(c.node?.n ?? null)}
         onBlur={() => setActive(null)}
-        className={`group flex items-center gap-3 rounded-2xl border bg-background p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-md ${
+        className={`group flex items-center gap-3 rounded-2xl border bg-background p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-raised active:scale-[0.98] ${
           highlighted
-            ? "-translate-y-0.5 border-accent shadow-md"
+            ? "-translate-y-0.5 border-accent shadow-raised"
             : "border-ink/10"
         }`}
       >
@@ -222,7 +231,7 @@ export default function ConditionsBodyMap({
             {nombreOf(c.slug)}
           </span>
           {detalle && (
-            <span className="mt-0.5 font-body text-xs text-ink/50">
+            <span className="mt-0.5 font-body text-xs text-muted">
               {detalle}
             </span>
           )}
@@ -251,8 +260,8 @@ export default function ConditionsBodyMap({
         onMouseLeave={() => setActive(null)}
         onFocus={() => setActive(c.node?.n ?? null)}
         onBlur={() => setActive(null)}
-        className={`group flex min-h-[48px] items-center gap-3 rounded-2xl border bg-background px-[14px] py-[13px] transition duration-150 ease-out hover:border-accent hover:shadow-md ${
-          highlighted ? "border-accent shadow-md" : "border-ink/10"
+        className={`group flex min-h-[48px] items-center gap-3 rounded-2xl border bg-background px-[14px] py-[13px] transition duration-150 ease-out hover:border-accent hover:shadow-raised active:scale-[0.98] ${
+          highlighted ? "border-accent shadow-raised" : "border-ink/10"
         }`}
       >
         <span
@@ -266,7 +275,7 @@ export default function ConditionsBodyMap({
             {nombreOf(c.slug)}
           </span>
           {detalle && (
-            <span className="mt-0.5 font-body text-[12.5px] text-ink/60">
+            <span className="mt-0.5 font-body text-[12.5px] text-muted">
               {detalle}
             </span>
           )}
@@ -284,7 +293,7 @@ export default function ConditionsBodyMap({
   return (
     <section className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
-        <Reveal>
+        <div>
           <Heading className="font-heading text-[26px] font-bold text-primary text-center md:text-left md:text-4xl">
             {cc.h2}
           </Heading>
@@ -303,45 +312,50 @@ export default function ConditionsBodyMap({
             </Link>
             .
           </p>
-        </Reveal>
+        </div>
 
-        {/* ===== Desktop (≥ md): silueta completa + dos listas en columnas ===== */}
-        <div className="mt-10 hidden gap-8 md:grid md:grid-cols-[minmax(0,0.9fr)_1fr_1fr] md:gap-10">
+        {/* ===== Desktop (≥ md): silueta completa + dos listas =====
+            Tablet (md): figura + listas apiladas en la segunda columna; a tres
+            columnas las tarjetas quedaban en ~230px. lg+: tres columnas (el
+            contenedor de listas se disuelve con `lg:contents`). */}
+        <div className="mt-10 hidden gap-8 md:grid md:grid-cols-[minmax(0,0.8fr)_1fr] md:gap-10 lg:grid-cols-[minmax(0,0.9fr)_1fr_1fr]">
           {/* Silueta con nodos numerados (navegación, no decoración).
               Sin caja de fondo: la figura va directa sobre el fondo de sección. */}
           <div className="md:mx-0 md:w-full">{renderFigure("full")}</div>
 
-          {/* Columna */}
-          <div>
-            <h3 className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-ink/50">
-              {grupoLabel("columna")}
-            </h3>
-            <div className="mt-4 space-y-3">{columna.map(renderCard)}</div>
-          </div>
+          <div className="space-y-10 lg:contents lg:space-y-0">
+            {/* Columna */}
+            <div>
+              <h3 className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+                {grupoLabel("columna")}
+              </h3>
+              <div className="mt-4 space-y-3">{columna.map(renderCard)}</div>
+            </div>
 
-          {/* Ortopedia y traumatología */}
-          <div>
-            <h3 className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-ink/50">
-              {grupoLabel("ortopedia")}
-            </h3>
-            <div className="mt-4 space-y-3">
-              {ortopedia.map(renderCard)}
+            {/* Ortopedia y traumatología */}
+            <div>
+              <h3 className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+                {grupoLabel("ortopedia")}
+              </h3>
+              <div className="mt-4 space-y-3">
+                {ortopedia.map(renderCard)}
 
-              {/* Cierre: puerta a la evaluación para quien no se ubica. */}
-              <Link
-                href={evaluacionHref}
-                className="flex items-center gap-3 rounded-2xl border border-accent bg-primary-soft p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <span className="font-heading text-base font-semibold text-primary">
-                  {cc.ctaCard}
-                </span>
-                <span
-                  aria-hidden="true"
-                  className="ml-auto font-body text-accent"
+                {/* Cierre: puerta a la evaluación para quien no se ubica. */}
+                <Link
+                  href={evaluacionHref}
+                  className="flex items-center gap-3 rounded-2xl border border-accent bg-primary-soft p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:shadow-raised active:scale-[0.98]"
                 >
-                  →
-                </span>
-              </Link>
+                  <span className="font-heading text-base font-semibold text-primary">
+                    {cc.ctaCard}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="ml-auto font-body text-accent"
+                  >
+                    →
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -350,8 +364,8 @@ export default function ConditionsBodyMap({
         <div className="md:hidden">
           {/* Figura compacta + leyenda de zonas fuera del encuadre. */}
           <div className="mt-8 flex flex-col items-center">
-            <div className="w-[150px]">{renderFigure("torso")}</div>
-            <p className="mt-3 text-center font-body text-xs text-ink/55">
+            <div className="w-[190px]">{renderFigure("torso")}</div>
+            <p className="mt-3 text-center font-body text-xs text-muted">
               {cc.legendMobile}
             </p>
           </div>
@@ -379,7 +393,7 @@ export default function ConditionsBodyMap({
           {/* CTA punteado a ancho completo. */}
           <Link
             href={evaluacionHref}
-            className="mt-6 flex items-center justify-center rounded-xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft px-4 py-[15px] text-center font-body text-[14px] font-semibold text-accent transition duration-150 ease-out hover:border-accent"
+            className="mt-6 flex items-center justify-center rounded-xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft px-4 py-[15px] text-center font-body text-[14px] font-semibold text-accent transition duration-150 ease-out hover:border-accent active:scale-[0.98]"
           >
             {cc.ctaMobile}
           </Link>
