@@ -265,20 +265,21 @@ html[data-cta-bar] .wa-float {
     visibility 0s 200ms;
 }
 
-/* Popovers (idioma, compartir): nacen desde su botón con fade + escala leve.
-   @starting-style anima la entrada sin JS; si el navegador no lo soporta,
-   simplemente aparecen. */
+/* Popovers (menús de idioma y compartir, Base UI Menu): nacen desde su botón
+   con fade + escala leve y se van igual. El origen lo calcula la librería
+   según el lado en que quedó el menú (--transform-origin); la entrada y la
+   salida las marcan data-starting-style y data-ending-style. */
 .popover-in {
+  transform-origin: var(--transform-origin);
   transition:
     opacity 150ms var(--ease-out),
     scale 150ms var(--ease-out);
 }
 
-@starting-style {
-  .popover-in {
-    opacity: 0;
-    scale: 0.97;
-  }
+.popover-in[data-starting-style],
+.popover-in[data-ending-style] {
+  opacity: 0;
+  scale: 0.97;
 }
 
 /* Motor de evaluación: transiciones de entrada entre pantallas. --eval-dx la
@@ -474,19 +475,21 @@ html[data-cta-bar] .wa-float {
     transition: opacity 150ms ease !important;
   }
 
-  /* Menú lateral: sin deslizar; entra y sale con el fundido de .rm-fade. */
+  /* Menú lateral: sin deslizar; entra y sale con el fundido de .rm-fade
+     (Base UI marca la entrada y la salida con data-starting-style y
+     data-ending-style). */
   .drawer-panel {
     translate: none !important;
   }
 
-  .drawer-panel[data-open="false"] {
+  .drawer-panel[data-starting-style],
+  .drawer-panel[data-ending-style] {
     opacity: 0;
   }
 
-  @starting-style {
-    .popover-in {
-      scale: 1;
-    }
+  .popover-in[data-starting-style],
+  .popover-in[data-ending-style] {
+    scale: 1;
   }
 
   .wa-float {

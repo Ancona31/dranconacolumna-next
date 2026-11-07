@@ -10,6 +10,13 @@ import { trackEvent } from "@/lib/analytics";
 import type { Locale, UiStrings } from "@/lib/i18n/types";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+import { useLazyComponent } from "@/components/ui/useLazyComponent";
+
+// El panel del menú móvil (Base UI Dialog) se carga bajo demanda: la
+// hamburguesa se renderiza en el servidor y el panel se pide al primer gesto
+// sobre ella (hover, foco o toque), así la librería no pesa en la carga
+// inicial de cada página.
+const loadDrawer = () => import("@/components/layout/MobileDrawer");
 
 function Logo({
   alt,
@@ -61,16 +68,16 @@ export default function Header({
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
-  // Drawer: `mounted` = presente en el DOM; `entered` = en posición abierta.
-  // El cierre no desmonta de golpe: se dispara la salida y se desmonta al
-  // terminar la transición (onTransitionEnd) con fallback de setTimeout. Abrir
-  // durante la salida cancela ese fallback y la transición CSS retoma desde la
-  // posición actual (interrumpible).
-  const [mounted, setMounted] = useState(false);
-  const [entered, setEntered] = useState(false);
-  const unmountTimer = useRef<number | null>(null);
+  // Drawer: `open` lo controla el Header; el panel (MobileDrawer) se monta la
+  // primera vez que hace falta (`drawerWanted`) y ya no se desmonta, para que
+  // sus salidas sigan animándose. `instantClose` apaga la transición del
+  // cierre por cambio de ruta (ver abajo).
+  const [open, setOpen] = useState(false);
+  const [drawerWanted, setDrawerWanted] = useState(false);
+  const [instantClose, setInstantClose] = useState(false);
+  const [openedByKeyboard, setOpenedByKeyboard] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const drawerRef = useRef<HTMLDivElement>(null);
+  const [MobileDrawer, requestDrawer] = useLazyComponent(loadDrawer);
 
   const whatsappLink = buildWhatsAppLink(strings.whatsappDefaultMessage);
 
@@ -81,132 +88,60 @@ export default function Header({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // `fromKeyboard`: con teclado el foco va al primer enlace (con su anillo);
-  // al tocar va al panel mismo, que no dibuja anillo (en iPhone el foco
-  // programático tras un toque pintaba el anillo en el primer enlace).
-  const openDrawer = useCallback((fromKeyboard: boolean) => {
-    if (unmountTimer.current !== null) {
-      clearTimeout(unmountTimer.current);
-      unmountTimer.current = null;
+  const closeDrawer = useCallback(() => setOpen(false), []);
+
+  // Intención de abrir (hover, foco, toque): se pide el código del panel
+  // para que al hacer clic ya esté listo. Si el clic llega antes, el panel se
+  // abre en cuanto el código llega.
+  const prefetchDrawer = requestDrawer;
+
+  function toggleDrawer(e: React.MouseEvent<HTMLButtonElement>) {
+    if (open) {
+      closeDrawer();
+      return;
     }
-    setMounted(true);
-    // En el siguiente frame pasamos a "abierto" para que la entrada se anime
-    // desde la posición cerrada; si ya estaba montado (salida en curso), la
-    // transición se revierte desde donde va.
-    requestAnimationFrame(() => {
-      setEntered(true);
-      const target = fromKeyboard
-        ? drawerRef.current?.querySelector<HTMLElement>("a[href]")
-        : drawerRef.current;
-      target?.focus({ preventScroll: true });
-    });
-  }, []);
-
-  const closeDrawer = useCallback(() => {
-    setEntered(false);
-    toggleRef.current?.focus({ preventScroll: true });
-    // Fallback por si onTransitionEnd no dispara (algo más que la salida).
-    if (unmountTimer.current !== null) clearTimeout(unmountTimer.current);
-    unmountTimer.current = window.setTimeout(() => {
-      unmountTimer.current = null;
-      setMounted(false);
-    }, 250);
-  }, []);
-
-  useEffect(
-    () => () => {
-      if (unmountTimer.current !== null) clearTimeout(unmountTimer.current);
-    },
-    [],
-  );
+    // detail === 0: el clic lo generó Enter/Espacio, no un puntero.
+    setOpenedByKeyboard(e.detail === 0);
+    setInstantClose(false);
+    setDrawerWanted(true);
+    setOpen(true);
+    requestDrawer();
+  }
 
   // Cambio de ruta con el drawer aún abierto (Atrás/Adelante del navegador,
   // o una navegación que no pasó por sus enlaces): se cierra en el render
-  // mismo, sin animación, para que la página nueva no llegue tapada ni con el
-  // scroll bloqueado. Los enlaces del drawer ya cierran al tocarlos (entered
+  // mismo y sin animación, para que la página nueva no llegue tapada ni con
+  // el scroll bloqueado. Los enlaces del drawer ya cierran al tocarlos (open
   // pasa a false antes del cambio de ruta) y conservan su salida animada.
   const [lastPathname, setLastPathname] = useState(pathname);
   if (pathname !== lastPathname) {
     setLastPathname(pathname);
-    if (entered) {
-      setEntered(false);
-      setMounted(false);
+    if (open) {
+      setOpen(false);
+      setInstantClose(true);
     }
   }
 
   // Atrás del sistema con el menú abierto: se cierra ya (popstate llega
   // antes que el nuevo pathname), con su salida normal.
   useEffect(() => {
-    if (!entered) return;
+    if (!open) return;
     const onPopState = () => closeDrawer();
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
-  }, [entered, closeDrawer]);
+  }, [open, closeDrawer]);
 
-  // Bloquea el scroll mientras el drawer esté abierto. Va en <html> y <body>:
-  // iOS Safari ignora overflow:hidden si solo está en el body. No se fija el
-  // body con position:fixed porque el header sticky se iría con él. Depende
-  // de `entered` (no de `mounted`): se libera en cuanto empieza el cierre, así
-  // que una navegación nunca encuentra el scroll bloqueado.
+  // El drawer solo existe por debajo de lg: si la ventana crece hasta lg con
+  // él abierto, se cierra (si no, quedaría invisible con el scroll bloqueado).
   useEffect(() => {
-    if (!entered) return;
-    const html = document.documentElement.style;
-    const body = document.body.style;
-    const previous = { html: html.overflow, body: body.overflow };
-    html.overflow = "hidden";
-    body.overflow = "hidden";
-    return () => {
-      html.overflow = previous.html;
-      body.overflow = previous.body;
+    if (!open) return;
+    const wide = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => {
+      if (wide.matches) closeDrawer();
     };
-  }, [entered]);
-
-  // Con el drawer abierto: Escape cierra y Tab queda atrapado entre el botón
-  // de cerrar (en el header) y los enlaces del drawer.
-  useEffect(() => {
-    if (!entered) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        closeDrawer();
-        return;
-      }
-      if (e.key !== "Tab" || !drawerRef.current || !toggleRef.current) return;
-      const focusables = [
-        toggleRef.current,
-        ...drawerRef.current.querySelectorAll<HTMLElement>("a[href], button"),
-      ];
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      const active = document.activeElement;
-      // Abierto al tocar, el foco está en el panel: Tab entra a sus enlaces.
-      if (active === drawerRef.current) {
-        e.preventDefault();
-        (e.shiftKey ? last : (focusables[1] ?? first)).focus();
-        return;
-      }
-      if (e.shiftKey && active === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && active === last) {
-        e.preventDefault();
-        first.focus();
-      } else if (!focusables.includes(active as HTMLElement)) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [entered, closeDrawer]);
-
-  function toggleDrawer(e: React.MouseEvent<HTMLButtonElement>) {
-    if (entered) {
-      closeDrawer();
-    } else {
-      // detail === 0: el clic lo generó Enter/Espacio, no un puntero.
-      openDrawer(e.detail === 0);
-    }
-  }
+    wide.addEventListener("change", onChange);
+    return () => wide.removeEventListener("change", onChange);
+  }, [open, closeDrawer]);
 
   function isActive(href: string) {
     return href === "/"
@@ -271,27 +206,35 @@ export default function Header({
               fija (MobileActionBar) y en el drawer. */}
           <div className="flex shrink-0 items-center gap-1.5 min-[400px]:gap-2 lg:hidden">
             <LanguageSwitcher locale={locale} />
+            {/* La hamburguesa queda por encima del fondo del drawer (el header
+                va en z-[60]): con puntero también lo cierra. Con teclado y
+                lector de pantalla se cierra con Escape o con el botón
+                "Cerrar" del final del panel. */}
             <button
               ref={toggleRef}
               type="button"
               aria-label={
-                entered ? strings.header.closeMenu : strings.header.openMenu
+                open ? strings.header.closeMenu : strings.header.openMenu
               }
-              aria-expanded={entered}
+              aria-haspopup="dialog"
+              aria-expanded={open}
               onClick={toggleDrawer}
+              onPointerEnter={prefetchDrawer}
+              onPointerDown={prefetchDrawer}
+              onFocus={prefetchDrawer}
               className="relative flex h-11 w-11 items-center justify-center rounded-full border border-ink/15 text-ink transition-[transform,background-color,color,opacity] duration-150 ease-out active:scale-[0.97]"
             >
               {/* Ícono hamburguesa ⇄ X: rotación + fade cruzado */}
               <Menu
                 className={`absolute h-5 w-5 transition-[transform,opacity] duration-200 ${
-                  entered ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
+                  open ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
                 }`}
                 strokeWidth={1.5}
                 aria-hidden="true"
               />
               <X
                 className={`absolute h-5 w-5 transition-[transform,opacity] duration-200 ${
-                  entered ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"
+                  open ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"
                 }`}
                 strokeWidth={1.5}
                 aria-hidden="true"
@@ -301,78 +244,17 @@ export default function Header({
         </div>
       </header>
 
-      {/* Drawer móvil (bajo el header z-[60], que queda siempre accesible) */}
-      {mounted && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className={`rm-fade absolute inset-0 bg-ink/40 transition-opacity ease-drawer ${
-              entered ? "opacity-100 duration-300" : "opacity-0 duration-200"
-            }`}
-            onClick={closeDrawer}
-            aria-hidden="true"
-          />
-          <div
-            ref={drawerRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label={strings.header.menuLabel}
-            tabIndex={-1}
-            // Con reducir movimiento el panel no se desliza: se funde
-            // (.drawer-panel + .rm-fade en globals.css, guiado por data-open).
-            data-open={entered ? "true" : "false"}
-            onTransitionEnd={(e) => {
-              // Tailwind 4 desliza con `translate`; con reducir movimiento
-              // lo que termina es el fundido (`opacity`).
-              if (
-                e.target === e.currentTarget &&
-                ["translate", "transform", "opacity"].includes(
-                  e.propertyName,
-                ) &&
-                !entered
-              ) {
-                if (unmountTimer.current !== null) {
-                  clearTimeout(unmountTimer.current);
-                  unmountTimer.current = null;
-                }
-                setMounted(false);
-              }
-            }}
-            // Misma curva de iOS en ambos sentidos: entra en 300ms y sale en
-            // 200ms. ease-in en la salida hacía que el cierre se sintiera lento.
-            className={`drawer-panel rm-fade absolute right-0 top-0 flex h-full w-72 max-w-[80%] flex-col overflow-y-auto overscroll-contain bg-background pb-[env(safe-area-inset-bottom)] pr-[env(safe-area-inset-right)] pt-[4.5rem] shadow-overlay transition-transform ease-drawer ${
-              entered
-                ? "translate-x-0 duration-300"
-                : "translate-x-full duration-200"
-            }`}
-          >
-            <nav className="flex flex-col p-4">
-              {strings.nav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={closeDrawer}
-                  className="border-b border-ink/5 py-3 font-body text-base font-medium text-ink transition-colors duration-150 hover:text-accent"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => {
-                  trackEvent("whatsapp_click", { source_section: "header" });
-                  if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
-                  closeDrawer();
-                }}
-                className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-center text-sm font-semibold text-white transition-[transform,background-color,color,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
-              >
-                <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp" />
-                {strings.header.whatsappLabel}
-              </a>
-            </nav>
-          </div>
-        </div>
+      {drawerWanted && MobileDrawer && (
+        <MobileDrawer
+          open={open}
+          onOpenChange={setOpen}
+          instantClose={instantClose}
+          onCloseComplete={() => setInstantClose(false)}
+          openedByKeyboard={openedByKeyboard}
+          toggleRef={toggleRef}
+          strings={strings}
+          whatsappLink={whatsappLink}
+        />
       )}
     </>
   );

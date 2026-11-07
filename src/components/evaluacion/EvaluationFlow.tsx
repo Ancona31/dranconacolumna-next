@@ -8,7 +8,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { createPortal } from "react-dom";
+import { Dialog } from "@base-ui/react/dialog";
 import type { BodyZoneId } from "@/components/home/BodyFigureSVG";
 import { trackEvent } from "@/lib/analytics";
 import type { AnswerMap, TestDefinition } from "@/lib/evaluacion/types";
@@ -174,6 +174,19 @@ function timeLabel(test: TestDefinition, ui: EvaluationUi) {
 function questionNounCap(test: TestDefinition, ui: EvaluationUi) {
   const singular = test.questionNoun?.singular ?? ui.alarm.nounFallbackSingular;
   return singular.charAt(0).toUpperCase() + singular.slice(1);
+}
+
+/**
+ * h1 de la pantalla activa, preparado como destino de foco: nombra al diálogo
+ * (SCREEN_TITLE_ID) y acepta foco programático sin entrar al orden de Tab
+ * (tabIndex -1; globals.css le quita el anillo).
+ */
+function screenTitle(screen: HTMLElement | null): HTMLElement | null {
+  const h1 = screen?.querySelector("h1");
+  if (!h1) return null;
+  h1.id = SCREEN_TITLE_ID;
+  h1.tabIndex = -1;
+  return h1;
 }
 
 // Montado en el cliente (false en el servidor y durante la hidratación): el
@@ -395,40 +408,35 @@ export default function EvaluationFlow({
   const screenKey = `${state.trail.length}:${positionKey(top)}`;
   useEffect(() => {
     if (!overlay) return;
-    const h1 = screenRef.current?.querySelector("h1");
-    if (!h1) return;
-    h1.id = SCREEN_TITLE_ID;
-    h1.tabIndex = -1;
-    h1.focus({ preventScroll: true });
+    screenTitle(screenRef.current)?.focus({ preventScroll: true });
   }, [overlay, screenKey, mounted]);
 
-  // Mientras el flujo cubre la pantalla, la página de atrás no se desplaza.
-  // position: fixed (y no solo overflow: hidden) porque iOS Safari ignora el
-  // overflow del body; se restaura el scroll guardado al cerrar.
+  // El bloqueo del scroll de la página de atrás mientras el flujo la cubre lo
+  // hace el Dialog modal de Base UI (también en iOS). Lo que sí queda aquí es
+  // volver a la posición del selector al salir: mientras el diálogo está
+  // abierto el selector no se renderiza (la página se acorta y el navegador
+  // recorta el scroll), así que la posición se guarda al elegir la zona y se
+  // repone al cerrar. En un setTimeout, para correr después de que la
+  // librería libere su bloqueo. Con entrada directa no hay nada que reponer
+  // (salir vuelve a la página anterior).
+  const pickerScrollRef = useRef<number | null>(null);
   useEffect(() => {
     if (!overlay) return;
-    const { body } = document;
-    const scrollY = window.scrollY;
-    const prev = {
-      position: body.style.position,
-      top: body.style.top,
-      width: body.style.width,
-    };
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.width = "100%";
     return () => {
-      body.style.position = prev.position;
-      body.style.top = prev.top;
-      body.style.width = prev.width;
-      // instant: el scroll suave global animaría el regreso a la posición.
-      window.scrollTo({ top: scrollY, behavior: "instant" });
+      const top = pickerScrollRef.current;
+      pickerScrollRef.current = null;
+      if (top === null) return;
+      window.setTimeout(() => {
+        // instant: el scroll suave global animaría el regreso a la posición.
+        window.scrollTo({ top, behavior: "instant" });
+      }, 0);
     };
   }, [overlay]);
 
   function handleZoneSelect(zoneId: BodyZoneId) {
     if (!getTest(zoneId, locale)) return;
     trackEvent("evaluacion_iniciada", { zona: zoneId });
+    pickerScrollRef.current = window.scrollY;
     advance({
       ...PICKER_STATE,
       zone: zoneId,
@@ -553,13 +561,10 @@ export default function EvaluationFlow({
   }
 
   // El resto del flujo toma toda la pantalla para dar foco total.
-  const dialog = (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={SCREEN_TITLE_ID}
-      className="fixed inset-0 z-[70] flex flex-col overflow-y-auto overscroll-contain bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
-    >
+  const dialogClass =
+    "fixed inset-0 z-[70] flex flex-col overflow-y-auto overscroll-contain bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] outline-none";
+  const content = (
+    <>
       <div className="h-1 w-full shrink-0 bg-ink/10">
         <div
           className="h-full origin-left bg-accent transition-transform duration-200 ease-out"
@@ -620,12 +625,51 @@ export default function EvaluationFlow({
           <ResultScreen result={result} locale={locale} />
         )}
       </div>
-    </div>
+    </>
   );
 
-  // Portal al <body>: el diálogo fixed nunca queda dentro de un ancestro con
-  // transform/filter (que lo convertiría en su bloque contenedor y lo dejaría
-  // de 0 px de alto) ni bajo el contexto de apilamiento del header. Antes de
-  // hidratar (entrada directa renderizada en el servidor) va en sitio.
-  return mounted ? createPortal(dialog, document.body) : dialog;
+  // Antes de hidratar (entrada directa ?zona= renderizada en el servidor) el
+  // diálogo va en sitio, como HTML normal: el portal necesita document.body.
+  if (!mounted) {
+    return (
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={SCREEN_TITLE_ID}
+        className={dialogClass}
+      >
+        {content}
+      </div>
+    );
+  }
+
+  // Ya en el cliente: Dialog modal de Base UI en un portal al <body>, así el
+  // diálogo fixed nunca queda dentro de un ancestro con transform/filter (que
+  // lo convertiría en su bloque contenedor) ni bajo el contexto de
+  // apilamiento del header. La librería atrapa el foco, deja el resto de la
+  // página fuera del alcance de los lectores de pantalla y bloquea su scroll.
+  // Siempre abierto mientras haya flujo: salir es desmontarlo (handleExit o
+  // el Atrás que llega al selector). Escape equivale a "Salir" (con su
+  // confirmación si hay avance); no hay fuera que tocar.
+  return (
+    <Dialog.Root
+      open
+      disablePointerDismissal
+      onOpenChange={(next, details) => {
+        if (!next && details.reason === "escape-key") handleExit();
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Popup
+          aria-modal="true"
+          aria-labelledby={SCREEN_TITLE_ID}
+          initialFocus={() => screenTitle(screenRef.current) ?? true}
+          finalFocus={false}
+          className={dialogClass}
+        >
+          {content}
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
 }

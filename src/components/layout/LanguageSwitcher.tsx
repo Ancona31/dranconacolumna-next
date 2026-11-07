@@ -1,19 +1,13 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ComponentType,
-  type KeyboardEvent as ReactKeyboardEvent,
-} from "react";
-import Link from "next/link";
+import { useRef, useState, type ComponentType } from "react";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { Locale } from "@/lib/i18n/types";
 import { getAlternatePath } from "@/lib/i18n/slug-map";
 import FlagMX from "@/components/ui/FlagMX";
 import FlagUS from "@/components/ui/FlagUS";
+import { useLazyComponent } from "@/components/ui/useLazyComponent";
 
 type Option = {
   code: Locale;
@@ -34,6 +28,10 @@ const OPTIONS: Option[] = [
 const FLAG_CLASS =
   "h-[14px] w-[20px] shrink-0 rounded-[2px] ring-1 ring-black/10";
 
+// El desplegable (Base UI Menu) se carga bajo demanda: el botón se renderiza
+// en el servidor y el menú se pide al primer gesto sobre él.
+const loadMenu = () => import("@/components/layout/LanguageMenu");
+
 /**
  * Selector de idioma estilo desplegable (bandera + código en el botón; bandera
  * + nombre completo + check en las opciones). El idioma actual queda marcado;
@@ -44,66 +42,18 @@ const FLAG_CLASS =
 export default function LanguageSwitcher({ locale }: { locale: Locale }) {
   const pathname = usePathname() ?? (locale === "es" ? "/" : "/en");
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  // El menú se monta la primera vez que hace falta y ya no se desmonta (así
+  // su salida se anima).
+  const [wanted, setWanted] = useState(false);
+  const [openedByKeyboard, setOpenedByKeyboard] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  // Abierto con teclado (Enter/Espacio): el foco va a la primera opción. Con
-  // toque o clic va al panel, que no dibuja anillo (en iPhone el foco
-  // programático tras un toque lo pintaba sobre la opción).
-  const openedByKeyboard = useRef(false);
+  const [LanguageMenu, requestMenu] = useLazyComponent(loadMenu);
 
-  // Abierto: el foco pasa al menú; toque/clic fuera cierra
-  // (pointerdown cubre ratón y táctil) y Escape cierra devolviendo el foco al
-  // botón.
-  useEffect(() => {
-    if (!open) return;
-    const target = openedByKeyboard.current
-      ? menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')
-      : menuRef.current;
-    target?.focus({ preventScroll: true });
-    const onDown = (e: PointerEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node))
-        setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        triggerRef.current?.focus();
-      }
-    };
-    document.addEventListener("pointerdown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
-  // Navegación del menú con flechas, Inicio y Fin (patrón ARIA menu). Tab
-  // cierra y deja que el foco siga su curso.
-  function onMenuKeyDown(e: ReactKeyboardEvent<HTMLDivElement>) {
-    if (e.key === "Tab") {
-      setOpen(false);
-      return;
-    }
-    const items = Array.from(
-      menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
-    );
-    if (items.length === 0) return;
-    const index = items.indexOf(document.activeElement as HTMLElement);
-    const next =
-      e.key === "ArrowDown"
-        ? (index + 1) % items.length
-        : e.key === "ArrowUp"
-          ? (index - 1 + items.length) % items.length
-          : e.key === "Home"
-            ? 0
-            : e.key === "End"
-              ? items.length - 1
-              : null;
-    if (next === null) return;
-    e.preventDefault();
-    items[next].focus();
+  function show(byKeyboard: boolean) {
+    setOpenedByKeyboard(byKeyboard);
+    setWanted(true);
+    setOpen(true);
+    requestMenu();
   }
 
   const current = OPTIONS.find((o) => o.code === locale) ?? OPTIONS[0];
@@ -112,15 +62,26 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
     code === locale ? pathname : getAlternatePath(pathname, locale);
 
   return (
-    <div ref={ref} className="relative">
+    <>
       <button
         ref={triggerRef}
         type="button"
         onClick={(e) => {
-          // detail === 0: el clic lo generó el teclado, no un puntero.
-          openedByKeyboard.current = e.detail === 0;
-          setOpen((v) => !v);
+          // Con el menú abierto el fondo de la librería recibe el toque (y
+          // cierra); aquí solo llega la apertura. detail === 0: el clic lo
+          // generó el teclado, no un puntero.
+          if (!open) show(e.detail === 0);
         }}
+        onKeyDown={(e) => {
+          // Patrón ARIA menu button: flecha abajo/arriba también abre.
+          if (!open && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+            e.preventDefault();
+            show(true);
+          }
+        }}
+        onPointerEnter={requestMenu}
+        onPointerDown={requestMenu}
+        onFocus={requestMenu}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Idioma / Language: ${current.label}`}
@@ -140,45 +101,22 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
         />
       </button>
 
-      {open && (
-        <div
-          ref={menuRef}
-          role="menu"
-          aria-label="Idioma / Language"
-          tabIndex={-1}
-          onKeyDown={onMenuKeyDown}
-          className="popover-in absolute right-0 top-full z-[70] mt-2 min-w-[168px] origin-top-right overflow-hidden rounded-xl border border-ink/10 bg-background py-1 shadow-overlay"
-        >
-          {OPTIONS.map((o) => {
-            const active = o.code === locale;
-            return (
-              <Link
-                key={o.code}
-                href={hrefFor(o.code)}
-                hrefLang={o.code}
-                role="menuitem"
-                aria-current={active ? "true" : undefined}
-                onClick={() => setOpen(false)}
-                className={`flex min-h-[44px] items-center gap-2.5 px-3 font-body text-sm transition-colors ${
-                  active
-                    ? "bg-primary/5 font-semibold text-primary"
-                    : "text-ink hover:bg-ink/5"
-                }`}
-              >
-                <o.Flag className={FLAG_CLASS} />
-                <span className="flex-1">{o.label}</span>
-                {active && (
-                  <Check
-                    className="h-4 w-4 shrink-0 text-accent"
-                    strokeWidth={2.5}
-                    aria-hidden="true"
-                  />
-                )}
-              </Link>
-            );
-          })}
-        </div>
+      {wanted && LanguageMenu && (
+        <LanguageMenu
+          open={open}
+          onOpenChange={setOpen}
+          openedByKeyboard={openedByKeyboard}
+          anchorRef={triggerRef}
+          options={OPTIONS.map((o) => ({
+            code: o.code,
+            label: o.label,
+            href: hrefFor(o.code),
+            Flag: o.Flag,
+          }))}
+          current={locale}
+          flagClass={FLAG_CLASS}
+        />
       )}
-    </div>
+    </>
   );
 }
