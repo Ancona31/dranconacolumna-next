@@ -7,6 +7,24 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
   },
+  // Recursos pesados del esqueleto 3D y del hero (.glb, decodificador Draco,
+  // pósters y diapositivas): caché de un año sin revalidar, para que al volver
+  // atrás no se descarguen ni decodifiquen de nuevo. Se sirven desde /public
+  // (Next no les pone hash): si uno cambia, debe cambiar también su NOMBRE
+  // (p. ej. skeleton-high.v2.glb) o los visitantes seguirán con el viejo.
+  async headers() {
+    const immutable = [
+      {
+        key: "Cache-Control",
+        value: "public, max-age=31536000, immutable",
+      },
+    ];
+    return [
+      { source: "/models/:path*", headers: immutable },
+      { source: "/draco/:path*", headers: immutable },
+      { source: "/img/skeleton/:path*", headers: immutable },
+    ];
+  },
   async redirects() {
     return [
       {

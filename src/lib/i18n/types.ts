@@ -44,6 +44,18 @@ export interface UiStrings {
     privacyHref: string;
     /** Descargo médico. */
     disclaimer: string;
+    /**
+     * Crédito del modelo anatómico 3D (licencia CC BY-SA 2.1 JP). Se arma
+     * como: `{modelCreditLead} [modelCreditSource] {modelCreditModified},
+     * {modelCreditLicenseLead} [CC BY-SA 2.1 JP]`, con fuente y licencia
+     * enlazadas (la licencia exige enlazar su texto e indicar cambios).
+     */
+    modelCreditLead: string;
+    modelCreditSource: string;
+    modelCreditModified: string;
+    modelCreditLicenseLead: string;
+    /** Aviso para lectores de pantalla en enlaces que abren pestaña nueva. */
+    opensInNewTab: string;
   };
 
   mobileBar: {

@@ -51,9 +51,10 @@ export interface HomeContent {
     groupOrtho: string;
     ctaCard: string;
     ctaMobile: string;
-    legendMobile: string;
-    figureAria: string;
-    zoneAriaBefore: string;
+    /** Botón de pausa del escenario 3D (WCAG 2.2.2): nombre fijo + aria-pressed. */
+    pause3d: string;
+    /** Tooltip del mismo botón cuando está en pausa. */
+    resume3d: string;
     items: Record<ConditionSlug, ConditionCopy>;
   };
   about: { text: string; cta: string; imageAlt: string };
@@ -164,9 +165,8 @@ const HOME_ES: HomeContent = {
     groupOrtho: "Ortopedia y traumatología",
     ctaCard: "¿No encuentras tu dolor? Haz la evaluación gratuita",
     ctaMobile: "¿No encuentras tu dolor? Haz la evaluación gratuita →",
-    legendMobile: "8 = Rodilla · ± = varias zonas",
-    figureAria: "Silueta del cuerpo con las zonas de cada padecimiento",
-    zoneAriaBefore: "Ir a padecimientos de esta zona",
+    pause3d: "Pausar la animación del esqueleto",
+    resume3d: "Reanudar la animación del esqueleto",
     items: {
       "hernia-de-disco": { nombre: "Hernia de disco" },
       ciatica: { nombre: "Ciática", detalle: "dolor que baja a la pierna" },
@@ -322,9 +322,8 @@ const HOME_EN: HomeContent = {
     // ctaMobile = variante móvil de ancho completo, con la flecha en el texto.
     ctaCard: "Don't see your condition? Take the free assessment",
     ctaMobile: "Don't see your condition? Take the free assessment →",
-    legendMobile: "8 = Knee · ± = multiple areas",
-    figureAria: "Body silhouette showing the area of each condition",
-    zoneAriaBefore: "Go to conditions for this area",
+    pause3d: "Pause the skeleton animation",
+    resume3d: "Resume the skeleton animation",
     items: {
       "hernia-de-disco": { nombre: "Herniated disc" },
       ciatica: { nombre: "Sciatica", detalle: "pain that shoots down your leg" },

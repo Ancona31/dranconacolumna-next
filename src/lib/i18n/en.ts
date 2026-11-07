@@ -32,6 +32,11 @@ export const en: UiStrings = {
     privacyHref: "/aviso-de-privacidad",
     disclaimer:
       "The evaluations on this site are for guidance only and do not replace a medical consultation.",
+    modelCreditLead: "3D anatomical model:",
+    modelCreditSource: "BodyParts3D © DBCLS",
+    modelCreditModified: "(modified)",
+    modelCreditLicenseLead: "licensed",
+    opensInNewTab: "(opens in a new tab)",
   },
   mobileBar: {
     evaluationCta: "Start my evaluation",

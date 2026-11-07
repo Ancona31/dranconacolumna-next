@@ -1,5 +1,4 @@
-import Link from "next/link";
-import BodyFigureSVG from "@/components/home/BodyFigureSVG";
+import HeroSkeletonArt from "@/components/home/HeroSkeletonArt";
 import ButtonLink from "@/components/ui/Button";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { WHATSAPP_DEFAULT_MESSAGE } from "@/lib/nav";
@@ -18,7 +17,8 @@ export default function HeroBodyMap({ locale }: { locale: Locale }) {
 
   return (
     <section className="bg-primary-soft">
-      <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-12 md:grid-cols-2 md:py-20">
+      {/* Zona segura en horizontal (muesca): alineado con el header. */}
+      <div className="mx-auto grid max-w-6xl items-center gap-8 py-12 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] md:grid-cols-2 md:py-20">
         {/* Texto. Entra con animación solo CSS (load-enter): es lo primero que
             se ve y no debe esperar a que React hidrate para hacerse visible. */}
         <div className="load-enter order-1 text-center md:text-left">
@@ -48,25 +48,17 @@ export default function HeroBodyMap({ locale }: { locale: Locale }) {
           </WhatsAppLink>
         </div>
 
-        {/* Figura (autocontenida: puntos y halos los dibuja el SVG). Sin chip:
-            en la home nadie ha elegido zona todavía. */}
+        {/* Diapositivas de rayos X (sin marco, bordes desvanecidos). Sigue
+            siendo el enlace a la evaluación, con la misma etiqueta. */}
         <div
           className="load-enter order-2 flex justify-center"
           style={{ "--load-delay": "120ms" } as React.CSSProperties}
         >
-          <Link
+          <HeroSkeletonArt
             href={evaluacionHref}
-            aria-label={c.figureAria}
-            className="relative block w-[82%] max-w-[382px] md:w-full md:max-w-[491px]"
-          >
-            {/* El <Link> ya aporta el nombre accesible; la silueta va decorativa
-                (aria-hidden) para no duplicar la etiqueta. */}
-            <BodyFigureSVG
-              mode="ambient"
-              decorative
-              className="h-auto w-full text-primary"
-            />
-          </Link>
+            ariaLabel={c.figureAria}
+            locale={locale}
+          />
         </div>
       </div>
     </section>

@@ -25,6 +25,11 @@ export const es: UiStrings = {
     privacyHref: "/aviso-de-privacidad",
     disclaimer:
       "Las evaluaciones de este sitio son orientativas y no sustituyen una consulta médica.",
+    modelCreditLead: "Modelo anatómico 3D:",
+    modelCreditSource: "BodyParts3D © DBCLS",
+    modelCreditModified: "(modificado)",
+    modelCreditLicenseLead: "licencia",
+    opensInNewTab: "(se abre en una pestaña nueva)",
   },
   mobileBar: {
     evaluationCta: "Hacer mi evaluación",

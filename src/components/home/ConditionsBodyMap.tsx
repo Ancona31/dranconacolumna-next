@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { BODY_PATH } from "@/components/home/BodyFigureSVG";
+import Skeleton3D from "@/components/skeleton3d/Skeleton3D";
 import { CONDITIONS, type Condition, type ConditionSlug } from "@/lib/conditions";
 import type { Locale } from "@/lib/i18n/types";
 import { getHomeContent } from "@/lib/i18n/pages/home";
 import { routeFor } from "@/lib/i18n/slug-map";
+import { CONDITION_SCENARIOS, IDLE_TOUR, REST_POSTER } from "@/lib/skeleton3d/scenarios";
+import { useMediaQuery } from "@/components/home/conditions3d/useMediaQuery";
+import { useScrollSpy } from "@/components/home/conditions3d/useScrollSpy";
+import { useHeaderHeight } from "@/components/home/conditions3d/useHeaderHeight";
 
 type ConditionsBodyMapProps = {
   locale: Locale;
@@ -15,64 +18,80 @@ type ConditionsBodyMapProps = {
   headingAs?: "h1" | "h2";
 };
 
-// Un nodo dibujado en la silueta: el número, su posición y el primer
-// padecimiento de esa zona (destino al hacer clic en el punto).
-type MapNode = {
-  n: string;
-  cx: number;
-  cy: number;
-  slug: ConditionSlug;
-  nombre: string;
-};
+/**
+ * Modo hover de PC (plan §5): ancho de PC Y puntero con hover. Un iPad en
+ * horizontal (≥1024 px, táctil) usa el layout de PC pero activa por
+ * scroll-spy, como la tablet.
+ */
+const HOVER_MQ = "(min-width: 1024px) and (hover: hover)";
+/** Arrastrar para girar solo con mouse/trackpad (D6). */
+const FINE_POINTER_MQ = "(hover: hover) and (pointer: fine)";
+/**
+ * Pantalla baja (celular en horizontal, PC con zoom al 200 %) por debajo
+ * del layout de PC: el escenario deja de ser fijo y no hay scroll-spy (no
+ * quedaría espacio para leer la lista). Debe coincidir con las clases
+ * `max-lg:[@media(max-height:600px)]:…` de abajo.
+ */
+const LOW_MQ = "(max-width: 1023px) and (max-height: 600px)";
+/** Al salir de una tarjeta se espera un instante: pasar a la vecina no regresa al reposo. */
+const LEAVE_DELAY = 140;
+/**
+ * Intención de hover (PC): al pasar de una tarjeta activa a otra se espera
+ * 70 ms, así cruzar la lista con el mouse no dispara escenarios intermedios.
+ * Desde el reposo y con el foco de teclado la respuesta es inmediata.
+ */
+const HOVER_INTENT = 70;
 
-// Encuadre de la figura. "full" (desktop) muestra el cuerpo entero; "torso"
-// (móvil) recorta a cabeza-torso-cadera para una figura compacta.
-type FigureCrop = "full" | "torso";
-// Límites del recorte torso: solo se dibujan los nodos que caen dentro (1-6).
-const TORSO_BOUNDS = { minX: 20, maxX: 200, minY: 10, maxY: 330 };
+/** Fondo "escenario" azul tinta (D1-A): solo detrás del modelo. */
+const STAGE_BG = "radial-gradient(120% 90% at 50% 40%, var(--color-primary) 0%, #06243a 75%)";
+
+const noopSubscribe = () => () => {};
 
 export default function ConditionsBodyMap({
   locale,
   headingAs = "h2",
 }: ConditionsBodyMapProps) {
   const cc = getHomeContent(locale).conditions;
-  const router = useRouter();
-  const [active, setActive] = useState<string | null>(null);
-  const [reduced, setReduced] = useState(false);
+  const [active, setActive] = useState<ConditionSlug | null>(null);
+  // Pausa del 3D (WCAG 2.2.2): detiene recorrido, giro y latidos.
+  const [paused, setPaused] = useState(false);
+  const hoverMode = useMediaQuery(HOVER_MQ);
+  const finePointer = useMediaQuery(FINE_POINTER_MQ);
+  const lowScreen = useMediaQuery(LOW_MQ);
+  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const listsRef = useRef<HTMLDivElement>(null);
+  const timer = useRef<number | undefined>(undefined);
+  const headerH = useHeaderHeight();
 
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReduced(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
+  const activate = useCallback((slug: ConditionSlug, delay = 0) => {
+    window.clearTimeout(timer.current);
+    if (delay > 0) timer.current = window.setTimeout(() => setActive(slug), delay);
+    else setActive(slug);
   }, []);
+  const deactivate = useCallback(() => {
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setActive(null), LEAVE_DELAY);
+  }, []);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
 
-  const nombreOf = (slug: Condition["slug"]) => cc.items[slug].nombre;
-  const detalleOf = (slug: Condition["slug"]) => cc.items[slug].detalle;
-  const hrefOf = (slug: Condition["slug"]) =>
-    routeFor(`/padecimientos/${slug}`, locale);
+  // Tablet, celular y PC táctil (D4-A): la tarjeta más cercana al centro del
+  // área visible junto al escenario fijo activa su animación. Tocar navega.
+  useScrollSpy({
+    // `hydrated`: en el primer render (hidratación) las media queries aún
+    // traen el valor del servidor; sin esta guarda el spy se activaba un
+    // instante en PC, contaba como interacción y cancelaba el recorrido.
+    enabled: hydrated && !hoverMode && !lowScreen,
+    stageRef,
+    listRef: listsRef,
+    layoutKey: headerH,
+    onChange: (slug) => (slug ? activate(slug) : deactivate()),
+  });
+
+  const nombreOf = (slug: ConditionSlug) => cc.items[slug].nombre;
+  const detalleOf = (slug: ConditionSlug) => cc.items[slug].detalle;
+  const hrefOf = (slug: ConditionSlug) => routeFor(`/padecimientos/${slug}`, locale);
   const evaluacionHref = routeFor("/evaluacion", locale);
-
-  // Un nodo por número, en el orden de aparición; su destino es el primer
-  // padecimiento que lo usa. (Sin useMemo manual: el React Compiler lo
-  // optimiza y la memoización manual con dependencia `cc` no se preservaba.)
-  const nodes: MapNode[] = [];
-  {
-    const seen = new Set<string>();
-    for (const c of CONDITIONS) {
-      if (c.node && !seen.has(c.node.n)) {
-        seen.add(c.node.n);
-        nodes.push({
-          n: c.node.n,
-          cx: c.node.cx,
-          cy: c.node.cy,
-          slug: c.slug,
-          nombre: cc.items[c.slug].nombre,
-        });
-      }
-    }
-  }
 
   const columna = CONDITIONS.filter((c) => c.grupo === "columna");
   const ortopedia = CONDITIONS.filter((c) => c.grupo === "ortopedia");
@@ -80,221 +99,140 @@ export default function ConditionsBodyMap({
     id === "columna" ? cc.groupSpine : cc.groupOrtho;
 
   const Heading = headingAs;
+  // Bajo un h1 (índice /padecimientos) las etiquetas de grupo son h2.
+  const GroupHeading = headingAs === "h1" ? "h2" : "h3";
 
-  // Silueta compartida entre desktop ("full") y móvil ("torso"): mismo path y
-  // misma lógica de nodos; solo cambian viewBox, tamaños y qué nodos entran.
-  const renderFigure = (crop: FigureCrop) => {
-    const isTorso = crop === "torso";
-    const viewBox = isTorso ? "20 10 180 320" : "0 0 220 540";
-    const nodeR = isTorso ? 10 : 12;
-    const haloR = isTorso ? 18 : 20;
-    const fontSize = isTorso ? 11 : 13;
-    // Radio del área táctil invisible (unidades del viewBox). El torso se pinta
-    // a 190px de ancho (escala ~1.06) y la figura completa a ≥1.4x: con estos
-    // radios cada nodo ofrece ≥44px de toque aunque el punto se vea más
-    // pequeño. Tope: 21 = la mitad de la distancia cuello–dorsal (42), para que
-    // las áreas de nodos vecinos no se pisen.
-    const hitR = isTorso ? 21 : 18;
-    const figureNodes = isTorso
-      ? nodes.filter(
-          (nd) =>
-            nd.cx >= TORSO_BOUNDS.minX &&
-            nd.cx <= TORSO_BOUNDS.maxX &&
-            nd.cy >= TORSO_BOUNDS.minY &&
-            nd.cy <= TORSO_BOUNDS.maxY
-        )
-      : nodes;
+  // Eventos de tarjeta: hover solo en modo PC (en táctil el toque navega);
+  // el foco de teclado activa en cualquier ancho y le gana al scroll-spy.
+  const cardEvents = (slug: ConditionSlug) => ({
+    "data-condition": slug,
+    onMouseEnter: hoverMode
+      ? () => activate(slug, active !== null && active !== slug ? HOVER_INTENT : 0)
+      : undefined,
+    onMouseLeave: hoverMode ? deactivate : undefined,
+    onFocus: () => activate(slug),
+    onBlur: deactivate,
+  });
 
-    return (
-      // role="group" y no "img": un img oculta a sus hijos al lector de
-      // pantalla, y los nodos son enlaces que deben poder anunciarse.
-      <svg
-        viewBox={viewBox}
-        className="h-auto w-full"
-        role="group"
-        aria-label={cc.figureAria}
-      >
-        <path
-          d={BODY_PATH}
-          fill="var(--color-accent, #1a6299)"
-          opacity="0.12"
-        />
+  // Indicador de la tarjeta: punto tenue que se enciende en rojo de dolor
+  // (el mismo del 3D) mientras corre su animación.
+  const renderDot = (on: boolean, size: "md" | "sm") => (
+    <span
+      aria-hidden="true"
+      className={`flex flex-none items-center justify-center ${size === "md" ? "h-8 w-8" : "h-6 w-6"}`}
+    >
+      <span
+        className={`block rounded-full transition-[transform,box-shadow,background-color] duration-200 ease-out motion-reduce:transition-none ${
+          size === "md" ? "h-2.5 w-2.5" : "h-2 w-2"
+        } ${on ? "scale-125 bg-pain ring-4 ring-pain/20" : "bg-accent/30"}`}
+      />
+    </span>
+  );
 
-        {figureNodes.map((node) => {
-          const isActive = node.n === active;
-          const go = () => router.push(hrefOf(node.slug));
-          // En el torso, la zona lumbar (3) conserva su halo de dolor estático.
-          const painHalo = isTorso && node.n === "3";
-          return (
-            <g
-              key={node.n}
-              role="link"
-              tabIndex={0}
-              aria-label={`${cc.zoneAriaBefore} (${node.nombre})`}
-              onMouseEnter={() => setActive(node.n)}
-              onMouseLeave={() => setActive(null)}
-              onFocus={() => setActive(node.n)}
-              onBlur={() => setActive(null)}
-              onClick={go}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  go();
-                }
-              }}
-              className="cursor-pointer"
-              style={{
-                transformBox: "fill-box",
-                transformOrigin: "center",
-                transform: isActive && !reduced ? "scale(1.12)" : "scale(1)",
-                transition: reduced ? undefined : "transform 150ms var(--ease-out)",
-              }}
-            >
-              {/* Área táctil: transparente pero pintada, así recibe el toque. */}
-              <circle cx={node.cx} cy={node.cy} r={hitR} fill="transparent" />
-              {painHalo && (
-                <circle
-                  cx={node.cx}
-                  cy={node.cy}
-                  r={haloR}
-                  fill="var(--color-pain, #d64541)"
-                  opacity="0.25"
-                />
-              )}
-              {/* Halo de resalte: aparece en hover/focus del nodo o de su(s) card(s). */}
-              <circle
-                cx={node.cx}
-                cy={node.cy}
-                r={haloR}
-                fill="var(--color-accent, #1a6299)"
-                style={{
-                  opacity: isActive ? 0.25 : 0,
-                  transition: reduced ? undefined : "opacity 150ms var(--ease-out)",
-                }}
-              />
-              <circle
-                cx={node.cx}
-                cy={node.cy}
-                r={nodeR}
-                fill="var(--color-primary, #0b3c5d)"
-                stroke="var(--color-background, #fbfbf9)"
-                strokeWidth="2"
-              />
-              <text
-                x={node.cx}
-                y={node.cy}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fontFamily="inherit"
-                fontSize={fontSize}
-                fontWeight="700"
-                fill="var(--color-background, #fbfbf9)"
-              >
-                {node.n}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-    );
-  };
-
-  // Card desktop.
-  const renderCard = (c: Condition) => {
-    const highlighted = c.node ? c.node.n === active : false;
-    const simbolo = c.node ? c.node.n : "±";
+  // Texto de la tarjeta: `min-w-0` deja que la columna se encoja con texto
+  // grande o zoom de iOS (si no, la flecha se sale de la tarjeta).
+  const renderText = (c: Condition, mobile: boolean) => {
     const detalle = detalleOf(c.slug);
     return (
-      <Link
-        key={c.slug}
-        href={hrefOf(c.slug)}
-        onMouseEnter={() => setActive(c.node?.n ?? null)}
-        onMouseLeave={() => setActive(null)}
-        onFocus={() => setActive(c.node?.n ?? null)}
-        onBlur={() => setActive(null)}
-        className={`group flex items-center gap-3 rounded-2xl border bg-background p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-raised active:scale-[0.98] ${
-          highlighted
-            ? "-translate-y-0.5 border-accent shadow-raised"
-            : "border-ink/10"
-        }`}
-      >
+      <span className="flex min-w-0 flex-col">
         <span
-          aria-hidden="true"
-          className={`flex h-8 w-8 flex-none items-center justify-center rounded-full font-heading text-sm font-bold ${
-            c.node ? "bg-primary text-white" : "bg-primary-soft text-primary"
+          className={`font-heading font-semibold text-ink hyphens-auto [overflow-wrap:anywhere] ${
+            mobile ? "text-[15px]" : "text-base"
           }`}
         >
-          {simbolo}
+          {nombreOf(c.slug)}
         </span>
-        <span className="flex flex-col">
-          <span className="font-heading text-base font-semibold text-ink">
-            {nombreOf(c.slug)}
+        {detalle && (
+          <span
+            className={`mt-0.5 font-body text-muted hyphens-auto [overflow-wrap:anywhere] ${
+              mobile ? "text-[12.5px]" : "text-xs"
+            }`}
+          >
+            <span className="sr-only">, </span>
+            {detalle}
           </span>
-          {detalle && (
-            <span className="mt-0.5 font-body text-xs text-muted">
-              {detalle}
-            </span>
-          )}
-        </span>
-        <span
-          aria-hidden="true"
-          className="ml-auto font-body text-accent transition-transform duration-150 group-hover:translate-x-0.5"
-        >
-          →
-        </span>
-      </Link>
+        )}
+      </span>
     );
   };
 
-  // Card móvil: compacta, hit-target de 48px, chip por grupo (primary/accent).
-  const renderMobileCard = (c: Condition) => {
-    const highlighted = c.node ? c.node.n === active : false;
-    const simbolo = c.node ? c.node.n : "±";
-    const chipBg = c.grupo === "columna" ? "bg-primary" : "bg-accent";
-    const detalle = detalleOf(c.slug);
+  const arrow = (
+    <span
+      aria-hidden="true"
+      className="ml-auto shrink-0 font-body text-accent transition-transform duration-150 group-hover:translate-x-0.5"
+    >
+      →
+    </span>
+  );
+
+  // Margen de scroll (WCAG 2.4.11): al llegar con Tab, la tarjeta se coloca
+  // en el hueco visible entre el escenario fijo y la barra móvil, no debajo
+  // de ellos. Las variables se definen en la <section> por breakpoint.
+  const cardScroll = "scroll-mt-[var(--card-smt)] scroll-mb-[var(--card-smb)]";
+
+  // Card desktop / tablet.
+  const renderCard = (c: Condition) => {
+    const highlighted = c.slug === active;
     return (
-      <Link
-        key={c.slug}
-        href={hrefOf(c.slug)}
-        onMouseEnter={() => setActive(c.node?.n ?? null)}
-        onMouseLeave={() => setActive(null)}
-        onFocus={() => setActive(c.node?.n ?? null)}
-        onBlur={() => setActive(null)}
-        className={`group flex min-h-[48px] items-center gap-3 rounded-2xl border bg-background px-[14px] py-[13px] transition duration-150 ease-out hover:border-accent hover:shadow-raised active:scale-[0.98] ${
-          highlighted ? "border-accent shadow-raised" : "border-ink/10"
-        }`}
-      >
-        <span
-          aria-hidden="true"
-          className={`flex h-6 w-6 flex-none items-center justify-center rounded-full font-heading text-[12px] font-bold text-white ${chipBg}`}
+      <li key={c.slug}>
+        <Link
+          href={hrefOf(c.slug)}
+          {...cardEvents(c.slug)}
+          className={`group flex min-h-[76px] items-center gap-3 rounded-2xl border bg-background p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-raised active:scale-[0.98] ${cardScroll} ${
+            highlighted
+              ? "-translate-y-0.5 border-accent shadow-raised"
+              : "border-ink/10"
+          }`}
         >
-          {simbolo}
-        </span>
-        <span className="flex flex-col">
-          <span className="font-heading text-[15px] font-semibold text-ink">
-            {nombreOf(c.slug)}
-          </span>
-          {detalle && (
-            <span className="mt-0.5 font-body text-[12.5px] text-muted">
-              {detalle}
-            </span>
-          )}
-        </span>
-        <span
-          aria-hidden="true"
-          className="ml-auto font-body text-accent transition-transform duration-150 group-hover:translate-x-0.5"
-        >
-          →
-        </span>
-      </Link>
+          {renderDot(highlighted, "md")}
+          {renderText(c, false)}
+          {arrow}
+        </Link>
+      </li>
     );
   };
+
+  // Card móvil: compacta, hit-target de 48px.
+  const renderMobileCard = (c: Condition) => {
+    const highlighted = c.slug === active;
+    return (
+      <li key={c.slug}>
+        <Link
+          href={hrefOf(c.slug)}
+          {...cardEvents(c.slug)}
+          className={`group flex min-h-[48px] items-center gap-3 rounded-2xl border bg-background px-[14px] py-[13px] transition duration-150 ease-out hover:border-accent hover:shadow-raised active:scale-[0.98] ${cardScroll} ${
+            highlighted ? "border-accent shadow-raised" : "border-ink/10"
+          }`}
+        >
+          {renderDot(highlighted, "sm")}
+          {renderText(c, true)}
+          {arrow}
+        </Link>
+      </li>
+    );
+  };
+
+  // `tracking-…!`: globals.css cierra el tracking de todo h2 (sin capa, le
+  // gana a la utilidad); en /padecimientos estas etiquetas son h2.
+  const groupLabelClass =
+    "font-body text-xs font-semibold uppercase tracking-[0.2em]! text-muted";
 
   return (
-    <section className="bg-background">
+    <section
+      // data-conditions-section: el WhatsApp flotante se oculta mientras
+      // esta sección está en pantalla (taparía tarjetas y escenario).
+      data-conditions-section
+      // --stage-top: alto en vivo del header (el escenario se pega justo
+      // debajo). --card-smt / --card-smb: margen de scroll de las tarjetas =
+      // lo que tapa el escenario fijo (pt-2 + alto + pb-3 + degradado) y la
+      // barra móvil. En PC el escenario va al lado: solo el header. En
+      // pantalla baja el escenario no es fijo.
+      style={{ "--stage-top": `${headerH}px` } as CSSProperties}
+      className="bg-background [--card-smb:calc(5rem+env(safe-area-inset-bottom))] [--card-smt:calc(var(--stage-top)+max(45svh,240px)+3rem)] md:[--card-smb:0.75rem] md:[--card-smt:calc(var(--stage-top)+clamp(240px,46svh,560px)+3rem)] lg:[--card-smt:calc(var(--stage-top)+1rem)] max-lg:[@media(max-height:600px)]:[--card-smt:calc(var(--stage-top)+0.75rem)]"
+    >
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <div>
-          <Heading className="font-heading text-[26px] font-bold text-primary text-center md:text-left md:text-4xl">
+          <Heading className="font-heading text-3xl font-bold text-primary text-center md:text-left">
             {cc.h2}
           </Heading>
           {/* Subtítulo móvil: corto y centrado. */}
@@ -314,89 +252,125 @@ export default function ConditionsBodyMap({
           </p>
         </div>
 
-        {/* ===== Desktop (≥ md): silueta completa + dos listas =====
-            Tablet (md): figura + listas apiladas en la segunda columna; a tres
-            columnas las tarjetas quedaban en ~230px. lg+: tres columnas (el
-            contenedor de listas se disuelve con `lg:contents`). */}
-        <div className="mt-10 hidden gap-8 md:grid md:grid-cols-[minmax(0,0.8fr)_1fr] md:gap-10 lg:grid-cols-[minmax(0,0.9fr)_1fr_1fr]">
-          {/* Silueta con nodos numerados (navegación, no decoración).
-              Sin caja de fondo: la figura va directa sobre el fondo de sección. */}
-          <div className="md:mx-0 md:w-full">{renderFigure("full")}</div>
-
-          <div className="space-y-10 lg:contents lg:space-y-0">
-            {/* Columna */}
-            <div>
-              <h3 className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-                {grupoLabel("columna")}
-              </h3>
-              <div className="mt-4 space-y-3">{columna.map(renderCard)}</div>
+        {/* ===== Esqueleto 3D + listas =====
+            PC (lg+): tres columnas, el 3D fijo a la izquierda mientras pasan
+            las listas. Tablet y celular: el 3D queda fijo arriba (bajo el
+            header) y las listas pasan por debajo. Pantalla baja (< lg y
+            ≤ 600 px de alto): el 3D va en el flujo normal, sin fijarse. Un
+            solo lienzo WebGL para todos los anchos. */}
+        <div className="mt-8 md:mt-10 lg:grid lg:grid-cols-[minmax(0,0.9fr)_1fr_1fr] xl:grid-cols-[minmax(0,1.1fr)_1fr_1fr] lg:items-start lg:gap-8">
+          {/* "Tapete" del color de la sección: tapa las tarjetas que pasan
+              por debajo del escenario fijo, incluidas sus esquinas. El
+              degradado de 20 px (::after) las desvanece en vez de cortarlas
+              a cuchillo. */}
+          <div
+            ref={stageRef}
+            className="sticky top-[var(--stage-top)] z-10 -mx-4 bg-background px-4 pt-2 pb-3 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-5 after:bg-gradient-to-b after:from-background after:to-transparent md:mx-0 md:px-0 lg:top-[calc(var(--stage-top)+1.5rem)] lg:pt-0 lg:pb-0 lg:after:hidden max-lg:[@media(max-height:600px)]:static max-lg:[@media(max-height:600px)]:after:hidden"
+          >
+            <div
+              className="relative h-[45svh] min-h-[240px] overflow-hidden rounded-3xl shadow-card after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:ring-1 after:ring-inset after:ring-white/5 md:h-[46svh] md:max-h-[560px] lg:h-[min(76vh,680px)] lg:max-h-none max-lg:[@media(max-height:600px)]:h-[70svh] max-lg:[@media(max-height:600px)]:min-h-[200px]"
+              style={{ background: STAGE_BG }}
+            >
+              <Skeleton3D
+                scenario={active ? CONDITION_SCENARIOS[active] : null}
+                idleTour={IDLE_TOUR}
+                interactive={hoverMode && finePointer}
+                posterSrc={REST_POSTER}
+                // En el índice la sección es el h1: el póster es el LCP.
+                posterPriority={headingAs === "h1" ? "high" : "low"}
+                paused={paused}
+              />
+              {/* Pausa (WCAG 2.2.2), hermano del lienzo (que va con
+                  aria-hidden). Siempre visible, 44 px, anillo de foco blanco
+                  sobre el azul. Con "reducir movimiento" no hay nada que
+                  pausar: se oculta ya desde el HTML del servidor. */}
+              <button
+                type="button"
+                onClick={() => setPaused((p) => !p)}
+                aria-label={cc.pause3d}
+                aria-pressed={paused}
+                title={paused ? cc.resume3d : cc.pause3d}
+                className="focus-ring-light absolute bottom-3 right-3 z-10 inline-flex size-11 items-center justify-center rounded-full bg-white/90 text-primary shadow-card ring-1 ring-white/40 transition-[background-color,transform] duration-150 ease-out hover:bg-white active:scale-95 aria-pressed:bg-white motion-reduce:hidden"
+              >
+                {paused ? (
+                  <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 translate-x-px" fill="currentColor">
+                    <path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.2-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" />
+                  </svg>
+                ) : (
+                  <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="currentColor">
+                    <rect x="3.5" y="2.5" width="3" height="11" rx="0.8" />
+                    <rect x="9.5" y="2.5" width="3" height="11" rx="0.8" />
+                  </svg>
+                )}
+              </button>
             </div>
+          </div>
 
-            {/* Ortopedia y traumatología */}
-            <div>
-              <h3 className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-                {grupoLabel("ortopedia")}
-              </h3>
-              <div className="mt-4 space-y-3">
-                {ortopedia.map(renderCard)}
+          <div ref={listsRef} className="contents">
+            {/* ===== PC y tablet (≥ md): dos listas =====
+                En tablet van apiladas en una sola columna: el scroll-spy
+                necesita una tarjeta por altura (dos columnas cruzarían la
+                línea a la vez). En PC cada lista es una columna del grid. */}
+            <div className="mt-6 hidden gap-10 md:grid md:grid-cols-1 lg:contents">
+              {/* Columna */}
+              <div>
+                <GroupHeading className={groupLabelClass}>{grupoLabel("columna")}</GroupHeading>
+                <ul role="list" className="mt-4 space-y-3">
+                  {columna.map(renderCard)}
+                </ul>
+              </div>
 
-                {/* Cierre: puerta a la evaluación para quien no se ubica. */}
+              {/* Ortopedia y traumatología */}
+              <div>
+                <GroupHeading className={groupLabelClass}>{grupoLabel("ortopedia")}</GroupHeading>
+                <ul role="list" className="mt-4 space-y-3">
+                  {ortopedia.map(renderCard)}
+                </ul>
+
+                {/* Cierre: puerta a la evaluación para quien no se ubica.
+                    Punteado como en celular: el borde accent sólido queda
+                    para la tarjeta activa. */}
                 <Link
                   href={evaluacionHref}
-                  className="flex items-center gap-3 rounded-2xl border border-accent bg-primary-soft p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:shadow-raised active:scale-[0.98]"
+                  className={`mt-3 flex items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-raised active:scale-[0.98] ${cardScroll}`}
                 >
-                  <span className="font-heading text-base font-semibold text-primary">
+                  <span className="min-w-0 font-heading text-base font-semibold text-primary">
                     {cc.ctaCard}
                   </span>
-                  <span
-                    aria-hidden="true"
-                    className="ml-auto font-body text-accent"
-                  >
+                  <span aria-hidden="true" className="ml-auto shrink-0 font-body text-accent">
                     →
                   </span>
                 </Link>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* ===== Móvil (< md): una columna apilada, figura recortada al torso ===== */}
-        <div className="md:hidden">
-          {/* Figura compacta + leyenda de zonas fuera del encuadre. */}
-          <div className="mt-8 flex flex-col items-center">
-            <div className="w-[190px]">{renderFigure("torso")}</div>
-            <p className="mt-3 text-center font-body text-xs text-muted">
-              {cc.legendMobile}
-            </p>
-          </div>
+            {/* ===== Celular (< md): una columna apilada ===== */}
+            <div className="md:hidden">
+              {/* Columna */}
+              <div className="mt-5">
+                <GroupHeading className={groupLabelClass}>{grupoLabel("columna")}</GroupHeading>
+                <ul role="list" className="mt-3 flex flex-col gap-2">
+                  {columna.map(renderMobileCard)}
+                </ul>
+              </div>
 
-          {/* Columna */}
-          <div className="mt-8">
-            <h3 className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              {grupoLabel("columna")}
-            </h3>
-            <div className="mt-3 flex flex-col gap-2">
-              {columna.map(renderMobileCard)}
+              {/* Ortopedia y traumatología */}
+              <div className="mt-8">
+                <GroupHeading className={groupLabelClass}>{grupoLabel("ortopedia")}</GroupHeading>
+                <ul role="list" className="mt-3 flex flex-col gap-2">
+                  {ortopedia.map(renderMobileCard)}
+                </ul>
+              </div>
+
+              {/* CTA punteado a ancho completo. */}
+              <Link
+                href={evaluacionHref}
+                className={`mt-6 flex items-center justify-center rounded-2xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft px-4 py-[15px] text-center font-body text-[14px] font-semibold text-accent transition duration-150 ease-out hover:border-accent active:scale-[0.98] ${cardScroll}`}
+              >
+                {cc.ctaMobile}
+              </Link>
             </div>
           </div>
-
-          {/* Ortopedia y traumatología */}
-          <div className="mt-8">
-            <h3 className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              {grupoLabel("ortopedia")}
-            </h3>
-            <div className="mt-3 flex flex-col gap-2">
-              {ortopedia.map(renderMobileCard)}
-            </div>
-          </div>
-
-          {/* CTA punteado a ancho completo. */}
-          <Link
-            href={evaluacionHref}
-            className="mt-6 flex items-center justify-center rounded-xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft px-4 py-[15px] text-center font-body text-[14px] font-semibold text-accent transition duration-150 ease-out hover:border-accent active:scale-[0.98]"
-          >
-            {cc.ctaMobile}
-          </Link>
         </div>
       </div>
     </section>
