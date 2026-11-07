@@ -7,7 +7,7 @@ import type { Skeleton3DProps } from "./types";
 import type { SkeletonEngine } from "./engine";
 
 /**
- * Esqueleto 3D en rayos X (plan §3.2). Decorativo: el canvas va con
+ * Esqueleto 3D en rayos X "en tinta" sobre fondo claro (plan §3.2). Decorativo: el canvas va con
  * aria-hidden y no toma foco; la navegación sigue en la lista de enlaces.
  *
  * Carga diferida: three.js, el .glb y el decodificador Draco se descargan en
@@ -17,8 +17,10 @@ import type { SkeletonEngine } from "./engine";
  * doble esqueleto). Sin WebGL, con error de carga, con quality="static" o si
  * se pierde el contexto WebGL se queda la imagen fija.
  *
- * El componente ocupa el 100 % de su contenedor: el tamaño y el fondo
- * ("escenario" azul tinta, D1-A) los pone quien lo usa.
+ * El componente ocupa el 100 % de su contenedor y es transparente: va
+ * directo sobre el fondo de la página (sin escenario oscuro). El tamaño lo
+ * pone quien lo usa; el borde del lienzo y de la imagen se desvanece
+ * (EDGE_MASK) para que un encuadre cercano no deje ver el rectángulo.
  */
 
 type Status = "idle" | "loading" | "ready" | "static";
@@ -173,6 +175,7 @@ export default function Skeleton3D({
         ref={stageRef}
         className="rm-fade absolute inset-0 transition-opacity ease-out"
         style={{
+          ...EDGE_STYLE,
           opacity: ready ? 1 : 0,
           transitionDuration: `${ready ? IN_MS : OUT_MS}ms`,
           transitionDelay: `${ready ? IN_DELAY_MS : 0}ms`,
@@ -183,13 +186,15 @@ export default function Skeleton3D({
 }
 
 /**
- * Bordes desvanecidos: varias imágenes traen hueso o piel hasta el borde y,
- * como el escenario cambia de proporción, sin esto se ve el rectángulo. Es
- * lineal en los 4 lados (no radial) para no apagar el cráneo ni los pies.
+ * Bordes desvanecidos: sobre el fondo claro no hay caja que contenga al
+ * esqueleto, así que un hueso cortado a cuchillo en el borde dejaría ver el
+ * rectángulo (encuadres cercanos, imágenes que traen hueso o piel hasta el
+ * borde). Solo es alfa: funciona igual sobre cualquier fondo. Es lineal en
+ * los 4 lados (no radial) para no apagar el cráneo ni los pies.
  */
 const EDGE_MASK =
-  "linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent), linear-gradient(to right, transparent, #000 6%, #000 94%, transparent)";
-const POSTER_STYLE: CSSProperties = {
+  "linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)";
+const EDGE_STYLE: CSSProperties = {
   maskImage: EDGE_MASK,
   WebkitMaskImage: EDGE_MASK,
   maskComposite: "intersect",
@@ -289,7 +294,7 @@ function PosterLayer({
           decoding="async"
           draggable={false}
           className={POSTER_CLASS}
-          style={POSTER_STYLE}
+          style={EDGE_STYLE}
         />
       )}
       {layers.cur && (
@@ -307,7 +312,7 @@ function PosterLayer({
           decoding="async"
           draggable={false}
           className={POSTER_CLASS}
-          style={POSTER_STYLE}
+          style={EDGE_STYLE}
           onLoad={(e) => onCurLoad(e.currentTarget, layers.cur as string)}
           onError={() => markFailed(layers.cur as string)}
         />

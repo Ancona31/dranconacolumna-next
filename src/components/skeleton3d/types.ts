@@ -166,7 +166,7 @@ export type Effect =
 
 /**
  * Tono del resalte. "pain" (defecto) = rojo de dolor con latido; "calm" =
- * azul claro suave, sin alarma (recorrido guiado de reposo: "esto también lo
+ * azul tinta de marca, más denso que el hueso y sin alarma (recorrido guiado de reposo: "esto también lo
  * atiendo").
  */
 export type Tone = "pain" | "calm";

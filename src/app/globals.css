@@ -14,7 +14,7 @@
   --color-success: #2e7d5b; /* severidad leve · 4.8:1 */
   --color-warning: #9a5b0e; /* severidad moderada · 5.2:1 */
   --color-danger: #b23b30; /* severidad severa · 5.7:1 */
-  --color-pain: #d64541; /* nodo de dolor del mapa corporal (gráfico, no texto) */
+  --color-pain: #c0392b; /* dolor: mismo rojo clínico que el 3D (gráfico, no texto) */
   /* WhatsApp: los botones van en primary y solo el ícono lleva el verde, para
      que el sitio tenga un único color dominante. --color-whatsapp sobre
      primary da 5.8:1; sobre fondos claros se usa whatsapp-strong (5.0:1). */

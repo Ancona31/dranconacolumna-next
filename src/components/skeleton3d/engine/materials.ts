@@ -1,7 +1,7 @@
 import {
-  AdditiveBlending,
   Color,
   DoubleSide,
+  NormalBlending,
   ShaderMaterial,
   Vector2,
   Vector4,
@@ -9,22 +9,30 @@ import {
 } from "three";
 
 /**
- * Material "rayos X" (el de la demo aprobada `demo_L4_dolor.html`): el brillo
- * depende del ángulo entre la superficie y la cámara (fresnel). Bordes que
- * brillan, interior translúcido, mezcla aditiva sin escribir profundidad.
- * El dolor mezcla hacia #ff5236 y late; nunca se vuelve rojo sólido.
+ * Material "rayos X en tinta" sobre fondo claro (decisión del dueño, demo
+ * aprobada `draft/comparativa/index.html`, FRAG_LIGHT): la opacidad depende
+ * del ángulo entre la superficie y la cámara (fresnel). Borde nítido en azul
+ * de marca, interior casi transparente, mezcla normal sin escribir
+ * profundidad: el lienzo va directo sobre el fondo de la página, sin
+ * escenario oscuro. El dolor mezcla hacia el rojo clínico #c0392b y late;
+ * nunca se vuelve rojo sólido.
  */
 
 export const COLORS = {
-  bone: "#9cc7e4",
-  // Discos: un poco más claros y cálidos que el hueso.
-  disc: "#d6e4e6",
-  skin: "#8fbadb",
-  tube: "#c2e2f7",
-  pain: "#ff5236",
-  flow: "#ffc6b3",
-  // Resalte "calm" del recorrido guiado: azul claro, más vivo que el hueso.
-  calm: "#a8d4f2",
+  // Hueso: azul acento de marca.
+  bone: "#1a6299",
+  // Discos: azul más claro que el hueso.
+  disc: "#5b9bd0",
+  // Piel fantasma: gris azulado muy tenue.
+  skin: "#7f9bb3",
+  // Nervios y canal: solo se ven con su escenario, ya en el color del dolor.
+  tube: "#c0392b",
+  pain: "#c0392b",
+  // Pulso que viaja por el nervio: rojo más profundo (en blanco, "más tinta").
+  flow: "#8e1d12",
+  // Resalte "calm" del recorrido guiado: azul tinta de marca, más denso que
+  // el hueso. Sereno y claramente distinto del rojo de dolor.
+  calm: "#0b3c5d",
 } as const;
 
 /** Uniforms compartidos por todos los materiales (un solo objeto por motor). */
@@ -116,20 +124,20 @@ const XRAY_FRAG = /* glsl */ `
     vec3 col = mix(uBase, uPainColor, pain);
     // Tono "calm": el latido casi se aplana (resalte sereno, no alarma).
     float pulse = mix(uPulse, 0.6, uTone * 0.75);
-    // Con dolor, el interior también se enciende y late (igual que la demo).
-    float core = pain * (0.05 + 0.09 * pulse) * (1.0 - rim);
-    float a = rim * (0.9 + 0.5 * pain * pulse) + 0.05 + core;
-    // "Calm" no late fuerte: para que se lea como resalte, gana brillo propio.
-    a *= 1.0 + 0.9 * pain * uTone;
-    // Destello breve (fractura): blanco cálido, sin saturar a sólido.
-    col = mix(col, vec3(1.0, 0.93, 0.88), uFlash * 0.55);
-    a += uFlash * (0.25 + 0.45 * rim);
+    // Con dolor, el interior también se tiñe y late (igual que la demo). En
+    // "calm" casi no: el azul tinta relleno se vería gris pesado en blanco.
+    float core = pain * (0.10 + 0.12 * pulse) * (1.0 - rim) * (1.0 - 0.7 * uTone);
+    float a = rim * (0.7 + 0.35 * pain * pulse) + 0.02 + core;
+    // "Calm" no late fuerte: para que se lea como resalte, el borde gana algo de tinta.
+    a *= 1.0 + 0.25 * pain * uTone;
+    // Destello breve (fractura): el rojo se oscurece y gana opacidad un instante.
+    col = mix(col, vec3(0.32, 0.03, 0.02), uFlash * 0.5);
+    a += uFlash * (0.2 + 0.4 * rim);
     float g = uGain * uMaster;
     #ifdef USE_FADE
       g *= vFade;
     #endif
-    a *= g;
-    gl_FragColor = vec4(col * a, a);
+    gl_FragColor = vec4(col, clamp(a * g, 0.0, 1.0));
   }
 `;
 
@@ -176,22 +184,27 @@ const TUBE_FRAG = /* glsl */ `
     float pulse = exp(-(d * d) / max(w * w, 1e-5));
     float glow = uFlow * pulse + uBreathe;
     vec3 col = mix(mix(uBase, uPainColor, uPain), uFlowColor, clamp(glow, 0.0, 1.0) * 0.85);
-    float a = uVisible * (rim * 0.75 + 0.12) + glow * (0.55 + 0.45 * rim);
-    a *= uMaster;
-    gl_FragColor = vec4(col * a, a);
+    // Sobre fondo claro el interior va casi vacío: el canal (tubo ancho) no
+    // debe volverse una franja roja sólida; el pulso sí gana tinta.
+    float a = uVisible * (rim * 0.75 + 0.05) + glow * (0.4 + 0.45 * rim);
+    gl_FragColor = vec4(col, clamp(a * uMaster, 0.0, 1.0));
   }
 `;
 
 const KIND_STYLE: Record<PartKind, { color: string; gain: number; rimPow: number }> = {
-  bone: { color: COLORS.bone, gain: 1, rimPow: 2.2 },
-  disc: { color: COLORS.disc, gain: 0.95, rimPow: 2.0 },
-  // Piel: fantasma, mucho más tenue que el hueso y con borde más suave.
-  skin: { color: COLORS.skin, gain: 0.2, rimPow: 2.6 },
+  bone: { color: COLORS.bone, gain: 0.85, rimPow: 2.4 },
+  disc: { color: COLORS.disc, gain: 0.75, rimPow: 2.4 },
+  // Piel: fantasma, mucho más tenue que el hueso (× el atenuado por vértice).
+  skin: { color: COLORS.skin, gain: 0.16, rimPow: 2.4 },
   tube: { color: COLORS.tube, gain: 1, rimPow: 1.6 },
 };
 
-export function createPartUniforms(shared: SharedUniforms, kind: PartKind): PartUniforms {
+/** Costillas y cráneo: mucha superficie encimada; más tenues para no empastar. */
+const LIGHT_BONE_RE = /^(ribs|skull)$/;
+
+export function createPartUniforms(shared: SharedUniforms, kind: PartKind, names: readonly string[] = []): PartUniforms {
   const st = KIND_STYLE[kind];
+  const gain = kind === "bone" && names.some((n) => LIGHT_BONE_RE.test(n)) ? 0.6 : st.gain;
   return {
     // Los compartidos se pasan por referencia: un solo cambio llega a todos.
     uPulse: shared.uPulse,
@@ -199,7 +212,7 @@ export function createPartUniforms(shared: SharedUniforms, kind: PartKind): Part
     uBase: { value: new Color(st.color) },
     uPainColor: { value: new Color(COLORS.pain) },
     uTone: { value: 0 },
-    uGain: { value: st.gain },
+    uGain: { value: gain },
     uRimPow: { value: st.rimPow },
     uPain: { value: 0 },
     uFlash: { value: 0 },
@@ -230,6 +243,6 @@ export function createPartMaterial(kind: PartKind, uniforms: PartUniforms, withF
     transparent: true,
     depthWrite: false,
     side: DoubleSide,
-    blending: AdditiveBlending,
+    blending: NormalBlending,
   });
 }

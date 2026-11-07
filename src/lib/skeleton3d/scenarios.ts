@@ -314,7 +314,7 @@ export const CONDITION_SCENARIOS = Object.fromEntries(
 
 // ── Recorrido guiado de reposo (plan §3.2) ──────────────────────────────
 // Cervicales → hombro → mano → lumbar → rodilla → tobillo (derechos) →
-// tobillo y rodilla izquierdos → vista general. Resalte "calm" (azul claro),
+// tobillo y rodilla izquierdos → vista general. Resalte "calm" (azul tinta),
 // viaje de ~1.5 s con curva suave y cámara quieta en cada parada.
 // Decisión D1 del dueño: el recorrido completo, con ambas piernas, UNA sola
 // vuelta por visita (`loop: false`) y después la vista general quieta. Sin

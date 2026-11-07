@@ -129,10 +129,13 @@ function makePart(mesh: Mesh, names: string[], kind: PartKind, shared: SharedUni
   if (kind !== "tube" && geo.getAttribute("uv")) geo.deleteAttribute("uv");
   if (geo.getAttribute("color")) geo.deleteAttribute("color");
 
-  const u = createPartUniforms(shared, kind);
+  const u = createPartUniforms(shared, kind, names);
   const old = mesh.material;
   (Array.isArray(old) ? old : [old]).forEach((m) => m?.dispose());
   mesh.material = createPartMaterial(kind, u, kind === "skin");
+  // Mezcla normal sin profundidad: la piel va primero y el hueso se dibuja
+  // encima (si no, la piel lo "lava" según el orden de profundidad).
+  mesh.renderOrder = kind === "skin" ? 0 : 1;
   if (kind === "tube") mesh.visible = false;
 
   mesh.updateMatrix();
@@ -174,7 +177,7 @@ function readFlowOffset(mesh: Mesh): number {
   return 0;
 }
 
-/** Recorre la escena del .glb y convierte cada malla en una pieza rayos X. */
+/** Recorre la escena del .glb y convierte cada malla en una pieza de rayos X en tinta. */
 export function buildParts(root: Object3D, shared: SharedUniforms): Part[] {
   root.updateMatrixWorld(true);
   const meshes: Mesh[] = [];

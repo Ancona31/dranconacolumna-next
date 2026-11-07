@@ -10,7 +10,7 @@ import { COLORS, createSharedUniforms } from "./materials";
 import { buildParts, buildTube, type Part } from "./parts";
 
 /**
- * Motor del esqueleto rayos X. Se carga con import() dinámico desde
+ * Motor del esqueleto rayos X (en tinta, sobre fondo claro). Se carga con import() dinámico desde
  * Skeleton3D, así three.js nunca entra al bundle inicial.
  *
  * Render bajo demanda: el ciclo solo corre mientras hay algo que mover

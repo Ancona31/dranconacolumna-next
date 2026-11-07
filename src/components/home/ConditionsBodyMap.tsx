@@ -44,9 +44,6 @@ const LEAVE_DELAY = 140;
  */
 const HOVER_INTENT = 70;
 
-/** Fondo "escenario" azul tinta (D1-A): solo detrás del modelo. */
-const STAGE_BG = "radial-gradient(120% 90% at 50% 40%, var(--color-primary) 0%, #06243a 75%)";
-
 const noopSubscribe = () => () => {};
 
 export default function ConditionsBodyMap({
@@ -301,10 +298,10 @@ export default function ConditionsBodyMap({
               ref={stageRef}
               className="sticky top-[var(--stage-top)] z-10 -mx-4 bg-background px-4 pt-2 pb-3 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-5 after:bg-gradient-to-b after:from-background after:to-transparent md:mx-0 md:px-0 lg:top-[calc(var(--stage-top)+1.5rem)] lg:pt-0 lg:pb-0 lg:after:hidden max-lg:[@media(max-height:600px)]:static max-lg:[@media(max-height:600px)]:after:hidden"
             >
-              <div
-                className="relative h-[45svh] min-h-[240px] overflow-hidden rounded-3xl shadow-card after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:ring-1 after:ring-inset after:ring-white/5 md:h-[46svh] md:max-h-[560px] lg:h-[min(76vh,680px)] lg:max-h-none max-lg:[@media(max-height:600px)]:h-[70svh] max-lg:[@media(max-height:600px)]:min-h-[200px]"
-                style={{ background: STAGE_BG }}
-              >
+              {/* Sin escenario propio (decisión del dueño): el esqueleto en tinta
+                  va directo sobre el fondo de la sección, como el slideshow del
+                  hero. Nada de caja, sombra ni borde. */}
+              <div className="relative h-[45svh] min-h-[240px] overflow-hidden md:h-[46svh] md:max-h-[560px] lg:h-[min(76vh,680px)] lg:max-h-none max-lg:[@media(max-height:600px)]:h-[70svh] max-lg:[@media(max-height:600px)]:min-h-[200px]">
                 <Skeleton3D
                   scenario={active ? CONDITION_SCENARIOS[active] : null}
                   idleTour={IDLE_TOUR}
@@ -315,16 +312,17 @@ export default function ConditionsBodyMap({
                   paused={paused}
                 />
                 {/* Pausa (WCAG 2.2.2), hermano del lienzo (que va con
-                    aria-hidden). Siempre visible, 44 px, anillo de foco blanco
-                    sobre el azul. Con "reducir movimiento" no hay nada que
-                    pausar: se oculta ya desde el HTML del servidor. */}
+                    aria-hidden). Siempre visible, 44 px, sobre fondo claro con
+                    el anillo de foco accent de siempre. Con "reducir
+                    movimiento" no hay nada que pausar: se oculta ya desde el
+                    HTML del servidor. */}
                 <button
                   type="button"
                   onClick={() => setPaused((p) => !p)}
                   aria-label={cc.pause3d}
                   aria-pressed={paused}
                   title={paused ? cc.resume3d : cc.pause3d}
-                  className="focus-ring-light absolute bottom-3 right-3 z-10 inline-flex size-11 items-center justify-center rounded-full bg-white/90 text-primary shadow-card ring-1 ring-white/40 transition-[background-color,transform] duration-150 ease-out hover:bg-white active:scale-95 aria-pressed:bg-white motion-reduce:hidden"
+                  className="absolute bottom-3 right-3 z-10 inline-flex size-11 items-center justify-center rounded-full border border-ink/10 bg-white/90 text-primary transition-[background-color,border-color,transform] duration-150 ease-out hover:border-accent/40 hover:bg-white active:scale-95 aria-pressed:border-accent/40 aria-pressed:bg-white motion-reduce:hidden"
                 >
                   {paused ? (
                     <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 translate-x-px" fill="currentColor">
