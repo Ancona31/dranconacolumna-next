@@ -5,6 +5,7 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 import type { Locale } from "@/lib/i18n/types";
 import { getHomeContent } from "@/lib/i18n/pages/home";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+import { buttonClasses } from "@/components/ui/Button";
 
 /**
  * Aseguradoras con las que se trabaja. Logos en public/images/aseguradoras/.
@@ -39,10 +40,10 @@ export default function InsuranceBar({ locale }: { locale: Locale }) {
     <section className="border-t border-ink/10 bg-primary-soft">
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <div className="text-center">
-          <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+          <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
             {c.eyebrow}
           </p>
-          <h2 className="mt-2 font-heading text-4xl font-extrabold text-primary">
+          <h2 className="mt-2 font-heading text-3xl font-bold text-primary">
             {c.h2}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl font-body text-ink/70">
@@ -82,7 +83,13 @@ export default function InsuranceBar({ locale }: { locale: Locale }) {
           <WhatsAppLink
             href={whatsappLink}
             section="aseguradoras"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-center font-body text-sm font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+            // Texto largo: en celular baja a text-sm para quedar en dos
+            // renglones (a 16 px eran tres).
+            className={buttonClasses({
+              variant: "whatsapp",
+              size: "lg",
+              className: "max-sm:text-sm",
+            })}
           >
             <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
             {c.waCta}

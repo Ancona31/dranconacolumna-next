@@ -14,6 +14,7 @@ import { waMessage } from "@/lib/i18n";
 import { getContactContent } from "@/lib/i18n/pages/contact";
 import { getSedesCopy } from "@/lib/i18n/content/sedes";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+import { buttonClasses } from "@/components/ui/Button";
 
 /**
  * Grafo JSON-LD para SEO local: el médico y sus consultorios, construido
@@ -110,8 +111,8 @@ export default function ContactBody({ locale }: { locale: Locale }) {
 
       {/* Hero de página */}
       <section className="bg-primary-soft">
-        <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <div className="load-enter">
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
+          <div className="load-enter max-w-3xl">
             <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
               {c.hero.eyebrow}
             </p>
@@ -125,7 +126,7 @@ export default function ContactBody({ locale }: { locale: Locale }) {
 
       {/* CTA WhatsApp principal */}
       <section className="bg-background">
-        <div className="mx-auto max-w-3xl px-4 pt-14 md:pt-20">
+        <div className="mx-auto max-w-6xl px-4 pt-14 md:pt-20">
           <div
             className="load-enter"
             style={{ "--load-delay": "120ms" } as React.CSSProperties}
@@ -136,7 +137,11 @@ export default function ContactBody({ locale }: { locale: Locale }) {
                 section="ubicaciones"
                 // flex-wrap + max-w-full: con zoom de texto al 200 % el ícono baja
                 // de renglón en vez de sacar el botón de la pantalla.
-                className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full bg-primary px-5 py-4 text-center font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97] sm:px-7"
+                className={buttonClasses({
+                  variant: "whatsapp",
+                  size: "lg",
+                  className: "max-w-full flex-wrap",
+                })}
               >
                 <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
                 {c.cta.button}
@@ -149,7 +154,7 @@ export default function ContactBody({ locale }: { locale: Locale }) {
 
       {/* Grid de sedes */}
       <section className="bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-14 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {SEDES.map((sede) => (
               <Reveal

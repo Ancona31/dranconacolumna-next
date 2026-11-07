@@ -1,7 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { AlertTriangle, Check, Plus } from "lucide-react";
-import ButtonLink from "@/components/ui/Button";
+import ButtonLink, {
+  buttonClasses,
+  PAIRED_CTA_WIDTH,
+} from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import HeroZoneFigure from "@/components/padecimientos/HeroZoneFigure";
 import StickyCtaBar from "@/components/padecimientos/StickyCtaBar";
@@ -137,7 +140,7 @@ export default function ConditionTemplate({
                     </span>
                   )}
                   {p.statChip && (
-                    <span className="inline-flex items-center rounded-full bg-[#EAF4EF] px-3 py-1 font-body text-xs font-semibold text-success">
+                    <span className="inline-flex items-center rounded-full bg-success/10 px-3 py-1 font-body text-xs font-semibold text-success">
                       {p.statChip}
                     </span>
                   )}
@@ -190,49 +193,51 @@ export default function ConditionTemplate({
           páginas de una sola patología renderizan idéntico. */}
       {p.patologias && p.patologias.length > 0 && (
         <section className="bg-background">
-          <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-            <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
-              {ui.causesEyebrow}
-            </p>
-            <h2 className="break-words mt-2 font-heading text-3xl font-bold text-primary">
-              {ui.causesH2}
-            </h2>
+          <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
+            <div className="max-w-3xl">
+              <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
+                {ui.causesEyebrow}
+              </p>
+              <h2 className="break-words mt-2 font-heading text-3xl font-bold text-primary">
+                {ui.causesH2}
+              </h2>
 
-            <div className="mt-8 space-y-6">
-              {/* Sin Reveal: es texto clínico, se muestra de inmediato. */}
-              {p.patologias.map((pat) => (
-                <article key={pat.nombre} className="rounded-xl border border-primary/10 bg-primary-soft p-6 md:p-8">
-                  <h3 className="break-words font-heading text-xl font-bold text-primary">
-                    {pat.nombre}
-                  </h3>
-                  <div className="mt-5 space-y-5">
-                    <div>
-                      <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                        {ui.pathoWhatLabel}
-                      </p>
-                      <p className="mt-1.5 font-body text-ink/75">
-                        {pat.queEs}
-                      </p>
+              <div className="mt-8 space-y-6">
+                {/* Sin Reveal: es texto clínico, se muestra de inmediato. */}
+                {p.patologias.map((pat) => (
+                  <article key={pat.nombre} className="rounded-2xl border border-primary/10 bg-primary-soft p-6 md:p-8">
+                    <h3 className="break-words font-heading text-xl font-bold text-primary">
+                      {pat.nombre}
+                    </h3>
+                    <div className="mt-5 space-y-5">
+                      <div>
+                        <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                          {ui.pathoWhatLabel}
+                        </p>
+                        <p className="mt-1.5 font-body text-ink/75">
+                          {pat.queEs}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                          {ui.pathoFeelLabel}
+                        </p>
+                        <p className="mt-1.5 font-body text-ink/75">
+                          {pat.comoSeSiente}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                          {ui.pathoTreatLabel}
+                        </p>
+                        <p className="mt-1.5 font-body text-ink/75">
+                          {pat.comoSeTrata}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                        {ui.pathoFeelLabel}
-                      </p>
-                      <p className="mt-1.5 font-body text-ink/75">
-                        {pat.comoSeSiente}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                        {ui.pathoTreatLabel}
-                      </p>
-                      <p className="mt-1.5 font-body text-ink/75">
-                        {pat.comoSeTrata}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -245,47 +250,47 @@ export default function ConditionTemplate({
           (las 13 páginas) conserva el py completo tras el hero primary-soft. */}
       <section className="bg-background">
         <div
-          className={`mx-auto max-w-3xl px-4 ${
+          className={`mx-auto max-w-6xl px-4 ${
             p.patologias?.length ? "pb-14 md:pb-20" : "py-14 md:py-20"
           }`}
         >
-          <h2 className="break-words font-heading text-3xl font-bold text-primary">
-            {ui.symptomsH2}
-          </h2>
-          <ul className="mt-6 space-y-4">
-            {p.sintomas.map((sintoma) => (
-              <li key={sintoma} className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full bg-primary-soft text-primary">
-                  <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
-                </span>
-                <span className="font-body text-ink/75">{sintoma}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="max-w-3xl">
+            <h2 className="break-words font-heading text-3xl font-bold text-primary">
+              {ui.symptomsH2}
+            </h2>
+            <ul className="mt-6 space-y-4">
+              {p.sintomas.map((sintoma) => (
+                <li key={sintoma} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full bg-primary-soft text-primary">
+                    <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                  </span>
+                  <span className="font-body text-ink/75">{sintoma}</span>
+                </li>
+              ))}
+            </ul>
 
-          {/* Puente al test: mide limitación, no confirma diagnóstico. */}
-          <div className="mt-10 flex flex-col gap-4 rounded-xl bg-primary-soft p-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="font-body text-ink/80">
-              {ui.bridgeBefore}
-              {zonaMinuscula}
-              {ui.bridgeAfter}
-            </p>
-            <Link
-              href={evaluacionHref}
-              className="inline-flex flex-none items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-sm font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
-            >
-              {p.testCtaLabel}
-            </Link>
+            {/* Puente al test: mide limitación, no confirma diagnóstico. */}
+            <div className="mt-10 flex flex-col gap-4 rounded-2xl border border-primary/10 bg-primary-soft p-6 sm:flex-row sm:items-center sm:justify-between">
+              <p className="font-body text-ink/80">
+                {ui.bridgeBefore}
+                {zonaMinuscula}
+                {ui.bridgeAfter}
+              </p>
+              <ButtonLink href={evaluacionHref} className="flex-none">
+                {p.testCtaLabel}
+              </ButtonLink>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Señales de alarma */}
       <section className="bg-background">
-        <div className="mx-auto max-w-3xl px-4 pb-14 md:pb-20">
+        <div className="mx-auto max-w-6xl px-4 pb-14 md:pb-20">
           {/* Sin Reveal: es información de seguridad, debe verse de inmediato
-              aunque el JS tarde o falle. */}
-          <div className="rounded-2xl border-l-4 border-danger bg-[#F9EAE8] p-6 md:p-8">
+              aunque el JS tarde o falle. Recuadro tintado con borde del mismo
+              tono (sin border-l-4: con esquina redondeada dibujaba un gancho). */}
+          <div className="max-w-3xl rounded-2xl border border-danger/20 bg-danger/[0.08] p-6 md:p-8">
             <div className="flex items-center gap-3">
               <AlertTriangle
                 className="h-6 w-6 flex-none text-danger"
@@ -323,7 +328,7 @@ export default function ConditionTemplate({
 
       {/* Opciones de tratamiento: escalera conectada, del más simple al último */}
       <section className="bg-primary-soft">
-        <div className="mx-auto max-w-5xl px-4 py-14 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
           <h2 className="break-words font-heading text-3xl font-bold text-primary">
             {ui.treatmentH2}
           </h2>
@@ -413,75 +418,85 @@ export default function ConditionTemplate({
 
       {/* Preguntas frecuentes */}
       <section className="bg-background">
-        <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <h2 className="break-words font-heading text-3xl font-bold text-primary">
-            {ui.faqH2}
-          </h2>
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
+          <div className="max-w-3xl">
+            <h2 className="break-words font-heading text-3xl font-bold text-primary">
+              {ui.faqH2}
+            </h2>
 
-          <div className="mt-6 divide-y divide-ink/10 border-y border-ink/10">
-            {/* Sin Reveal ni escalonado: la lista ya está a la vista al llegar
-                al encabezado. La respuesta se despliega con .faq-item
-                (globals.css). El padding vive en el summary para que toda la
-                fila sea área de toque. */}
-            {p.faq.map((item) => (
-              <details key={item.pregunta} className="faq-item group pb-2">
-                <summary className="flex cursor-pointer list-none items-start justify-between gap-4 pt-5 pb-3 font-heading text-base font-semibold text-primary [&::-webkit-details-marker]:hidden">
-                  {item.pregunta}
-                  {/* Ícono lucide (no un "+" de la fuente) y la misma
-                      duración que el panel (250 ms, globals.css). */}
-                  <Plus
-                    aria-hidden="true"
-                    strokeWidth={2}
-                    className="mt-0.5 h-5 w-5 flex-none text-accent transition-transform duration-[250ms] ease-out group-open:rotate-45"
-                  />
-                </summary>
-                <p className="pr-8 pb-3 font-body text-ink/75">
-                  {item.respuesta}
-                </p>
-              </details>
-            ))}
-          </div>
+            <div className="mt-6 divide-y divide-ink/10 border-y border-ink/10">
+              {/* Sin Reveal ni escalonado: la lista ya está a la vista al llegar
+                  al encabezado. La respuesta se despliega con .faq-item
+                  (globals.css). El padding vive en el summary para que toda la
+                  fila sea área de toque. */}
+              {p.faq.map((item) => (
+                <details key={item.pregunta} className="faq-item group pb-2">
+                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4 pt-5 pb-3 font-heading text-base font-semibold text-primary [&::-webkit-details-marker]:hidden">
+                    {item.pregunta}
+                    {/* Ícono lucide (no un "+" de la fuente) y la misma
+                        duración que el panel (250 ms, globals.css). */}
+                    <Plus
+                      aria-hidden="true"
+                      strokeWidth={2}
+                      className="mt-0.5 h-5 w-5 flex-none text-accent transition-transform duration-[250ms] ease-out group-open:rotate-45"
+                    />
+                  </summary>
+                  <p className="pr-8 pb-3 font-body text-ink/75">
+                    {item.respuesta}
+                  </p>
+                </details>
+              ))}
+            </div>
 
-          {/* Compartir discreto: cerca del final del contenido, antes del CTA. */}
-          <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-6">
-            <p className="font-body text-sm text-muted">{ui.sharePrompt}</p>
-            <ShareButton
-              url={`${SITE_URL}${ui.pathBase}/${p.slug}`}
-              title={`${p.nombre}${ui.shareTitleAfter}`}
-              text={`${ui.shareTextBefore}${p.nombre}${ui.shareTextAfter}`}
-              label={ui.shareLabel}
-              locale={locale}
-              origen="padecimiento"
-            />
+            {/* Compartir discreto: cerca del final del contenido, antes del CTA. */}
+            <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-6">
+              <p className="font-body text-sm text-muted">{ui.sharePrompt}</p>
+              <ShareButton
+                url={`${SITE_URL}${ui.pathBase}/${p.slug}`}
+                title={`${p.nombre}${ui.shareTitleAfter}`}
+                text={`${ui.shareTextBefore}${p.nombre}${ui.shareTextAfter}`}
+                label={ui.shareLabel}
+                locale={locale}
+                origen="padecimiento"
+              />
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA final */}
       <section className="bg-primary">
-        <div className="mx-auto max-w-3xl px-4 py-14 text-center md:py-20">
-          <h2 className="break-words font-heading text-3xl font-bold text-white">
-            {ui.finalCtaH2}
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl font-body text-white/80">
-            {p.testCtaQuestion}
-            {ui.finalCtaSubSuffix}
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href={evaluacionHref}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-4 font-body text-base font-semibold text-primary transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
-            >
-              {p.testCtaLabel}
-            </Link>
-            <WhatsAppLink
-              href={whatsappLink}
-              section="padecimientos"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-7 py-4 font-body text-base font-semibold text-white transition-[transform,background-color] duration-150 ease-out hover:bg-white/10 active:scale-[0.97]"
-            >
-              <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
-              {ui.finalWaButton}
-            </WhatsAppLink>
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="break-words font-heading text-3xl font-bold text-white">
+              {ui.finalCtaH2}
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl font-body text-white/80">
+              {p.testCtaQuestion}
+              {ui.finalCtaSubSuffix}
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <ButtonLink
+                href={evaluacionHref}
+                variant="onDark"
+                size="lg"
+                className={PAIRED_CTA_WIDTH}
+              >
+                {p.testCtaLabel}
+              </ButtonLink>
+              <WhatsAppLink
+                href={whatsappLink}
+                section="padecimientos"
+                className={buttonClasses({
+                  variant: "outlineOnDark",
+                  size: "lg",
+                  className: PAIRED_CTA_WIDTH,
+                })}
+              >
+                <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
+                {ui.finalWaButton}
+              </WhatsAppLink>
+            </div>
           </div>
         </div>
       </section>

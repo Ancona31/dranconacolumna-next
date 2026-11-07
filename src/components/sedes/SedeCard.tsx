@@ -4,17 +4,16 @@ import WhatsAppLink from "@/components/analytics/WhatsAppLink";
 import PhoneLink from "@/components/analytics/PhoneLink";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
 import SedeMap from "@/components/ui/SedeMap";
+import { buttonClasses } from "@/components/ui/Button";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import type { Sede } from "@/lib/sedes";
 import type { Locale } from "@/lib/i18n/types";
 import type { SedesCopy } from "@/lib/i18n/content/sedes";
 
-// Misma receta que ButtonLink (ui/Button.tsx, tamaño md a lo ancho): aquí el
-// enlace lo ponen PhoneLink / WhatsAppLink, que emiten el evento de analytics.
-const BUTTON_BASE =
-  "inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 font-body text-sm font-semibold transition-[transform,background-color,color,opacity] duration-150 ease-out active:scale-[0.97]";
-const BUTTON_OUTLINE = `${BUTTON_BASE} border border-primary bg-transparent text-primary hover:bg-primary hover:text-white`;
-const BUTTON_PRIMARY = `${BUTTON_BASE} bg-primary text-white hover:opacity-90`;
+// Botones del sistema (ui/Button.tsx, tamaño md a lo ancho): aquí el enlace lo
+// ponen PhoneLink / WhatsAppLink, que emiten el evento de analytics.
+const BUTTON_OUTLINE = buttonClasses({ variant: "outline", fullWidth: true });
+const BUTTON_WHATSAPP = buttonClasses({ variant: "whatsapp", fullWidth: true });
 
 /**
  * Con tres sedes, en tablet (2 columnas) la última tarjeta quedaría sola en
@@ -132,7 +131,7 @@ export default function SedeCard({
           <WhatsAppLink
             href={whatsappLink}
             section={sede.section}
-            className={BUTTON_PRIMARY}
+            className={BUTTON_WHATSAPP}
           >
             <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp" />
             {copy.whatsappButton}

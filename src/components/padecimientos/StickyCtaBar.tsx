@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { trackEvent } from "@/lib/analytics";
 import { openWhatsAppInApp } from "@/lib/whatsapp";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+import ButtonLink, { buttonClasses } from "@/components/ui/Button";
 
 type StickyCtaBarProps = {
   nombre: string;
@@ -79,12 +79,7 @@ export default function StickyCtaBar({
           {reminderText}
         </p>
         <div className="flex flex-none items-center gap-3">
-          <Link
-            href={evaluacionHref}
-            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-sm font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
-          >
-            {testCtaLabel}
-          </Link>
+          <ButtonLink href={evaluacionHref}>{testCtaLabel}</ButtonLink>
           <a
             href={whatsappLink}
             target="_blank"
@@ -95,7 +90,7 @@ export default function StickyCtaBar({
               });
               if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/25 px-5 py-2.5 font-body text-sm font-semibold text-primary transition-[transform,background-color] duration-150 ease-out hover:bg-primary-soft active:scale-[0.97]"
+            className={buttonClasses({ variant: "subtle" })}
           >
             <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp-strong" />
             WhatsApp

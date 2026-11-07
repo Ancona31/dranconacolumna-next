@@ -19,7 +19,7 @@ const LICENSE_NAME = "CC BY-SA 2.1 JP";
 
 // py-1 en enlaces en línea: el área táctil llega a ≥24 px sin mover el texto.
 const creditLink =
-  "py-1 underline decoration-white/40 underline-offset-4 transition-colors hover:text-white hover:decoration-white/80";
+  "py-1 underline decoration-white/40 underline-offset-4 transition-colors duration-150 ease-out hover:text-white hover:decoration-white/80";
 
 const columnHeading = "font-heading text-sm font-semibold text-white";
 
@@ -74,7 +74,7 @@ export default function Footer({ strings }: { strings: UiStrings }) {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="inline-flex min-h-11 items-center font-body text-sm text-white/90 transition-colors hover:text-white md:min-h-9"
+                    className="inline-flex min-h-11 items-center font-body text-sm text-white/90 transition-colors duration-150 ease-out hover:text-white md:min-h-9"
                   >
                     {item.label}
                   </Link>
@@ -91,7 +91,7 @@ export default function Footer({ strings }: { strings: UiStrings }) {
             <p className="mt-3">
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
-                className="inline-block py-1 text-white/90 underline underline-offset-4 transition-colors [overflow-wrap:anywhere] hover:text-white"
+                className="inline-block py-1 text-white/90 underline underline-offset-4 transition-colors duration-150 ease-out [overflow-wrap:anywhere] hover:text-white"
               >
                 {emailUser}@
                 <wbr />
@@ -110,7 +110,7 @@ export default function Footer({ strings }: { strings: UiStrings }) {
             </ul>
             <Link
               href={f.contactHref}
-              className="mt-3 inline-flex min-h-11 items-center gap-1 font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white/80 md:min-h-9"
+              className="mt-3 inline-flex min-h-11 items-center gap-1 font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors duration-150 ease-out hover:decoration-white/80 md:min-h-9"
             >
               {f.locationsLinkLabel}
               <span aria-hidden="true">→</span>
@@ -124,7 +124,7 @@ export default function Footer({ strings }: { strings: UiStrings }) {
         <div className="mt-10 border-t border-white/15 pt-6 font-body text-sm">
           <Link
             href={f.privacyHref}
-            className="inline-flex min-h-6 items-center text-white/90 underline underline-offset-4 transition-colors hover:text-white"
+            className="inline-flex min-h-6 items-center text-white/90 underline underline-offset-4 transition-colors duration-150 ease-out hover:text-white"
           >
             {f.privacyLabel}
           </Link>

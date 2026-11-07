@@ -7,6 +7,7 @@ import { openWhatsAppInApp } from "@/lib/whatsapp";
 import { trackEvent } from "@/lib/analytics";
 import type { UiStrings } from "@/lib/i18n/types";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+import { buttonClasses } from "@/components/ui/Button";
 import { useNextFrame } from "@/components/ui/useNextFrame";
 
 /**
@@ -82,7 +83,7 @@ export default function MobileDrawer({
                 key={item.href}
                 href={item.href}
                 onClick={close}
-                className="border-b border-ink/5 py-3 font-body text-base font-medium text-ink transition-colors duration-150 hover:text-accent"
+                className="border-b border-ink/5 py-3 font-body text-base font-medium text-ink transition-colors duration-150 ease-out hover:text-accent"
               >
                 {item.label}
               </Link>
@@ -96,7 +97,7 @@ export default function MobileDrawer({
                 if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
                 close();
               }}
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-center text-sm font-semibold text-white transition-[transform,background-color,color,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+              className={buttonClasses({ variant: "whatsapp", className: "mt-4" })}
             >
               <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp" />
               {strings.header.whatsappLabel}

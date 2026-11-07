@@ -264,14 +264,14 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
 
   return (
     <section className="bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-20">
+      <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         {/* Encabezado */}
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+            <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
               {c.eyebrow}
             </p>
-            <h2 className="mt-2 font-heading text-4xl font-extrabold text-primary">
+            <h2 className="mt-2 font-heading text-3xl font-bold text-primary">
               {c.h2}
             </h2>
           </div>

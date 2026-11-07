@@ -1,4 +1,7 @@
-import Link from "next/link";
+import ButtonLink, {
+  buttonClasses,
+  PAIRED_CTA_WIDTH,
+} from "@/components/ui/Button";
 import Image from "next/image";
 import { Microscope, Wrench, Syringe, Monitor } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
@@ -52,11 +55,13 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
 
       {/* Cuándo se considera la cirugía */}
       <section className="bg-background">
-        <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <h2 className="break-words font-heading text-3xl font-bold text-primary">
-            {c.when.h2}
-          </h2>
-          <p className="mt-6 font-body text-ink/75">{c.when.text}</p>
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
+          <div className="max-w-3xl">
+            <h2 className="break-words font-heading text-3xl font-bold text-primary">
+              {c.when.h2}
+            </h2>
+            <p className="mt-6 font-body text-ink/75">{c.when.text}</p>
+          </div>
         </div>
       </section>
 
@@ -97,38 +102,48 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
 
       {/* Cómo es la recuperación */}
       <section className="bg-background">
-        <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <h2 className="break-words font-heading text-3xl font-bold text-primary">
-            {c.recovery.h2}
-          </h2>
-          <p className="mt-6 font-body text-ink/75">{c.recovery.text}</p>
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
+          <div className="max-w-3xl">
+            <h2 className="break-words font-heading text-3xl font-bold text-primary">
+              {c.recovery.h2}
+            </h2>
+            <p className="mt-6 font-body text-ink/75">{c.recovery.text}</p>
+          </div>
         </div>
       </section>
 
       {/* CTA final */}
       <section className="bg-primary">
-        <div className="mx-auto max-w-3xl px-4 py-14 text-center md:py-20">
-          <h2 className="break-words font-heading text-3xl font-bold text-white">
-            {c.cta.h2}
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl font-body text-white/80">
-            {c.cta.sub}
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href={routeFor("/evaluacion", locale)}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-4 font-body text-base font-semibold text-primary transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
-            >
-              {c.cta.evaluationCta}
-            </Link>
-            <WhatsAppLink
-              href={whatsappLink}
-              section="cirugia"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-7 py-4 font-body text-base font-semibold text-white transition-[transform,background-color] duration-150 ease-out hover:bg-white/10 active:scale-[0.97]"
-            >
-              <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
-              {c.cta.whatsappCta}
-            </WhatsAppLink>
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="break-words font-heading text-3xl font-bold text-white">
+              {c.cta.h2}
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl font-body text-white/80">
+              {c.cta.sub}
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <ButtonLink
+                href={routeFor("/evaluacion", locale)}
+                variant="onDark"
+                size="lg"
+                className={PAIRED_CTA_WIDTH}
+              >
+                {c.cta.evaluationCta}
+              </ButtonLink>
+              <WhatsAppLink
+                href={whatsappLink}
+                section="cirugia"
+                className={buttonClasses({
+                  variant: "outlineOnDark",
+                  size: "lg",
+                  className: PAIRED_CTA_WIDTH,
+                })}
+              >
+                <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
+                {c.cta.whatsappCta}
+              </WhatsAppLink>
+            </div>
           </div>
         </div>
       </section>

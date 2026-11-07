@@ -17,8 +17,8 @@ type HeroZoneFigureProps = {
   ariaLabel?: string;
 };
 
-const ACCENT = "var(--color-accent, #1B6CA8)";
-const INK = "var(--color-primary, #0B3C5D)";
+const ACCENT = "var(--color-accent)";
+const INK = "var(--color-primary)";
 
 /**
  * Silueta de marca del hero: reutiliza el BODY_PATH y las zonas de
@@ -61,7 +61,7 @@ export default function HeroZoneFigure({
           cy={zona.cy}
           r="9"
           fill={ACCENT}
-          stroke="var(--color-background, #FBFBF9)"
+          stroke="var(--color-background)"
           strokeWidth="2.5"
         />
       </svg>

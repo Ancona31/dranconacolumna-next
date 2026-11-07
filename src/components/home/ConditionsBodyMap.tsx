@@ -162,7 +162,7 @@ export default function ConditionsBodyMap({
   const arrow = (
     <span
       aria-hidden="true"
-      className="ml-auto shrink-0 font-body text-accent transition-transform duration-150 group-hover:translate-x-0.5"
+      className="ml-auto shrink-0 font-body text-accent transition-transform duration-150 ease-out group-hover:translate-x-0.5"
     >
       →
     </span>
@@ -181,7 +181,7 @@ export default function ConditionsBodyMap({
         <Link
           href={hrefOf(c.slug)}
           {...cardEvents(c.slug)}
-          className={`group flex min-h-[76px] items-center gap-3 rounded-2xl border bg-background p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-raised active:scale-[0.98] ${cardScroll} ${
+          className={`group flex min-h-[76px] items-center gap-3 rounded-2xl border bg-background p-4 transition-[translate,scale,border-color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-raised active:scale-[0.98] ${cardScroll} ${
             highlighted
               ? "-translate-y-0.5 border-accent shadow-raised"
               : "border-ink/10"
@@ -203,7 +203,7 @@ export default function ConditionsBodyMap({
         <Link
           href={hrefOf(c.slug)}
           {...cardEvents(c.slug)}
-          className={`group flex min-h-[48px] items-center gap-3 rounded-2xl border bg-background px-[14px] py-[13px] transition duration-150 ease-out hover:border-accent hover:shadow-raised active:scale-[0.98] ${cardScroll} ${
+          className={`group flex min-h-[48px] items-center gap-3 rounded-2xl border bg-background px-[14px] py-[13px] transition-[translate,scale,border-color,box-shadow] duration-150 ease-out hover:border-accent hover:shadow-raised active:scale-[0.98] ${cardScroll} ${
             highlighted ? "border-accent shadow-raised" : "border-ink/10"
           }`}
         >
@@ -366,7 +366,7 @@ export default function ConditionsBodyMap({
                       para la tarjeta activa. */}
                   <Link
                     href={evaluacionHref}
-                    className={`mt-3 flex items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft p-4 transition duration-150 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-raised active:scale-[0.98] ${cardScroll}`}
+                    className={`mt-3 flex items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft p-4 transition-[translate,scale,border-color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-raised active:scale-[0.98] ${cardScroll}`}
                   >
                     <span className="min-w-0 font-heading text-base font-semibold text-primary">
                       {cc.ctaCard}
@@ -399,7 +399,7 @@ export default function ConditionsBodyMap({
                 {/* CTA punteado a ancho completo. */}
                 <Link
                   href={evaluacionHref}
-                  className={`mt-6 flex items-center justify-center rounded-2xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft px-4 py-[15px] text-center font-body text-[14px] font-semibold text-accent transition duration-150 ease-out hover:border-accent active:scale-[0.98] ${cardScroll}`}
+                  className={`mt-6 flex items-center justify-center rounded-2xl border-[1.5px] border-dashed border-primary/30 bg-primary-soft px-4 py-[15px] text-center font-body text-[14px] font-semibold text-accent transition-[translate,scale,border-color,box-shadow] duration-150 ease-out hover:border-accent active:scale-[0.98] ${cardScroll}`}
                 >
                   {cc.ctaMobile}
                 </Link>

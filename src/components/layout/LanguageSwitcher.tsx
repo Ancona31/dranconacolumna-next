@@ -93,7 +93,7 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
         <span className="hidden min-[360px]:inline">{current.short}</span>
         {/* Sin chevron en teléfonos angostos: deja sitio al nombre del header. */}
         <ChevronDown
-          className={`hidden h-3.5 w-3.5 text-muted transition-transform min-[400px]:block duration-150 ${
+          className={`hidden h-3.5 w-3.5 text-muted transition-transform duration-150 ease-out min-[400px]:block ${
             open ? "rotate-180" : ""
           }`}
           strokeWidth={2}

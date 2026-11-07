@@ -54,10 +54,10 @@ export const BODY_PATH =
 const SPINE_DOTS = Array.from({ length: 21 }, (_, i) => 89 + i * 8.5);
 const APOPHYSIS_Y = [100, 128, 156, 184, 212, 240];
 
-const INK = "var(--color-primary, #0B3C5D)";
-const ACCENT = "var(--color-accent, #1B6CA8)";
-const PAPER = "var(--color-background, #FBFBF9)";
-const PAIN = "var(--color-pain, #D64541)";
+const INK = "var(--color-primary)";
+const ACCENT = "var(--color-accent)";
+const PAPER = "var(--color-background)";
+const PAIN = "var(--color-pain)";
 
 /**
  * "selected" hay una zona elegida (o bajo el cursor): se anuncia con un chip.

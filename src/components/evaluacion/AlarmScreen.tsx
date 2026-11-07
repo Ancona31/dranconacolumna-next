@@ -10,6 +10,7 @@ import {
   getEvaluationUi,
   type EvaluationUi,
 } from "@/lib/i18n/pages/evaluacion";
+import { buttonClasses } from "@/components/ui/Button";
 
 type AlarmScreenProps = {
   /** Test en curso; provee el conteo de ítems y la duración estimada. */
@@ -122,7 +123,11 @@ export default function AlarmScreen({
         type="button"
         onClick={handleContinue}
         disabled={!hasSelection}
-        className="mt-6 w-full rounded-full bg-primary px-6 py-4 font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97] disabled:active:scale-100 disabled:cursor-not-allowed disabled:opacity-40"
+        className={buttonClasses({
+          size: "lg",
+          fullWidth: true,
+          className: "mt-6 disabled:cursor-not-allowed disabled:opacity-40",
+        })}
       >
         {ui.alarm.continue}
       </button>

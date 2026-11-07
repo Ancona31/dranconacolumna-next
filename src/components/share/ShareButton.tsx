@@ -6,6 +6,7 @@ import { Share2 } from "lucide-react";
 import { trackEvent, type ShareMetodo } from "@/lib/analytics";
 import type { Locale } from "@/lib/i18n/types";
 import { useLazyComponent } from "@/components/ui/useLazyComponent";
+import { buttonClasses } from "@/components/ui/Button";
 
 /** Textos fijos del menú por idioma (el botón trae su `label` de la página). */
 const STRINGS: Record<
@@ -111,12 +112,12 @@ export default function ShareButton({
     if (typeof navigator !== "undefined" && !navigator.share) requestMenu();
   }
 
-  const base =
-    "inline-flex items-center justify-center gap-2 rounded-full font-body font-semibold transition-[transform,background-color,border-color,color,opacity] duration-150 ease-out active:scale-[0.97]";
-  const variantClass =
+  // Botones del sistema (ui/Button.tsx): en el reporte, contorno azul a
+  // tamaño md; al pie de un artículo, terciario neutro y compacto.
+  const triggerClass =
     variant === "card"
-      ? "border-[1.5px] border-primary bg-primary-soft px-6 py-3 text-sm text-primary hover:bg-primary hover:text-white"
-      : "border border-ink/20 px-4 py-2 text-sm text-ink/70 hover:border-primary hover:text-primary";
+      ? buttonClasses({ variant: "outline" })
+      : buttonClasses({ variant: "ghost", size: "sm" });
 
   return (
     <div className="relative inline-block">
@@ -130,7 +131,7 @@ export default function ShareButton({
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={buttonLabel}
-        className={`${base} ${variantClass}`}
+        className={triggerClass}
       >
         <Share2
           className="h-4 w-4 shrink-0"

@@ -8,6 +8,8 @@ import { toPdfSafeName } from "@/lib/evaluacion/pdf/safe-text";
 import { trackEvent } from "@/lib/analytics";
 import type { Locale } from "@/lib/i18n/types";
 import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
+import { CALLOUT_BRAND } from "@/components/evaluacion/surfaces";
+import { buttonClasses } from "@/components/ui/Button";
 
 /** Estados de la descarga que el i18n de la evaluación aún no cubre. */
 const STATUS: Record<
@@ -175,7 +177,7 @@ export default function PdfDownload({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-primary px-6 py-3 font-body text-sm font-semibold text-primary transition-[transform,background-color,color] duration-150 ease-out hover:bg-primary hover:text-white active:scale-[0.97]"
+            className={buttonClasses({ variant: "outline", fullWidth: true })}
           >
             <Download className="h-4 w-4" strokeWidth={1.5} />
             {ui.open}
@@ -193,7 +195,7 @@ export default function PdfDownload({
           {/* Formulario: Enter (o "Listo" del teclado del teléfono) genera. */}
           <form
             onSubmit={generate}
-            className="rounded-2xl border border-ink/15 bg-primary-soft/50 p-4"
+            className={`${CALLOUT_BRAND} p-4`}
           >
             <label
               htmlFor="pdf-name"
@@ -218,7 +220,10 @@ export default function PdfDownload({
               type="submit"
               aria-busy={busy}
               disabled={busy}
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-body text-sm font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97] disabled:cursor-progress disabled:opacity-70"
+              className={buttonClasses({
+                fullWidth: true,
+                className: "mt-3 disabled:cursor-progress disabled:opacity-70",
+              })}
             >
               {busy ? (
                 <Loader2

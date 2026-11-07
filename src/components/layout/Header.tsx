@@ -10,6 +10,7 @@ import { trackEvent } from "@/lib/analytics";
 import type { Locale, UiStrings } from "@/lib/i18n/types";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+import { buttonClasses } from "@/components/ui/Button";
 import { useLazyComponent } from "@/components/ui/useLazyComponent";
 
 // El panel del menú móvil (Base UI Dialog) se carga bajo demanda: la
@@ -155,9 +156,9 @@ export default function Header({
           borde y la sombra solo aparecen al hacer scroll. Con
           prefers-reduced-transparency el fondo vuelve a ser sólido. */}
       <header
-        className={`sticky top-0 z-[60] border-b bg-background/80 backdrop-blur-md backdrop-saturate-150 transition-[border-color,box-shadow] duration-200 [@media(prefers-reduced-transparency:reduce)]:bg-background ${
+        className={`sticky top-0 z-[60] border-b bg-background/80 backdrop-blur-md backdrop-saturate-150 transition-[border-color,box-shadow] duration-200 ease-out [@media(prefers-reduced-transparency:reduce)]:bg-background ${
           scrolled
-            ? "border-ink/10 shadow-sm"
+            ? "border-ink/10 shadow-card"
             : "border-transparent shadow-none"
         }`}
       >
@@ -176,7 +177,7 @@ export default function Header({
                   key={item.href}
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`nav-link whitespace-nowrap py-1 font-body text-sm font-medium transition-colors duration-150 ${
+                  className={`nav-link whitespace-nowrap py-1 font-body text-sm font-medium transition-colors duration-150 ease-out ${
                     active ? "text-accent" : "text-ink hover:text-accent"
                   }`}
                 >
@@ -193,7 +194,11 @@ export default function Header({
                 trackEvent("whatsapp_click", { source_section: "header" });
                 if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
               }}
-              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-[transform,background-color,color,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+              className={buttonClasses({
+                variant: "whatsapp",
+                size: "sm",
+                className: "whitespace-nowrap",
+              })}
             >
               <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp" />
               {strings.header.whatsappLabel}
@@ -226,14 +231,14 @@ export default function Header({
             >
               {/* Ícono hamburguesa ⇄ X: rotación + fade cruzado */}
               <Menu
-                className={`absolute h-5 w-5 transition-[transform,opacity] duration-200 ${
+                className={`absolute h-5 w-5 transition-[transform,opacity] duration-200 ease-out ${
                   open ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
                 }`}
                 strokeWidth={1.5}
                 aria-hidden="true"
               />
               <X
-                className={`absolute h-5 w-5 transition-[transform,opacity] duration-200 ${
+                className={`absolute h-5 w-5 transition-[transform,opacity] duration-200 ease-out ${
                   open ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"
                 }`}
                 strokeWidth={1.5}

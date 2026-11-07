@@ -46,13 +46,22 @@ import { trackEvent } from "@/lib/analytics";
 import { openWhatsAppInApp } from "@/lib/whatsapp";
 import { SITE_URL } from "@/lib/config";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+import { buttonClasses } from "@/components/ui/Button";
+import {
+  CALLOUT_BRAND,
+  CALLOUT_DANGER,
+  CALLOUT_TONED,
+  CALLOUT_WARNING,
+  CARD,
+  calloutStyle,
+} from "@/components/evaluacion/surfaces";
 
 // Compartir el enlace a la evaluación (no el PDF): que otra persona haga su
 // test. Mismo bloque en el reporte scorable y en el no-scorable.
 function ShareEvaluation({ locale }: { locale: Locale }) {
   const ui = getEvaluationUi(locale).result;
   return (
-    <div className="mt-6 rounded-xl border border-primary/15 bg-primary-soft p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
+    <div className={`mt-6 ${CALLOUT_BRAND} p-4 sm:flex sm:items-center sm:justify-between sm:gap-4`}>
       <p className="font-body text-sm text-ink/70">{ui.sharePrompt}</p>
       <div className="mt-3 sm:mt-0 sm:shrink-0">
         <ShareButton
@@ -69,8 +78,8 @@ function ShareEvaluation({ locale }: { locale: Locale }) {
 }
 
 const BANNER_STYLES = {
-  precaucion: { box: "border-warning bg-warning/10", title: "text-warning" },
-  urgente: { box: "border-danger bg-danger/10", title: "text-danger" },
+  precaucion: { box: CALLOUT_WARNING, title: "text-warning" },
+  urgente: { box: CALLOUT_DANGER, title: "text-danger" },
 };
 
 // Icono lucide por dominio y glifo de estado (SVG, nunca emoji). Cubre la
@@ -173,39 +182,41 @@ function CapacityCard({
   domain: ReturnType<typeof computeDomains>[number];
   locale: Locale;
 }) {
-  // strong: borde, barra e ícono (gráfico); text: etiqueta y círculo del
-  // glifo, en el tono oscuro para que se lean (≥4.5:1).
+  // Tarjeta neutra: el semáforo va en el ícono (strong, gráfico) y en la
+  // etiqueta de estado (fondo suave + texto oscuro, ≥4.5:1). La etiqueta va
+  // en su propio renglón para que el título no se parta a 375 px.
   const { bg, strong, text } = FUNC_COLORS[domain.state];
   const Icon = DOMAIN_ICON[domain.id] ?? Activity;
   const Glyph = STATE_GLYPH[domain.state];
   return (
-    <div
-      className="relative overflow-hidden rounded-xl border-[1.5px] p-4 pl-5"
-      style={{ backgroundColor: bg, borderColor: strong }}
-    >
-      <span
-        className="absolute left-0 top-0 h-full w-[3px]"
-        style={{ backgroundColor: strong }}
-        aria-hidden="true"
-      />
-      <div className="flex items-center gap-2">
-        <Icon className="h-5 w-5 shrink-0" style={{ color: strong }} strokeWidth={1.75} />
-        <span className="font-heading text-sm font-bold text-ink">
-          {domain.label}
-        </span>
-        <span className="ml-auto flex items-center gap-1.5">
+    <div className={`${CARD} p-4`}>
+      <div className="flex items-start gap-2.5">
+        <Icon
+          className="mt-0.5 h-5 w-5 shrink-0"
+          style={{ color: strong }}
+          strokeWidth={1.75}
+        />
+        <div className="min-w-0">
+          <p className="font-heading text-sm font-bold text-ink">
+            {domain.label}
+          </p>
           <span
-            className="flex h-5 w-5 items-center justify-center rounded-full"
-            style={{ backgroundColor: text }}
+            className="mt-1.5 inline-flex items-center gap-1.5 rounded-full py-0.5 pl-0.5 pr-2.5"
+            style={{ backgroundColor: bg }}
           >
-            <Glyph className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
+            <span
+              className="flex h-5 w-5 items-center justify-center rounded-full"
+              style={{ backgroundColor: text }}
+            >
+              <Glyph className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
+            </span>
+            <span className="font-body text-xs font-bold" style={{ color: text }}>
+              {getEngineCopy(locale).funcStateLabels[domain.state]}
+            </span>
           </span>
-          <span className="font-body text-xs font-bold" style={{ color: text }}>
-            {getEngineCopy(locale).funcStateLabels[domain.state]}
-          </span>
-        </span>
+        </div>
       </div>
-      <p className="mt-1 font-body text-xs italic text-muted">
+      <p className="mt-2 font-body text-xs italic text-muted">
         {domain.examples}
       </p>
       <p className="mt-1.5 font-body text-sm text-ink/80">{domain.fullPhrase}</p>
@@ -248,9 +259,7 @@ function AlertBanner({
   if (!banner) return null;
   return (
     <div
-      className={`mt-6 rounded-r-xl border-l-4 p-4 ${
-        BANNER_STYLES[banner.tone].box
-      }`}
+      className={`mt-6 p-4 ${BANNER_STYLES[banner.tone].box}`}
     >
       <div className="flex items-start gap-2">
         <AlertTriangle
@@ -290,12 +299,12 @@ function UnscorableScreen({
       <ResultHeader result={result} locale={locale} />
       <AlertBanner result={result} locale={locale} />
 
-      <div className="mt-6 rounded-xl border-[1.5px] border-ink/15 bg-ink/[0.03] p-5">
+      <div className={`mt-6 ${CARD} p-5`}>
         <p className="font-body text-ink/80">{copy.unscorableMessage}</p>
       </div>
 
       {warningSigns.length > 0 && (
-        <div className="mt-8 rounded-xl border-l-4 border-danger bg-danger/5 p-4">
+        <div className={`mt-8 ${CALLOUT_DANGER} p-5`}>
           <h2 className="font-heading text-lg font-bold text-danger">
             {ui.warningTitle}
           </h2>
@@ -324,7 +333,12 @@ function UnscorableScreen({
           trackEvent("whatsapp_click", { source_section: "evaluacion" });
           if (openWhatsAppInApp(getResultWhatsAppLink(result))) e.preventDefault();
         }}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+        className={buttonClasses({
+          variant: "whatsapp",
+          size: "lg",
+          fullWidth: true,
+          className: "mt-6",
+        })}
       >
         <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
         {result.alertLevel === "urgente" ? ui.ctaUrgent : ui.ctaNormal}
@@ -409,11 +423,11 @@ export default function ResultScreen({
 
       {/* Definición del nivel (badge, según el nivel funcional del score) */}
       <div
-        className="mt-6 rounded-xl border-[1.5px] p-4"
-        style={{
-          backgroundColor: NIVEL_BADGE_COLORS[result.level].bg,
-          borderColor: NIVEL_BADGE_COLORS[result.level].strong,
-        }}
+        className={`mt-6 ${CALLOUT_TONED} p-4`}
+        style={calloutStyle(
+          NIVEL_BADGE_COLORS[result.level].bg,
+          NIVEL_BADGE_COLORS[result.level].strong
+        )}
       >
         <p
           className="font-heading text-sm font-bold"
@@ -485,7 +499,7 @@ export default function ResultScreen({
 
       {/* Señales para no esperar tu cita */}
       {warningSigns.length > 0 && (
-        <div className="mt-8 rounded-xl border-l-4 border-danger bg-danger/5 p-4">
+        <div className={`mt-8 ${CALLOUT_DANGER} p-5`}>
           <h2 className="font-heading text-lg font-bold text-danger">
             {ui.warningTitle}
           </h2>
@@ -512,16 +526,11 @@ export default function ResultScreen({
       {/* Recomendación: cierre del recorrido. La ventana de tiempo es el
           titular; el color no marca severidad, solo urgencia. */}
       <div
-        className="relative mt-8 overflow-hidden rounded-xl border-[1.5px] p-5 pl-6"
-        style={{ backgroundColor: recColors.bg, borderColor: recColors.strong }}
+        className={`mt-8 ${CALLOUT_TONED} p-5`}
+        style={calloutStyle(recColors.bg, recColors.strong)}
       >
-        <span
-          className="absolute left-0 top-0 h-full w-[3px]"
-          style={{ backgroundColor: recColors.strong }}
-          aria-hidden="true"
-        />
         <p
-          className="font-body text-[11px] font-bold uppercase tracking-[0.14em]"
+          className="font-body text-xs font-semibold uppercase tracking-[0.2em]"
           style={{ color: recColors.strong }}
         >
           {rec.label}
@@ -553,7 +562,11 @@ export default function ResultScreen({
             trackEvent("whatsapp_click", { source_section: "evaluacion" });
             if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
           }}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+          className={buttonClasses({
+            variant: "whatsapp",
+            size: "lg",
+            fullWidth: true,
+          })}
         >
           <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
           {result.alertLevel === "urgente" ? ui.ctaUrgent : ui.ctaNormal}

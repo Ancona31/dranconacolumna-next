@@ -113,7 +113,7 @@ export default function LanguageMenu({
                       aria-current={active ? "true" : undefined}
                     />
                   }
-                  className={`flex min-h-[44px] items-center gap-2.5 px-3 font-body text-sm transition-colors ${
+                  className={`flex min-h-[44px] items-center gap-2.5 px-3 font-body text-sm transition-colors duration-150 ease-out ${
                     active
                       ? "bg-primary/5 font-semibold text-primary"
                       : "text-ink hover:bg-ink/5 data-[highlighted]:bg-ink/5"
