@@ -67,8 +67,10 @@ export default function WhatsAppFloat({ strings }: { strings: UiStrings }) {
     >
       {/* El ancla se desplaza (.wa-float, cuando aparece la StickyCtaBar) y el
           círculo interior responde al hover/pulsación: transforms separados
-          para que no se pisen. */}
-      <span className="flex size-14 items-center justify-center rounded-full bg-whatsapp text-white shadow-overlay transition-transform duration-150 ease-out hover:scale-105 active:scale-[0.97] [@media(max-height:500px)]:size-11">
+          para que no se pisen. Regla del sitio: botón azul, solo el ícono en
+          verde (5.8:1 sobre primary). El anillo blanco tenue lo separa de las
+          bandas azules por las que pasa. */}
+      <span className="flex size-14 items-center justify-center rounded-full bg-primary text-whatsapp shadow-overlay ring-1 ring-white/20 transition-transform duration-150 ease-out hover:scale-105 active:scale-[0.97] [@media(max-height:500px)]:size-11">
         <WhatsAppIcon className="size-7 [@media(max-height:500px)]:size-6" />
       </span>
     </WhatsAppLink>

@@ -11,7 +11,7 @@ export default function HowItWorks({ locale }: { locale: Locale }) {
   return (
     <section className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
-        <h2 className="text-center font-heading text-3xl font-bold text-primary">
+        <h2 className="break-words text-center font-heading text-3xl font-bold text-primary">
           {c.h2}
         </h2>
 
@@ -19,7 +19,7 @@ export default function HowItWorks({ locale }: { locale: Locale }) {
           {c.steps.map((step, i) => {
             const Icon = ICONS[i];
             return (
-              <Reveal key={step.title} delay={i * 80}>
+              <Reveal key={step.title} className="min-w-0">
                 <div className="rounded-2xl border border-ink/10 bg-background p-6 text-center md:text-left">
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft text-primary md:mx-0">
                     <Icon className="h-6 w-6" strokeWidth={1.5} />
@@ -27,7 +27,7 @@ export default function HowItWorks({ locale }: { locale: Locale }) {
                   <p className="mt-4 font-body text-sm font-semibold text-accent">
                     {c.stepLabel} {i + 1}
                   </p>
-                  <h3 className="mt-1 font-heading text-lg font-bold text-ink">
+                  <h3 className="break-words mt-1 font-heading text-lg font-bold text-ink">
                     {step.title}
                   </h3>
                   <p className="mt-2 font-body text-sm text-ink/70">

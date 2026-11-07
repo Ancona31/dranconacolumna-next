@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import ButtonLink from "@/components/ui/Button";
 import { REVIEWS, type Review } from "@/lib/reviews";
 import type { Locale } from "@/lib/i18n/types";
 import { getHomeContent } from "@/lib/i18n/pages/home";
@@ -11,8 +12,12 @@ const GOOGLE_REVIEWS_URL = "https://share.google/F6JriyuEKHSREzTfi";
 /** Longitud a la que se trunca el texto antes de "Leer más". */
 const TRUNCATE_AT = 200;
 
-/** Intervalo del autoplay. */
-const AUTOPLAY_MS = 5000;
+// Sin avance automático (decisión D4): leer una reseña toma 8–12 s y en
+// táctil no había pausa visible. Solo flechas, puntos y deslizar.
+
+/** Tras el último evento de scroll se da por terminado el desplazamiento y se
+ *  olvida el destino pendiente de las flechas (respaldo de `scrollend`). */
+const SCROLL_IDLE_MS = 150;
 
 /** Duración del fundido con el que el bucle vuelve al inicio (en vez de
  *  rebobinar todas las tarjetas de golpe). */
@@ -92,9 +97,11 @@ function ReviewCard({
   const initial = review.author.charAt(0).toUpperCase();
 
   // Sin escala en hover/press: agrandar al presionar contradice la respuesta
-  // esperada y emborrona el texto. En md+ la tarjeta se eleva 2px.
+  // esperada y emborrona el texto. En md+ la tarjeta se eleva 2px, con la
+  // misma curva y duración que las tarjetas de padecimientos (150 ms,
+  // ease-out; ease-drawer es para paneles).
   return (
-    <div className="flex h-full min-h-[340px] flex-col rounded-2xl border border-ink/10 bg-white p-7 shadow-card transition-[translate,box-shadow] duration-300 ease-drawer hover:shadow-raised md:min-h-[330px] md:hover:-translate-y-0.5">
+    <div className="flex h-full min-h-[340px] flex-col rounded-2xl border border-ink/10 bg-white p-7 shadow-card transition-[translate,box-shadow] duration-150 ease-out hover:shadow-raised md:min-h-[330px] md:hover:-translate-y-0.5">
       <div className="flex items-center gap-3">
         <div
           aria-hidden="true"
@@ -144,16 +151,16 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
   const [current, setCurrent] = useState(0);
   const [perView, setPerView] = useState(1);
   const [reduced, setReduced] = useState(false);
-  // El autoplay se apaga para siempre en cuanto el usuario toca, enfoca o
-  // desliza el carrusel: a partir de ahí manda él.
-  const [stopped, setStopped] = useState(false);
   const [fading, setFading] = useState(false);
 
-  const sectionRef = useRef<HTMLElement>(null);
   const scrollerRef = useRef<HTMLUListElement>(null);
-  const hoverRef = useRef(false);
-  const inViewRef = useRef(false);
   const fadeTimerRef = useRef<number | undefined>(undefined);
+  // Destino del último clic en flechas o puntos mientras el scroll suave
+  // sigue en curso. `shown` sale del scrollLeft redondeado y, a media
+  // animación, todavía apunta a la tarjeta de origen: sin esto un segundo
+  // clic rápido iría a la misma tarjeta y se "perdería".
+  const targetRef = useRef<number | null>(null);
+  const idleTimerRef = useRef<number | undefined>(undefined);
 
   const positions = Math.max(1, REVIEWS.length - perView + 1);
   // Al pasar de móvil (más posiciones) a desktop el índice puede quedar fuera
@@ -188,78 +195,75 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
     const el = scrollerRef.current;
     if (!el) return;
     let frame = 0;
+    const settle = () => {
+      targetRef.current = null;
+    };
     const onScroll = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const step = stepOf(el);
         if (step > 0) setCurrent(Math.round(el.scrollLeft / step));
       });
+      // Respaldo para navegadores sin `scrollend`.
+      window.clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = window.setTimeout(settle, SCROLL_IDLE_MS);
     };
     el.addEventListener("scroll", onScroll, { passive: true });
+    el.addEventListener("scrollend", settle);
     return () => {
       cancelAnimationFrame(frame);
+      window.clearTimeout(idleTimerRef.current);
       el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("scrollend", settle);
     };
-  }, []);
-
-  // El autoplay solo corre con la sección a la vista.
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        inViewRef.current = entry.isIntersecting;
-      },
-      { threshold: 0.25 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
   }, []);
 
   useEffect(() => () => window.clearTimeout(fadeTimerRef.current), []);
 
+  /** Mueve `delta` posiciones desde el destino pendiente (si lo hay) o desde
+   *  lo que se ve: cada clic suma aunque el scroll anterior no haya acabado. */
+  const step = (delta: number) => goTo((targetRef.current ?? shown) + delta);
+
   const goTo = (target: number) => {
     const el = scrollerRef.current;
     if (!el) return;
-    const step = stepOf(el);
+    const width = stepOf(el);
 
     if (target >= 0 && target < positions) {
-      el.scrollTo({ left: target * step, behavior: reduced ? "auto" : "smooth" });
+      if (target === shown && targetRef.current === null) return;
+      targetRef.current = target;
+      // Clic durante el fundido del bucle: el carrusel está invisible, así
+      // que se salta directo al destino nuevo en vez de dejar que el salto
+      // pendiente lo pise.
+      if (fadeTimerRef.current !== undefined) {
+        window.clearTimeout(fadeTimerRef.current);
+        fadeTimerRef.current = undefined;
+        el.scrollTo({ left: target * width, behavior: "auto" });
+        setFading(false);
+        return;
+      }
+      el.scrollTo({ left: target * width, behavior: reduced ? "auto" : "smooth" });
       return;
     }
 
     // Bucle: en vez de rebobinar todas las tarjetas, fundido corto y salto.
     const wrapped = target < 0 ? positions - 1 : 0;
+    targetRef.current = wrapped;
     if (reduced) {
-      el.scrollTo({ left: wrapped * step, behavior: "auto" });
+      el.scrollTo({ left: wrapped * width, behavior: "auto" });
       return;
     }
     setFading(true);
     window.clearTimeout(fadeTimerRef.current);
     fadeTimerRef.current = window.setTimeout(() => {
-      el.scrollTo({ left: wrapped * step, behavior: "auto" });
+      fadeTimerRef.current = undefined;
+      el.scrollTo({ left: wrapped * width, behavior: "auto" });
       setFading(false);
     }, WRAP_FADE_MS);
   };
 
-  const stop = () => setStopped(true);
-
-  // Autoplay: avanza cada 5 s en bucle. Se salta el paso con hover, con la
-  // sección fuera de vista o la pestaña oculta; nunca corre con reduced-motion
-  // ni después de que el usuario interactúe.
-  const onTick = useEffectEvent(() => {
-    if (hoverRef.current || !inViewRef.current || document.hidden) return;
-    goTo(shown + 1);
-  });
-
-  useEffect(() => {
-    if (reduced || stopped) return;
-    const id = window.setInterval(() => onTick(), AUTOPLAY_MS);
-    return () => window.clearInterval(id);
-  }, [reduced, stopped]);
-
   return (
-    <section ref={sectionRef} className="bg-background">
+    <section className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-20">
         {/* Encabezado */}
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -289,22 +293,9 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
             dedo con la inercia del sistema. py-3 deja aire para la sombra y la
             elevación en hover; el sangrado horizontal (-mx-3/px-3 con
             scroll-px-3) es solo md+: en móvil cada tarjeta llena el 100%. */}
-        <div
-          className="mt-12 md:mt-14"
-          onMouseEnter={() => {
-            hoverRef.current = true;
-          }}
-          onMouseLeave={() => {
-            hoverRef.current = false;
-          }}
-        >
+        <div className="mt-12 md:mt-14">
           <ul
             ref={scrollerRef}
-            onPointerDown={stop}
-            onFocusCapture={stop}
-            onWheel={(e) => {
-              if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) stop();
-            }}
             className={`relative flex list-none snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-3 [scrollbar-width:none] md:-mx-3 md:scroll-px-3 md:gap-6 md:px-3 [&::-webkit-scrollbar]:hidden transition-opacity duration-200 ease-out ${
               fading ? "opacity-0" : ""
             }`}
@@ -333,10 +324,7 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
             <button
               type="button"
               aria-label={c.prevAria}
-              onClick={() => {
-                stop();
-                goTo(shown - 1);
-              }}
+              onClick={() => step(-1)}
               className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-primary text-primary transition-[background-color,color,scale] duration-150 ease-out hover:bg-primary hover:text-white active:scale-[0.97]"
             >
               <ChevronLeft className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
@@ -344,10 +332,7 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
             <button
               type="button"
               aria-label={c.nextAria}
-              onClick={() => {
-                stop();
-                goTo(shown + 1);
-              }}
+              onClick={() => step(1)}
               className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-primary text-primary transition-[background-color,color,scale] duration-150 ease-out hover:bg-primary hover:text-white active:scale-[0.97]"
             >
               <ChevronRight className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
@@ -362,15 +347,12 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
                 type="button"
                 aria-label={`${c.goToReview} ${i + 1}`}
                 aria-current={i === shown ? "true" : undefined}
-                onClick={() => {
-                  stop();
-                  goTo(i);
-                }}
+                onClick={() => goTo(i)}
                 className="grid h-11 w-11 place-items-center"
               >
                 <span
                   aria-hidden="true"
-                  className={`h-2 w-2 rounded-full transition-colors duration-150 ${
+                  className={`h-2 w-2 rounded-full transition-colors duration-150 ease-out ${
                     i === shown ? "bg-primary" : "bg-primary/25"
                   }`}
                 />
@@ -381,14 +363,9 @@ export default function GoogleReviews({ locale }: { locale: Locale }) {
 
         {/* Cierre */}
         <div className="mt-12 text-center">
-          <a
-            href={GOOGLE_REVIEWS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-full bg-primary px-[30px] py-[14px] font-body text-[15px] font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
-          >
+          <ButtonLink href={GOOGLE_REVIEWS_URL} external size="lg">
             {c.seeAll}
-          </a>
+          </ButtonLink>
           <p className="mx-auto mt-8 max-w-2xl font-body text-xs leading-relaxed text-muted">
             {c.disclaimer}
           </p>

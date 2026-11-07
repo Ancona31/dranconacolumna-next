@@ -25,7 +25,19 @@ export function buildWhatsAppLink(
  */
 export function isMobile(): boolean {
   if (typeof navigator === "undefined") return false;
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || isIOS();
+}
+
+/**
+ * ¿iOS o iPadOS? iPadOS se anuncia como "Macintosh": se distingue por la
+ * pantalla táctil (ninguna Mac la tiene).
+ */
+export function isIOS(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return (
+    /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
+  );
 }
 
 /**
@@ -48,34 +60,56 @@ export function toWhatsAppAppLink(waMeHref: string): string | null {
   }
 }
 
+/** Espera a que la app tome el control antes de abrir el respaldo web. */
+const APP_FALLBACK_MS = 2500;
+
 /**
- * En móvil intenta abrir la app de WhatsApp con el esquema `whatsapp://`, que
- * salta el navegador (y su vista web, el problema que veíamos en navegadores
- * in-app). Si la app no toma el control en ~1.2s —típicamente porque no está
- * instalada— cae al enlace web wa.me original.
+ * En Android intenta abrir la app de WhatsApp con el esquema `whatsapp://`,
+ * que salta el navegador (y su vista web, el problema que veíamos en
+ * navegadores in-app). Si la app no toma el control en ~2.5 s —típicamente
+ * porque no está instalada— abre el enlace web wa.me en OTRA pestaña: la
+ * pestaña actual nunca navega fuera (antes se perdía el resultado de la
+ * evaluación).
+ *
+ * En iOS no se usa el esquema: Safari muestra el diálogo "¿Abrir en
+ * WhatsApp?" y el respaldo saltaba antes de que el usuario respondiera. wa.me
+ * es un enlace universal que abre la app sin diálogo cuando viene de un toque,
+ * así que ahí manda el ancla tal cual (target="_blank").
  *
  * Pensado para llamarse desde el onClick del CTA. Devuelve true si tomó el
- * control (móvil): el llamador debe hacer `e.preventDefault()` para que el
- * ancla no abra además la pestaña wa.me. En desktop/SSR devuelve false y el
- * ancla se comporta como siempre.
+ * control (Android): el llamador debe hacer `e.preventDefault()` para que el
+ * ancla no abra además la pestaña wa.me. En iOS, desktop o SSR devuelve false
+ * y el ancla se comporta como siempre.
  */
 export function openWhatsAppInApp(waMeHref: string): boolean {
-  if (typeof window === "undefined" || !isMobile()) return false;
+  if (typeof window === "undefined" || !isMobile() || isIOS()) return false;
   const appHref = toWhatsAppAppLink(waMeHref);
   if (!appHref) return false;
 
-  const fallback = window.setTimeout(() => {
-    window.location.href = waMeHref;
-  }, 1200);
-
-  // Si la app abre, la pestaña se oculta: cancelamos el fallback web.
-  const onHide = () => {
-    if (document.visibilityState === "hidden") {
-      window.clearTimeout(fallback);
-      document.removeEventListener("visibilitychange", onHide);
-    }
+  const cleanup = () => {
+    window.clearTimeout(fallback);
+    document.removeEventListener("visibilitychange", onHide);
+    window.removeEventListener("pagehide", cleanup);
+    window.removeEventListener("blur", cleanup);
   };
+  // Si la app abre, la pestaña se oculta o pierde el foco (selector de apps):
+  // se cancela el respaldo web.
+  const onHide = () => {
+    if (document.visibilityState === "hidden") cleanup();
+  };
+
+  const fallback = window.setTimeout(() => {
+    cleanup();
+    // Pestaña nueva, nunca location.href: el resultado sigue en esta. Sin
+    // "noopener" en las features (haría que window.open devuelva null); el
+    // opener se corta a mano.
+    const win = window.open(waMeHref, "_blank");
+    if (win) win.opener = null;
+  }, APP_FALLBACK_MS);
+
   document.addEventListener("visibilitychange", onHide);
+  window.addEventListener("pagehide", cleanup);
+  window.addEventListener("blur", cleanup);
 
   window.location.href = appHref;
   return true;

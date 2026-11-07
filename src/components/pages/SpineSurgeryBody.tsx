@@ -25,7 +25,7 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
             <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
               {c.hero.eyebrow}
             </p>
-            <h1 className="mt-2 font-heading text-[clamp(2.25rem,1.6rem+2.6vw,3rem)] font-extrabold leading-tight text-primary">
+            <h1 className="break-words mt-2 font-heading text-[clamp(2.25rem,1.6rem+2.6vw,3rem)] font-extrabold leading-tight text-primary">
               {c.hero.h1}
             </h1>
             <p className="mt-5 max-w-3xl font-body text-lg text-ink/80">
@@ -36,7 +36,8 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
             className="load-enter"
             style={{ "--load-delay": "120ms" } as React.CSSProperties}
           >
-            <div className="relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-2xl">
+            {/* Fondo de respaldo: si la foto falla no queda un hueco. */}
+            <div className="relative bg-primary/10 mt-10 aspect-[16/9] w-full overflow-hidden rounded-2xl">
               <Image
                 src="/images/quirofano-2.jpg"
                 alt={c.imageAlt}
@@ -52,7 +53,7 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
       {/* Cuándo se considera la cirugía */}
       <section className="bg-background">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <h2 className="font-heading text-3xl font-bold text-primary">
+          <h2 className="break-words font-heading text-3xl font-bold text-primary">
             {c.when.h2}
           </h2>
           <p className="mt-6 font-body text-ink/75">{c.when.text}</p>
@@ -62,7 +63,7 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
       {/* Técnicas de mínima invasión */}
       <section className="bg-primary-soft">
         <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
-          <h2 className="font-heading text-3xl font-bold text-primary">
+          <h2 className="break-words font-heading text-3xl font-bold text-primary">
             {c.techniques.h2}
           </h2>
           <p className="mt-6 max-w-3xl font-body text-ink/75">
@@ -73,15 +74,15 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
             {c.techniques.cards.map((card, i) => {
               const Icon = TECH_ICONS[i];
               return (
-                <Reveal key={card.title} delay={i * 80} className="flex">
-                  <div className="flex flex-1 flex-col rounded-2xl border border-primary/10 bg-background p-6">
+                <Reveal key={card.title} className="flex min-w-0">
+                  <div className="flex min-w-0 flex-1 flex-col rounded-2xl border border-primary/10 bg-background p-6">
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
                       <Icon className="h-6 w-6" strokeWidth={1.5} />
                     </div>
-                    <h3 className="mt-4 font-heading text-lg font-bold text-primary">
+                    <h3 className="break-words mt-4 font-heading text-lg font-bold text-primary">
                       {card.title}
                     </h3>
-                    <p className="mt-3 font-body text-ink/75">{card.text}</p>
+                    <p className="mt-3 font-body break-words text-ink/75">{card.text}</p>
                   </div>
                 </Reveal>
               );
@@ -97,7 +98,7 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
       {/* Cómo es la recuperación */}
       <section className="bg-background">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <h2 className="font-heading text-3xl font-bold text-primary">
+          <h2 className="break-words font-heading text-3xl font-bold text-primary">
             {c.recovery.h2}
           </h2>
           <p className="mt-6 font-body text-ink/75">{c.recovery.text}</p>
@@ -107,7 +108,7 @@ export default function SpineSurgeryBody({ locale }: { locale: Locale }) {
       {/* CTA final */}
       <section className="bg-primary">
         <div className="mx-auto max-w-3xl px-4 py-14 text-center md:py-20">
-          <h2 className="font-heading text-3xl font-bold text-white">
+          <h2 className="break-words font-heading text-3xl font-bold text-white">
             {c.cta.h2}
           </h2>
           <p className="mx-auto mt-4 max-w-xl font-body text-white/80">

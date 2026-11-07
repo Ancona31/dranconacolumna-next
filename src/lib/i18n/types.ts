@@ -56,6 +56,13 @@ export interface UiStrings {
     modelCreditLicenseLead: string;
     /** Aviso para lectores de pantalla en enlaces que abren pestaña nueva. */
     opensInNewTab: string;
+    /** Título de la columna de navegación (también aria-label del <nav>). */
+    navHeading: string;
+    /** Título de la columna de contacto y sedes. */
+    contactHeading: string;
+    /** Enlace a la página de contacto, al pie del resumen de sedes. */
+    locationsLinkLabel: string;
+    contactHref: string;
   };
 
   mobileBar: {

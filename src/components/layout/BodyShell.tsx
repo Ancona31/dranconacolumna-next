@@ -23,13 +23,6 @@ export default function BodyShell({
 
   return (
     <>
-      {/* Marca el documento como con-JS antes del paint para habilitar las
-          animaciones de entrada sin provocar parpadeo (FOUC). */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: "document.documentElement.classList.add('js');",
-        }}
-      />
       <Header locale={locale} strings={strings} />
       <main className="flex-1">{children}</main>
       <Footer strings={strings} />

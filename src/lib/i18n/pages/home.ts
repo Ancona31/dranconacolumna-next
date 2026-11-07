@@ -30,6 +30,9 @@ export interface HomeContent {
     cedulaProf: string;
     cedulaEsp: string;
     certification: string;
+    /** Forma corta de la certificación para la línea de PC (la completa va
+     *  en el title). */
+    certificationShort: string;
   };
   howItWorks: {
     h2: string;
@@ -43,6 +46,8 @@ export interface HomeContent {
     imageAlts: string[];
   };
   conditions: {
+    /** Eyebrow de la cabecera de página en el índice /padecimientos. */
+    pageEyebrow: string;
     h2: string;
     subMobile: string;
     subDesktopPre: string;
@@ -112,6 +117,7 @@ const HOME_ES: HomeContent = {
     cedulaProf: "Céd. Prof.",
     cedulaEsp: "Céd. Esp.",
     certification: CERTIFICACION,
+    certificationShort: "Certificado por el CMOT",
   },
   howItWorks: {
     h2: "Cómo funciona",
@@ -156,6 +162,7 @@ const HOME_ES: HomeContent = {
     ],
   },
   conditions: {
+    pageEyebrow: "Padecimientos",
     h2: "Padecimientos que trato",
     subMobile: "Cada padecimiento está ligado a su zona en el cuerpo.",
     subDesktopPre:
@@ -267,6 +274,7 @@ const HOME_EN: HomeContent = {
     cedulaEsp: "Specialist License",
     certification:
       "Board certified by the Mexican Board of Orthopedics and Traumatology (CMOT)",
+    certificationShort: "CMOT board certified",
   },
   howItWorks: {
     h2: "How it works",
@@ -311,6 +319,7 @@ const HOME_EN: HomeContent = {
     ],
   },
   conditions: {
+    pageEyebrow: "Conditions",
     h2: "Conditions I treat",
     subMobile: "Each condition is linked to the area of the body it affects.",
     subDesktopPre:

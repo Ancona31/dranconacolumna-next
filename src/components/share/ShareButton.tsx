@@ -2,13 +2,40 @@
 
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
+import { usePathname } from "next/navigation";
 import { Share2, Mail, Link2, Check } from "lucide-react";
 import { trackEvent, type ShareMetodo } from "@/lib/analytics";
+import type { Locale } from "@/lib/i18n/types";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
+
+/** Textos fijos del menú por idioma (el botón trae su `label` de la página). */
+const STRINGS: Record<
+  Locale,
+  { label: string; menuAria: string; email: string; copy: string; copied: string }
+> = {
+  es: {
+    label: "Compartir",
+    menuAria: "Opciones para compartir",
+    email: "Correo",
+    copy: "Copiar enlace",
+    copied: "¡Copiado!",
+  },
+  en: {
+    label: "Share",
+    menuAria: "Sharing options",
+    email: "Email",
+    copy: "Copy link",
+    copied: "Copied!",
+  },
+};
+
+/** Margen mínimo entre el menú y el borde de la pantalla. */
+const VIEWPORT_GUTTER = 8;
 
 /** Logos de marca (trazos de simple-icons) a 16px, mismo tamaño que lucide. */
 
@@ -33,8 +60,10 @@ type ShareButtonProps = {
   variant?: "inline" | "card";
   /** Se propaga a analytics como `origen` del evento de compartir. */
   origen?: string;
-  /** Etiqueta visible del botón. Por defecto "Compartir". */
+  /** Etiqueta visible del botón. Por defecto "Compartir" / "Share". */
   label?: string;
+  /** Idioma del menú. Si no llega, se deduce de la ruta (/en/…). */
+  locale?: Locale;
 };
 
 /**
@@ -49,8 +78,14 @@ export default function ShareButton({
   text,
   variant = "inline",
   origen,
-  label = "Compartir",
+  label,
+  locale,
 }: ShareButtonProps) {
+  const pathname = usePathname();
+  const lang: Locale =
+    locale ?? (pathname === "/en" || pathname?.startsWith("/en/") ? "en" : "es");
+  const t = STRINGS[lang];
+  const buttonLabel = label ?? t.label;
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,6 +120,30 @@ export default function ShareButton({
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKey);
     };
+  }, [open]);
+
+  // Antes de pintar: si el menú alineado a la derecha del botón se saldría
+  // de la pantalla (botón pegado al borde izquierdo, celular sin Web Share),
+  // se desplaza lo justo para quedar dentro, con un margen de 8 px. Se toca
+  // el estilo del nodo directo: el menú se desmonta al cerrar, así que cada
+  // apertura arranca de la posición por defecto.
+  useLayoutEffect(() => {
+    if (!open) return;
+    const menu = menuRef.current;
+    const container = containerRef.current;
+    if (!menu || !container) return;
+    const box = container.getBoundingClientRect();
+    const width = menu.offsetWidth;
+    const vw = document.documentElement.clientWidth;
+    const preferred = box.right - width;
+    const clamped = Math.min(
+      Math.max(preferred, VIEWPORT_GUTTER),
+      vw - VIEWPORT_GUTTER - width,
+    );
+    if (clamped === preferred) return;
+    menu.style.left = `${clamped - box.left}px`;
+    menu.style.right = "auto";
+    menu.style.transformOrigin = "top";
   }, [open]);
 
   // Navegación del menú con flechas, Inicio y Fin (patrón ARIA menu). Tab
@@ -144,7 +203,9 @@ export default function ShareButton({
       } catch (err) {
         // AbortError = el usuario canceló: no mostramos nada.
         if (err instanceof Error && err.name === "AbortError") return;
-        // Otros errores: silencioso, no bloqueamos la UI.
+        // Otros errores (p. ej. NotAllowedError en WebViews): se ofrece el
+        // menú de respaldo en vez de no hacer nada.
+        setOpen(true);
       }
       return;
     }
@@ -170,7 +231,12 @@ export default function ShareButton({
       : "border border-ink/20 px-4 py-2 text-sm text-ink/70 hover:border-primary hover:text-primary";
 
   const itemClass =
-    "flex min-h-[44px] w-full items-center gap-3 px-4 py-2.5 text-left font-body text-sm text-ink/80 transition-colors hover:bg-primary-soft focus-visible:bg-primary-soft";
+    "flex min-h-[44px] w-full items-center gap-3 px-4 py-2.5 text-left font-body text-sm text-ink/80 transition-colors duration-150 ease-out hover:bg-primary-soft focus-visible:bg-primary-soft";
+
+  // Cruce de íconos al copiar: los dos ocupan la misma celda y el que entra
+  // crece desde 75 % con un fundido de 150 ms (sin cambio de golpe).
+  const iconSwap =
+    "col-start-1 row-start-1 h-4 w-4 transition-[opacity,scale] duration-150 ease-out";
 
   return (
     <div ref={containerRef} className="relative inline-block">
@@ -180,7 +246,7 @@ export default function ShareButton({
         onClick={handleClick}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={label}
+        aria-label={buttonLabel}
         className={`${base} ${variantClass}`}
       >
         <Share2
@@ -188,16 +254,16 @@ export default function ShareButton({
           strokeWidth={1.75}
           aria-hidden="true"
         />
-        {label}
+        {buttonLabel}
       </button>
 
       {open && (
         <div
           ref={menuRef}
           role="menu"
-          aria-label="Opciones para compartir"
+          aria-label={t.menuAria}
           onKeyDown={onMenuKeyDown}
-          className="popover-in absolute right-0 z-20 mt-2 w-52 origin-top-right overflow-hidden rounded-xl border border-ink/10 bg-background py-1 shadow-overlay"
+          className="popover-in absolute right-0 z-20 mt-2 w-52 max-w-[calc(100vw-1rem)] origin-top-right overflow-hidden rounded-xl border border-ink/10 bg-background py-1 shadow-overlay"
         >
           <a
             role="menuitem"
@@ -241,7 +307,7 @@ export default function ShareButton({
               strokeWidth={1.75}
               aria-hidden="true"
             />
-            Correo
+            {t.email}
           </a>
           <button
             role="menuitem"
@@ -249,20 +315,21 @@ export default function ShareButton({
             onClick={handleCopy}
             className={itemClass}
           >
-            {copied ? (
-              <Check
-                className="h-4 w-4 shrink-0 text-success"
-                strokeWidth={2}
-                aria-hidden="true"
-              />
-            ) : (
+            <span aria-hidden="true" className="grid shrink-0">
               <Link2
-                className="h-4 w-4 shrink-0 text-accent"
+                className={`${iconSwap} text-accent ${
+                  copied ? "scale-75 opacity-0" : "scale-100 opacity-100"
+                }`}
                 strokeWidth={1.75}
-                aria-hidden="true"
               />
-            )}
-            {copied ? "¡Copiado!" : "Copiar enlace"}
+              <Check
+                className={`${iconSwap} text-success ${
+                  copied ? "scale-100 opacity-100" : "scale-75 opacity-0"
+                }`}
+                strokeWidth={2}
+              />
+            </span>
+            {copied ? t.copied : t.copy}
           </button>
         </div>
       )}

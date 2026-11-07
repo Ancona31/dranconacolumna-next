@@ -57,11 +57,14 @@ export default function Differentiators({ locale }: { locale: Locale }) {
                 ? routeFor(meta.esHref, locale)
                 : null;
             return (
-              <Reveal key={card.title} delay={i * 80} className="flex">
+              <Reveal key={card.title} className="flex min-w-0">
                 {/* Sin elevación en hover: la tarjeta no es un enlace (solo su
                     "Ver más" lo es) y no debe prometer un clic que no existe. */}
-                <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 bg-background md:flex-row lg:flex-col">
-                  <div className="relative aspect-[4/3] w-full md:aspect-auto md:min-h-64 md:w-2/5 md:shrink-0 lg:aspect-[4/3] lg:min-h-0 lg:w-full">
+                {/* min-w-0 y break-words: con zoom de texto al 200 % una palabra
+                    larga ("especialidad") parte en vez de desbordar. */}
+                <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-primary/10 bg-background md:flex-row lg:flex-col">
+                  {/* Fondo de respaldo: si la foto falla no queda un hueco. */}
+                  <div className="relative bg-primary-soft aspect-[4/3] w-full md:aspect-auto md:min-h-64 md:w-2/5 md:shrink-0 lg:aspect-[4/3] lg:min-h-0 lg:w-full">
                     <Image
                       src={image.src}
                       alt={c.imageAlts[i]}
@@ -75,17 +78,17 @@ export default function Differentiators({ locale }: { locale: Locale }) {
                       sizes="(max-width: 767px) 100vw, (max-width: 1023px) 40vw, 33vw"
                     />
                   </div>
-                  <div className="flex flex-1 flex-col p-6">
+                  <div className="flex min-w-0 flex-1 flex-col p-6">
                     <div className="flex items-center gap-2">
                       <Icon
                         className="h-5 w-5 shrink-0 text-primary"
                         strokeWidth={1.5}
                       />
-                      <h3 className="font-heading text-lg font-bold text-primary">
+                      <h3 className="min-w-0 font-heading text-lg font-bold break-words text-primary">
                         {card.title}
                       </h3>
                     </div>
-                    <p className="mt-3 flex-1 font-body text-ink/75">
+                    <p className="mt-3 flex-1 font-body break-words text-ink/75">
                       {card.text}
                     </p>
                     {href && card.linkLabel && (
@@ -96,7 +99,7 @@ export default function Differentiators({ locale }: { locale: Locale }) {
                         {card.linkLabel}
                         <span
                           aria-hidden="true"
-                          className="transition-transform duration-150 group-hover/arrow:translate-x-0.5"
+                          className="transition-transform duration-150 ease-out group-hover/arrow:translate-x-0.5"
                         >
                           →
                         </span>

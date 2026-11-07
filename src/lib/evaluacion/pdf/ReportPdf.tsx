@@ -49,10 +49,12 @@ import {
 } from "@/lib/config";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import QrSvg from "@/lib/evaluacion/pdf/QrSvg";
+import { toPdfSafeName } from "@/lib/evaluacion/pdf/safe-text";
 
 // TODO: si se agregan /public/fonts/*.ttf, registrar aquí Plus Jakarta Sans
 // (bold, títulos) e Inter (regular/semibold) con Font.register. Por ahora se
-// usan las fuentes estándar Helvetica / Helvetica-Bold del visor de PDF.
+// usan las fuentes estándar Helvetica / Helvetica-Bold del visor de PDF, que
+// solo cubren WinAnsi: el texto libre (nombre) pasa por toPdfSafeName.
 
 // Evita el guionado de palabras (p. ej. "dranconacolumna.com" nunca se parte).
 Font.registerHyphenationCallback((word) => [word]);
@@ -612,7 +614,8 @@ function CapacityCardPdf({
   domain: DomainResult;
   locale: Locale;
 }) {
-  const { bg, strong } = FUNC_COLORS[domain.state];
+  // strong: borde e ícono; text: etiqueta y círculo del glifo (≥4.5:1).
+  const { bg, strong, text } = FUNC_COLORS[domain.state];
   return (
     <View
       style={[styles.capCard, { backgroundColor: bg, borderColor: strong }]}
@@ -626,9 +629,9 @@ function CapacityCardPdf({
           </Text>
         </View>
         <View style={styles.capState}>
-          <PdfStatusGlyph state={domain.state} color={strong} />
+          <PdfStatusGlyph state={domain.state} color={text} />
           <Text
-            style={{ fontFamily: "Helvetica-Bold", fontSize: 8, color: strong }}
+            style={{ fontFamily: "Helvetica-Bold", fontSize: 8, color: text }}
           >
             {getEngineCopy(locale).funcStateLabels[domain.state]}
           </Text>
@@ -686,6 +689,8 @@ export default function ReportPdf({
   const warningSigns = getWarningSigns(result, locale);
   const partialNote = getPartialAnswersNote(result, locale);
   const scheduleWaLink = buildWhatsAppLink(ui.pdf.scheduleWaMessage);
+  // Helvetica (WinAnsi) no tiene glifos para "ś" ni emoji: se adapta el nombre.
+  const safeName = name ? toPdfSafeName(name) : "";
 
   return (
     <Document>
@@ -710,8 +715,8 @@ export default function ReportPdf({
               <Text style={styles.meta}>
                 {ui.pdf.metaLine(fecha, result.folio)}
               </Text>
-              {name ? (
-                <Text style={styles.meta}>{ui.pdf.reportOf(name)}</Text>
+              {safeName ? (
+                <Text style={styles.meta}>{ui.pdf.reportOf(safeName)}</Text>
               ) : null}
             </View>
             <View style={{ marginTop: 10 }}>
@@ -789,7 +794,7 @@ export default function ReportPdf({
                 style={{
                   fontFamily: "Helvetica-Bold",
                   fontSize: 8.5,
-                  color: NIVEL_BADGE_COLORS[result.level].strong,
+                  color: NIVEL_BADGE_COLORS[result.level].text,
                 }}
               >
                 {ui.pdf.badgeQuestion(result.level)}

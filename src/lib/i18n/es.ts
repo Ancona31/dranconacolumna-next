@@ -30,6 +30,10 @@ export const es: UiStrings = {
     modelCreditModified: "(modificado)",
     modelCreditLicenseLead: "licencia",
     opensInNewTab: "(se abre en una pestaña nueva)",
+    navHeading: "Navegación",
+    contactHeading: "Contacto y sedes",
+    locationsLinkLabel: "Ver sedes y horarios",
+    contactHref: "/contacto",
   },
   mobileBar: {
     evaluationCta: "Hacer mi evaluación",

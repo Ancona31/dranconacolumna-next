@@ -4,24 +4,56 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Download, Loader2 } from "lucide-react";
 import type { EvaluationResult } from "@/lib/evaluacion/types";
 import { getResultWhatsAppLink } from "@/lib/evaluacion/engine";
+import { toPdfSafeName } from "@/lib/evaluacion/pdf/safe-text";
 import { trackEvent } from "@/lib/analytics";
 import type { Locale } from "@/lib/i18n/types";
 import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
 
 /** Estados de la descarga que el i18n de la evaluación aún no cubre. */
-const STATUS: Record<Locale, { done: string; error: string }> = {
+const STATUS: Record<
+  Locale,
+  { done: string; error: string; ready: string; openLink: string; retryLink: string }
+> = {
   es: {
     done: "Descargado",
     error: "No se pudo generar el PDF. Inténtalo de nuevo.",
+    ready: "Tu PDF está listo.",
+    openLink: "Abrir mi PDF",
+    retryLink: "¿No se descargó? Ábrelo aquí",
   },
   en: {
     done: "Downloaded",
     error: "We couldn't create the PDF. Please try again.",
+    ready: "Your PDF is ready.",
+    openLink: "Open my PDF",
+    retryLink: "Didn't download? Open it here",
   },
 };
 
 /** Tiempo que el botón muestra "Descargado" antes de volver a su estado. */
 const DONE_MS = 2000;
+
+/**
+ * Vida del enlace blob: la descarga es asíncrona y revocarlo en el mismo tick
+ * puede abortarla (Safari, Firefox). Un minuto basta y no deja el PDF en
+ * memoria indefinidamente.
+ */
+const BLOB_TTL_MS = 60_000;
+
+/** Largo máximo del nombre impreso en el reporte. */
+const NAME_MAX = 60;
+
+/**
+ * ¿El navegador descarga un blob con <a download>? Los navegadores dentro de
+ * otras apps (Facebook, Instagram, WhatsApp, WebView de Android) ignoran el
+ * atributo: ahí se ofrece abrir el PDF en vez de decir "Descargado".
+ */
+function canDownloadBlob(): boolean {
+  if (!("download" in HTMLAnchorElement.prototype)) return false;
+  return !/FBAN|FBAV|FB_IAB|Instagram|Line\/|WhatsApp|; wv\)/i.test(
+    navigator.userAgent
+  );
+}
 
 export default function PdfDownload({
   result,
@@ -36,16 +68,37 @@ export default function PdfDownload({
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState(false);
+  // Enlace al PDF generado (blob:) mientras vive: respaldo visible cuando la
+  // descarga no se pudo disparar o no se ve.
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [downloaded, setDownloaded] = useState(false);
   const doneTimer = useRef<number | null>(null);
+  const revokeTimer = useRef<number | null>(null);
+  const urlRef = useRef<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const status = STATUS[locale];
 
   useEffect(
     () => () => {
       if (doneTimer.current) window.clearTimeout(doneTimer.current);
+      if (revokeTimer.current) window.clearTimeout(revokeTimer.current);
+      if (urlRef.current) URL.revokeObjectURL(urlRef.current);
     },
     []
   );
+
+  /** Revoca el blob anterior (si lo hay) y programa la del nuevo. */
+  function keepUrl(url: string) {
+    if (revokeTimer.current) window.clearTimeout(revokeTimer.current);
+    if (urlRef.current) URL.revokeObjectURL(urlRef.current);
+    urlRef.current = url;
+    setFileUrl(url);
+    revokeTimer.current = window.setTimeout(() => {
+      URL.revokeObjectURL(url);
+      urlRef.current = null;
+      setFileUrl(null);
+    }, BLOB_TTL_MS);
+  }
 
   // Al desplegar el panel, el foco pasa directo al campo del nombre (después
   // del render: antes el panel sigue inert y no acepta foco).
@@ -53,7 +106,8 @@ export default function PdfDownload({
     if (open) inputRef.current?.focus({ preventScroll: true });
   }, [open]);
 
-  async function generate() {
+  async function generate(e?: React.FormEvent) {
+    e?.preventDefault();
     if (busy) return;
     setBusy(true);
     setDone(false);
@@ -73,27 +127,33 @@ export default function PdfDownload({
       const blob = await pdf(
         <ReportPdf
           result={result}
-          name={name.trim() || undefined}
+          name={toPdfSafeName(name) || undefined}
           qrDataUrl={qrDataUrl}
           locale={locale}
         />
       ).toBlob();
 
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `reporte-evaluacion-${result.folio}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      keepUrl(url);
       trackEvent("reporte_pdf_descargado", {
         zona: result.test.zoneId,
         nivel: result.alertLevel === "urgente" ? "urgente" : result.level,
       });
-      setDone(true);
-      if (doneTimer.current) window.clearTimeout(doneTimer.current);
-      doneTimer.current = window.setTimeout(() => setDone(false), DONE_MS);
+      // "Descargado" solo si la descarga se disparó de verdad; si el
+      // navegador no descarga blobs, queda el enlace para abrir el PDF.
+      const canDownload = canDownloadBlob();
+      setDownloaded(canDownload);
+      if (canDownload) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `reporte-evaluacion-${result.folio}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setDone(true);
+        if (doneTimer.current) window.clearTimeout(doneTimer.current);
+        doneTimer.current = window.setTimeout(() => setDone(false), DONE_MS);
+      }
     } catch {
       setError(true);
     } finally {
@@ -130,7 +190,11 @@ export default function PdfDownload({
         }`}
       >
         <div className="min-h-0 overflow-hidden">
-          <div className="rounded-2xl border border-ink/15 bg-primary-soft/50 p-4">
+          {/* Formulario: Enter (o "Listo" del teclado del teléfono) genera. */}
+          <form
+            onSubmit={generate}
+            className="rounded-2xl border border-ink/15 bg-primary-soft/50 p-4"
+          >
             <label
               htmlFor="pdf-name"
               className="font-body text-sm font-medium text-ink"
@@ -143,13 +207,15 @@ export default function PdfDownload({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              maxLength={NAME_MAX}
               autoComplete="off"
+              autoCapitalize="words"
+              enterKeyHint="done"
               placeholder={ui.namePlaceholder}
               className="mt-2 w-full rounded-xl border border-ink/20 bg-background px-4 py-3 font-body text-ink transition-colors duration-150 focus:border-accent"
             />
             <button
-              type="button"
-              onClick={generate}
+              type="submit"
               aria-busy={busy}
               disabled={busy}
               className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-body text-sm font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97] disabled:cursor-progress disabled:opacity-70"
@@ -172,9 +238,22 @@ export default function PdfDownload({
               {error && (
                 <span className="mt-2 block text-danger">{status.error}</span>
               )}
+              {!error && !busy && fileUrl && (
+                <span className="mt-2 block text-ink/80">
+                  {!downloaded && `${status.ready} `}
+                  <a
+                    href={fileUrl}
+                    target="_blank"
+                    rel="noopener"
+                    className="font-semibold text-accent underline underline-offset-2"
+                  >
+                    {downloaded ? status.retryLink : status.openLink}
+                  </a>
+                </span>
+              )}
             </p>
             <p className="mt-2 font-body text-xs text-muted">{ui.privacyNote}</p>
-          </div>
+          </form>
         </div>
       </div>
     </div>

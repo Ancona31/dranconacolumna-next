@@ -340,7 +340,7 @@ export default function HeroSkeletonArt({
           onClick={() => setUserPaused((p) => !p)}
           aria-label={userPaused ? t.play : t.pause}
           title={userPaused ? t.play : t.pause}
-          className={`absolute bottom-[6%] right-[8%] z-10 inline-flex size-11 scroll-mb-[calc(5.5rem+env(safe-area-inset-bottom))] items-center justify-center rounded-full bg-primary-soft/85 text-primary ring-1 ring-primary/25 backdrop-blur-sm transition-opacity duration-150 ease-out hover:bg-primary-soft focus-visible:opacity-100 group-hover:opacity-100 pointer-coarse:opacity-100 motion-reduce:hidden md:scroll-mb-4 ${
+          className={`absolute bottom-[6%] right-[8%] z-10 inline-flex size-11 scroll-mb-[calc(5.5rem+env(safe-area-inset-bottom))] items-center justify-center rounded-full bg-primary-soft/95 text-primary ring-1 ring-primary/25 transition-opacity duration-150 ease-out hover:bg-primary-soft focus-visible:opacity-100 group-hover:opacity-100 pointer-coarse:opacity-100 motion-reduce:hidden md:scroll-mb-4 ${
             userPaused ? "opacity-100" : "opacity-0"
           }`}
         >

@@ -48,7 +48,13 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${fontVariables} h-full`}
-      // BodyShell añade la clase "js" antes de hidratar (ver su script inline).
+      // Next 16 ya no anula el scroll-behavior: smooth de globals.css al
+      // navegar. Con este atributo lo desactiva durante cada cambio de ruta y
+      // la página nueva arranca arriba al instante (el scroll suave queda
+      // solo para anclas dentro de la página).
+      data-scroll-behavior="smooth"
+      // Las extensiones del navegador suelen añadir atributos a <html> antes
+      // de hidratar: no son errores de hidratación.
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">

@@ -31,6 +31,14 @@ export interface EvaluationUi {
     figureAria: string;
     /** aria-label del botón de una zona. */
     zoneAria: (label: string) => string;
+    /**
+     * Enlace de entrada directa a la evaluación de una zona: las zonas son
+     * <a> y funcionan aun antes de que hidrate el JS (la página lee el
+     * parámetro en el servidor).
+     */
+    zoneHref: (zoneId: string) => string;
+    /** Rótulo de la lista de zonas en texto bajo la figura. */
+    listLabel: string;
   };
 
   alarm: {
@@ -154,6 +162,8 @@ export const EVAL_UI_ES: EvaluationUi = {
     figureAria:
       "Figura humana vista de espaldas con las zonas del cuerpo que puedes evaluar",
     zoneAria: (label) => `Evaluar ${label}`,
+    zoneHref: (zoneId) => `/evaluacion?zona=${zoneId}`,
+    listLabel: "O elige la zona aquí:",
   },
 
   alarm: {
@@ -277,6 +287,8 @@ export const EVAL_UI_EN: EvaluationUi = {
     figureAria:
       "Human figure seen from behind, showing the body areas you can assess",
     zoneAria: (label) => `Assess ${label}`,
+    zoneHref: (zoneId) => `/en/assessment?zone=${zoneId}`,
+    listLabel: "Or choose the area here:",
   },
 
   alarm: {

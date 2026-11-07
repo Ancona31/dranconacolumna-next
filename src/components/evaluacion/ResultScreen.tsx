@@ -21,7 +21,6 @@ import type {
   DomainId,
   DomainState,
   EvaluationResult,
-  NonUrgentLevel,
 } from "@/lib/evaluacion/types";
 import {
   allDomainsGreen,
@@ -72,13 +71,6 @@ function ShareEvaluation({ locale }: { locale: Locale }) {
 const BANNER_STYLES = {
   precaucion: { box: "border-warning bg-warning/10", title: "text-warning" },
   urgente: { box: "border-danger bg-danger/10", title: "text-danger" },
-};
-
-// Clase de la pill de nivel (el color no lo da el texto). El texto sale de ui.
-const LEVEL_PILL: Record<NonUrgentLevel, string> = {
-  leve: "bg-success/10 text-success",
-  moderada: "bg-warning/10 text-warning",
-  severa: "bg-danger/10 text-danger",
 };
 
 // Icono lucide por dominio y glifo de estado (SVG, nunca emoji). Cubre la
@@ -181,7 +173,9 @@ function CapacityCard({
   domain: ReturnType<typeof computeDomains>[number];
   locale: Locale;
 }) {
-  const { bg, strong } = FUNC_COLORS[domain.state];
+  // strong: borde, barra e ícono (gráfico); text: etiqueta y círculo del
+  // glifo, en el tono oscuro para que se lean (≥4.5:1).
+  const { bg, strong, text } = FUNC_COLORS[domain.state];
   const Icon = DOMAIN_ICON[domain.id] ?? Activity;
   const Glyph = STATE_GLYPH[domain.state];
   return (
@@ -202,11 +196,11 @@ function CapacityCard({
         <span className="ml-auto flex items-center gap-1.5">
           <span
             className="flex h-5 w-5 items-center justify-center rounded-full"
-            style={{ backgroundColor: strong }}
+            style={{ backgroundColor: text }}
           >
             <Glyph className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
           </span>
-          <span className="font-body text-xs font-bold" style={{ color: strong }}>
+          <span className="font-body text-xs font-bold" style={{ color: text }}>
             {getEngineCopy(locale).funcStateLabels[domain.state]}
           </span>
         </span>
@@ -398,7 +392,11 @@ export default function ResultScreen({
         <p className="font-body text-sm text-muted">{ui.indexCaption}</p>
         <p className="mt-1 font-body text-xs text-muted">{ui.cutsLegend}</p>
         <span
-          className={`mt-3 rounded-full px-4 py-1 font-body text-sm font-semibold ${LEVEL_PILL[result.level]}`}
+          className="mt-3 rounded-full px-4 py-1 font-body text-sm font-semibold"
+          style={{
+            backgroundColor: NIVEL_BADGE_COLORS[result.level].bg,
+            color: NIVEL_BADGE_COLORS[result.level].text,
+          }}
         >
           {ui.levelPill[result.level]}
         </span>
@@ -419,7 +417,7 @@ export default function ResultScreen({
       >
         <p
           className="font-heading text-sm font-bold"
-          style={{ color: NIVEL_BADGE_COLORS[result.level].strong }}
+          style={{ color: NIVEL_BADGE_COLORS[result.level].text }}
         >
           {ui.badgeQuestion(result.level)}
         </p>

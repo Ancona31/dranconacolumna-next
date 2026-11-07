@@ -78,16 +78,62 @@ export const nivelDefinitions: Record<NonUrgentLevel, string> =
   getEngineCopy("es").nivelDefinitions;
 
 /**
- * Par de color por nivel para el badge de definición: fondo muy claro + color
- * intenso (borde, título y acentos). Fuente única para pantalla y PDF.
+ * Paleta de estado del evaluador (pantalla y PDF). Fuente única de los hex:
+ * los componentes no definen colores propios. Los que coinciden con un token
+ * de globals.css lo indican; el PDF no lee variables CSS, por eso son hex.
+ *
+ * Regla: lo GRÁFICO (borde, barra, ícono, punto de la silueta) puede ir en el
+ * tono vivo; el TEXTO de estado va siempre en su tono oscuro (≥4.5:1 sobre el
+ * fondo suave de la tarjeta). El amarillo vivo como texto daba 1.8:1.
  */
-export const NIVEL_BADGE_COLORS: Record<
-  NonUrgentLevel,
-  { bg: string; strong: string }
-> = {
-  leve: { bg: "#EAF4EF", strong: "#2E7D5B" },
-  moderada: { bg: "#FAF1E3", strong: "#9A5B0E" },
-  severa: { bg: "#F9EAE8", strong: "#B23B30" },
+export const EVAL_PALETTE = {
+  // Fondos suaves de tarjeta.
+  bgVerde: "#EAF4EF",
+  bgAmarillo: "#FDF7DC",
+  bgNaranja: "#FBEFE5",
+  bgRojo: "#F9EAE8",
+  bgNa: "#F1F4F6",
+  bgModerada: "#FAF1E3",
+  bgStandard: "#EDF2F5", // = --color-primary-soft
+  // Tonos vivos: solo borde, barra, ícono y glifo.
+  lineVerde: "#2E7D5B", // = --color-success
+  lineAmarillo: "#E3B505",
+  lineNaranja: "#D96C2C",
+  lineNa: "#94A3B2",
+  // Tonos de texto (contraste sobre su fondo suave).
+  textVerde: "#276B4E", // 5.7:1
+  textAmarillo: "#8A6400", // 5.0:1
+  textNaranja: "#9A4415", // 5.8:1
+  danger: "#B23B30", // = --color-danger · 5.0:1 (línea y texto)
+  warning: "#9A5B0E", // = --color-warning · 4.8:1 (línea y texto)
+  muted: "#5F6B76", // = --color-muted · 4.9:1
+  primary: "#0B3C5D", // = --color-primary
+} as const;
+
+/** Trío de color de un estado: fondo, tono vivo (gráfico) y tono de texto. */
+export type StatusColors = { bg: string; strong: string; text: string };
+
+/**
+ * Color por nivel para el badge de definición: fondo muy claro, `strong` para
+ * borde y acentos gráficos, `text` para el título. Fuente única para pantalla
+ * y PDF.
+ */
+export const NIVEL_BADGE_COLORS: Record<NonUrgentLevel, StatusColors> = {
+  leve: {
+    bg: EVAL_PALETTE.bgVerde,
+    strong: EVAL_PALETTE.lineVerde,
+    text: EVAL_PALETTE.textVerde,
+  },
+  moderada: {
+    bg: EVAL_PALETTE.bgModerada,
+    strong: EVAL_PALETTE.warning,
+    text: EVAL_PALETTE.warning,
+  },
+  severa: {
+    bg: EVAL_PALETTE.bgRojo,
+    strong: EVAL_PALETTE.danger,
+    text: EVAL_PALETTE.danger,
+  },
 };
 
 /**
@@ -100,8 +146,8 @@ export const RECOMMENDATION_COLORS: Record<
   "standard" | "urgente",
   { bg: string; strong: string }
 > = {
-  standard: { bg: "#EDF2F5", strong: "#0B3C5D" },
-  urgente: { bg: "#F9EAE8", strong: "#B23B30" },
+  standard: { bg: EVAL_PALETTE.bgStandard, strong: EVAL_PALETTE.primary },
+  urgente: { bg: EVAL_PALETTE.bgRojo, strong: EVAL_PALETTE.danger },
 };
 
 /** Par de color del bloque a partir de su variante. */
@@ -405,16 +451,36 @@ export function getMarkedItems(
 /* ===================== SEMÁFORO FUNCIONAL POR DOMINIO ===================== */
 
 /**
- * Paleta EXCLUSIVA del semáforo funcional (4 matices + el gris neutro de 'na').
- * No reutilizar los tokens ámbar/coral del resto del sitio. Par fondo-suave /
- * color-intenso.
+ * Paleta del semáforo funcional (4 matices + el gris neutro de 'na'). `strong`
+ * es el tono vivo de borde, barra, ícono y círculo del glifo; `text`, el de la
+ * etiqueta de estado (≥4.5:1 sobre `bg`). Ver EVAL_PALETTE.
  */
-export const FUNC_COLORS: Record<DomainState, { bg: string; strong: string }> = {
-  verde: { bg: "#EAF4EF", strong: "#2E7D5B" },
-  amarillo: { bg: "#FDF7DC", strong: "#E3B505" },
-  naranja: { bg: "#FBEFE5", strong: "#D96C2C" },
-  rojo: { bg: "#F9EAE8", strong: "#C0453A" },
-  na: { bg: "#F1F4F6", strong: "#94A3B2" },
+export const FUNC_COLORS: Record<DomainState, StatusColors> = {
+  verde: {
+    bg: EVAL_PALETTE.bgVerde,
+    strong: EVAL_PALETTE.lineVerde,
+    text: EVAL_PALETTE.textVerde,
+  },
+  amarillo: {
+    bg: EVAL_PALETTE.bgAmarillo,
+    strong: EVAL_PALETTE.lineAmarillo,
+    text: EVAL_PALETTE.textAmarillo,
+  },
+  naranja: {
+    bg: EVAL_PALETTE.bgNaranja,
+    strong: EVAL_PALETTE.lineNaranja,
+    text: EVAL_PALETTE.textNaranja,
+  },
+  rojo: {
+    bg: EVAL_PALETTE.bgRojo,
+    strong: EVAL_PALETTE.danger,
+    text: EVAL_PALETTE.danger,
+  },
+  na: {
+    bg: EVAL_PALETTE.bgNa,
+    strong: EVAL_PALETTE.lineNa,
+    text: EVAL_PALETTE.muted,
+  },
 };
 
 export const FUNC_STATE_LABELS: Record<DomainState, string> =
@@ -708,7 +774,12 @@ export function computeResult(
   test: TestDefinition,
   answers: AnswerMap,
   flags: string[],
-  locale: Locale = "es"
+  locale: Locale = "es",
+  /**
+   * Folio y fecha ya emitidos: al restaurar un resultado (recarga de la
+   * pestaña) se conservan, para que el folio del WhatsApp y del PDF no cambie.
+   */
+  issued?: { folio: string; createdAt: Date }
 ): EvaluationResult {
   const { raw, interval, score, answeredCount, unscorable } = computeScore(
     test.scoring,
@@ -741,7 +812,7 @@ export function computeResult(
 
   const base = {
     test,
-    folio: buildFolio(),
+    folio: issued?.folio ?? buildFolio(),
     zoneLabel: test.zoneLabel,
     score,
     interval,
@@ -754,7 +825,7 @@ export function computeResult(
     alertLevel,
     alertMarks,
     breakdown,
-    createdAt: new Date(),
+    createdAt: issued?.createdAt ?? new Date(),
   };
 
   return {

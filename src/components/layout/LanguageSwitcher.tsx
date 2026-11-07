@@ -47,15 +47,20 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
   const ref = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  // Abierto con teclado (Enter/Espacio): el foco va a la primera opción. Con
+  // toque o clic va al panel, que no dibuja anillo (en iPhone el foco
+  // programático tras un toque lo pintaba sobre la opción).
+  const openedByKeyboard = useRef(false);
 
-  // Abierto: el foco pasa a la primera opción; toque/clic fuera cierra
+  // Abierto: el foco pasa al menú; toque/clic fuera cierra
   // (pointerdown cubre ratón y táctil) y Escape cierra devolviendo el foco al
   // botón.
   useEffect(() => {
     if (!open) return;
-    menuRef.current
-      ?.querySelector<HTMLElement>('[role="menuitem"]')
-      ?.focus({ preventScroll: true });
+    const target = openedByKeyboard.current
+      ? menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')
+      : menuRef.current;
+    target?.focus({ preventScroll: true });
     const onDown = (e: PointerEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node))
         setOpen(false);
@@ -111,7 +116,11 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={(e) => {
+          // detail === 0: el clic lo generó el teclado, no un puntero.
+          openedByKeyboard.current = e.detail === 0;
+          setOpen((v) => !v);
+        }}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Idioma / Language: ${current.label}`}
@@ -136,6 +145,7 @@ export default function LanguageSwitcher({ locale }: { locale: Locale }) {
           ref={menuRef}
           role="menu"
           aria-label="Idioma / Language"
+          tabIndex={-1}
           onKeyDown={onMenuKeyDown}
           className="popover-in absolute right-0 top-full z-[70] mt-2 min-w-[168px] origin-top-right overflow-hidden rounded-xl border border-ink/10 bg-background py-1 shadow-overlay"
         >

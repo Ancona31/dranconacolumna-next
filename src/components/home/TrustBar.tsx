@@ -13,27 +13,46 @@ export default function TrustBar({ locale }: { locale: Locale }) {
       key: "cedula",
       node: <CedulaItem profLabel={c.cedulaProf} espLabel={c.cedulaEsp} />,
     },
-    { key: "cert", node: <span>{c.certification}</span> },
   ];
+
+  // La certificación es el dato más largo: en la rejilla (celular y tablet)
+  // va completa; en la línea de PC va la forma corta y la completa queda en
+  // el title y para lectores de pantalla.
+  const certFull = <span>{c.certification}</span>;
+  const certShort = (
+    <span title={c.certification}>
+      <span aria-hidden="true">{c.certificationShort}</span>
+      <span className="sr-only">{c.certification}</span>
+    </span>
+  );
 
   return (
     <section className="bg-primary text-white">
       <div className="mx-auto max-w-6xl px-4 py-3">
-        {/* Móvil: grid 2x2 */}
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-center font-body text-xs text-white/90 md:hidden">
-          {items.map((item) => (
-            <li key={item.key} className="flex items-center justify-center">
+        {/* Celular y tablet: rejilla 2x2. A 768 px los 4 datos no caben en
+            una línea sin partirse. */}
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-center font-body text-xs text-white/90 md:text-sm lg:hidden">
+          {[...items, { key: "cert", node: certFull }].map((item) => (
+            <li
+              key={item.key}
+              className="flex min-w-0 items-center justify-center break-words *:min-w-0"
+            >
               {item.node}
             </li>
           ))}
         </ul>
 
-        {/* Desktop: una línea con separadores */}
-        <ul className="hidden items-center justify-center gap-4 font-body text-sm text-white/90 md:flex">
-          {items.map((item, i) => (
-            <li key={item.key} className="flex items-center gap-4">
+        {/* PC: una línea con separadores. Cada dato va entero
+            (whitespace-nowrap); si alguna vez no cabe, baja el dato
+            completo, nunca medio dato. */}
+        <ul className="hidden flex-wrap items-center justify-center gap-x-6 gap-y-1 font-body text-sm text-white/90 lg:flex">
+          {[...items, { key: "cert", node: certShort }].map((item, i, all) => (
+            <li
+              key={item.key}
+              className="flex items-center gap-6 whitespace-nowrap"
+            >
               {item.node}
-              {i < items.length - 1 && (
+              {i < all.length - 1 && (
                 <span aria-hidden="true" className="text-white/40">
                   ·
                 </span>
@@ -69,12 +88,12 @@ function CedulaItem({
 }) {
   return (
     <span>
-      {/* Móvil (grid 2x2): solo la cédula de especialista para no saturar. */}
-      <span className="md:hidden">
+      {/* Rejilla 2x2: solo la cédula de especialista para no saturar. */}
+      <span className="lg:hidden">
         {espLabel} {CEDULA_ESPECIALIDAD}
       </span>
-      {/* Desktop: ambas cédulas. */}
-      <span className="hidden md:inline">
+      {/* PC: ambas cédulas. */}
+      <span className="hidden lg:inline">
         {profLabel} {CEDULA_PROFESIONAL} · {espLabel} {CEDULA_ESPECIALIDAD}
       </span>
     </span>

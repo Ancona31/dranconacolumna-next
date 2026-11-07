@@ -81,7 +81,10 @@ export default function Header({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const openDrawer = useCallback(() => {
+  // `fromKeyboard`: con teclado el foco va al primer enlace (con su anillo);
+  // al tocar va al panel mismo, que no dibuja anillo (en iPhone el foco
+  // programático tras un toque pintaba el anillo en el primer enlace).
+  const openDrawer = useCallback((fromKeyboard: boolean) => {
     if (unmountTimer.current !== null) {
       clearTimeout(unmountTimer.current);
       unmountTimer.current = null;
@@ -92,9 +95,10 @@ export default function Header({
     // transición se revierte desde donde va.
     requestAnimationFrame(() => {
       setEntered(true);
-      drawerRef.current
-        ?.querySelector<HTMLElement>("a[href]")
-        ?.focus({ preventScroll: true });
+      const target = fromKeyboard
+        ? drawerRef.current?.querySelector<HTMLElement>("a[href]")
+        : drawerRef.current;
+      target?.focus({ preventScroll: true });
     });
   }, []);
 
@@ -116,11 +120,36 @@ export default function Header({
     [],
   );
 
-  // Bloquea el scroll mientras el drawer esté presente. Va en <html> y <body>:
-  // iOS Safari ignora overflow:hidden si solo está en el body. No se fija el
-  // body con position:fixed porque el header sticky se iría con él.
+  // Cambio de ruta con el drawer aún abierto (Atrás/Adelante del navegador,
+  // o una navegación que no pasó por sus enlaces): se cierra en el render
+  // mismo, sin animación, para que la página nueva no llegue tapada ni con el
+  // scroll bloqueado. Los enlaces del drawer ya cierran al tocarlos (entered
+  // pasa a false antes del cambio de ruta) y conservan su salida animada.
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    if (entered) {
+      setEntered(false);
+      setMounted(false);
+    }
+  }
+
+  // Atrás del sistema con el menú abierto: se cierra ya (popstate llega
+  // antes que el nuevo pathname), con su salida normal.
   useEffect(() => {
-    if (!mounted) return;
+    if (!entered) return;
+    const onPopState = () => closeDrawer();
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [entered, closeDrawer]);
+
+  // Bloquea el scroll mientras el drawer esté abierto. Va en <html> y <body>:
+  // iOS Safari ignora overflow:hidden si solo está en el body. No se fija el
+  // body con position:fixed porque el header sticky se iría con él. Depende
+  // de `entered` (no de `mounted`): se libera en cuanto empieza el cierre, así
+  // que una navegación nunca encuentra el scroll bloqueado.
+  useEffect(() => {
+    if (!entered) return;
     const html = document.documentElement.style;
     const body = document.body.style;
     const previous = { html: html.overflow, body: body.overflow };
@@ -130,7 +159,7 @@ export default function Header({
       html.overflow = previous.html;
       body.overflow = previous.body;
     };
-  }, [mounted]);
+  }, [entered]);
 
   // Con el drawer abierto: Escape cierra y Tab queda atrapado entre el botón
   // de cerrar (en el header) y los enlaces del drawer.
@@ -149,6 +178,12 @@ export default function Header({
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
       const active = document.activeElement;
+      // Abierto al tocar, el foco está en el panel: Tab entra a sus enlaces.
+      if (active === drawerRef.current) {
+        e.preventDefault();
+        (e.shiftKey ? last : (focusables[1] ?? first)).focus();
+        return;
+      }
       if (e.shiftKey && active === first) {
         e.preventDefault();
         last.focus();
@@ -164,11 +199,12 @@ export default function Header({
     return () => document.removeEventListener("keydown", onKey);
   }, [entered, closeDrawer]);
 
-  function toggleDrawer() {
+  function toggleDrawer(e: React.MouseEvent<HTMLButtonElement>) {
     if (entered) {
       closeDrawer();
     } else {
-      openDrawer();
+      // detail === 0: el clic lo generó Enter/Espacio, no un puntero.
+      openDrawer(e.detail === 0);
     }
   }
 
@@ -205,7 +241,7 @@ export default function Header({
                   key={item.href}
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`nav-link whitespace-nowrap font-body text-sm font-medium transition-colors duration-150 ${
+                  className={`nav-link whitespace-nowrap py-1 font-body text-sm font-medium transition-colors duration-150 ${
                     active ? "text-accent" : "text-ink hover:text-accent"
                   }`}
                 >
@@ -269,7 +305,7 @@ export default function Header({
       {mounted && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className={`absolute inset-0 bg-ink/40 transition-opacity ease-drawer ${
+            className={`rm-fade absolute inset-0 bg-ink/40 transition-opacity ease-drawer ${
               entered ? "opacity-100 duration-300" : "opacity-0 duration-200"
             }`}
             onClick={closeDrawer}
@@ -280,10 +316,18 @@ export default function Header({
             role="dialog"
             aria-modal="true"
             aria-label={strings.header.menuLabel}
+            tabIndex={-1}
+            // Con reducir movimiento el panel no se desliza: se funde
+            // (.drawer-panel + .rm-fade en globals.css, guiado por data-open).
+            data-open={entered ? "true" : "false"}
             onTransitionEnd={(e) => {
+              // Tailwind 4 desliza con `translate`; con reducir movimiento
+              // lo que termina es el fundido (`opacity`).
               if (
                 e.target === e.currentTarget &&
-                e.propertyName === "transform" &&
+                ["translate", "transform", "opacity"].includes(
+                  e.propertyName,
+                ) &&
                 !entered
               ) {
                 if (unmountTimer.current !== null) {
@@ -295,7 +339,7 @@ export default function Header({
             }}
             // Misma curva de iOS en ambos sentidos: entra en 300ms y sale en
             // 200ms. ease-in en la salida hacía que el cierre se sintiera lento.
-            className={`absolute right-0 top-0 flex h-full w-72 max-w-[80%] flex-col overflow-y-auto overscroll-contain bg-background pb-[env(safe-area-inset-bottom)] pt-[4.5rem] shadow-overlay transition-transform ease-drawer ${
+            className={`drawer-panel rm-fade absolute right-0 top-0 flex h-full w-72 max-w-[80%] flex-col overflow-y-auto overscroll-contain bg-background pb-[env(safe-area-inset-bottom)] pr-[env(safe-area-inset-right)] pt-[4.5rem] shadow-overlay transition-transform ease-drawer ${
               entered
                 ? "translate-x-0 duration-300"
                 : "translate-x-full duration-200"

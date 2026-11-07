@@ -15,7 +15,8 @@ export default function AboutDoctor({ locale }: { locale: Locale }) {
         <Reveal>
           {/* En una columna (< md) se acota a max-w-md: a ancho completo la
               foto 4/5 llegaba a ~875px de alto entre 640 y 767px. */}
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl md:max-w-none">
+          {/* Fondo de respaldo: si la foto falla no queda un hueco. */}
+          <div className="relative bg-primary/10 mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl md:max-w-none">
             <Image
               src="/images/dr-ancona-perfil.jpg"
               alt={c.imageAlt}
@@ -26,7 +27,7 @@ export default function AboutDoctor({ locale }: { locale: Locale }) {
           </div>
         </Reveal>
 
-        <Reveal delay={120}>
+        <Reveal>
           <h2 className="font-heading text-3xl font-bold text-primary">
             {DOCTOR_FULL_NAME}
           </h2>

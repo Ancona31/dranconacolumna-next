@@ -48,9 +48,12 @@ export default function MobileActionBar({ strings }: { strings: UiStrings }) {
       data-mobile-action-bar
       className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink/10 md:hidden"
     >
+      {/* min-w-0 + px-2 + leading-tight: con zoom al 200 % (~190 px de
+          ancho) las etiquetas parten en dos renglones en vez de cortarse; en
+          ese ancho el ícono de WhatsApp pasa arriba del texto. */}
       <Link
         href={evaluacionHref}
-        className="flex flex-1 items-center justify-center bg-primary pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 text-center font-body text-sm font-semibold text-white transition-[filter] duration-150 ease-out active:brightness-90"
+        className="flex min-w-0 flex-1 items-center justify-center bg-primary px-2 pb-[calc(1rem+env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pt-4 text-center font-body text-sm font-semibold leading-tight text-white transition-[filter] duration-150 ease-out active:brightness-90"
       >
         {strings.mobileBar.evaluationCta}
       </Link>
@@ -62,10 +65,12 @@ export default function MobileActionBar({ strings }: { strings: UiStrings }) {
           trackEvent("whatsapp_click", { source_section: "barra_movil" });
           if (openWhatsAppInApp(whatsappLink)) e.preventDefault();
         }}
-        className="flex flex-1 items-center justify-center gap-2 bg-background pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 text-center font-body text-sm font-semibold text-primary transition-[filter] duration-150 ease-out active:brightness-95"
+        className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 bg-background px-2 pb-[calc(1rem+env(safe-area-inset-bottom))] pr-[max(0.5rem,env(safe-area-inset-right))] pt-4 text-center font-body text-sm font-semibold leading-tight text-primary transition-[filter] duration-150 ease-out active:brightness-95 min-[260px]:flex-row min-[260px]:gap-2"
       >
         <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp-strong" />
-        {strings.mobileBar.whatsappLabel}
+        <span className="min-w-0 [overflow-wrap:anywhere]">
+          {strings.mobileBar.whatsappLabel}
+        </span>
       </a>
     </div>
   );

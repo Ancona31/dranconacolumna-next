@@ -37,12 +37,16 @@ export interface ConditionsUi {
   /** H2 y subtítulo de la escalera de tratamiento. */
   treatmentH2: string;
   treatmentIntro: string;
-  /** Prefijo del paso numerado ("Paso 1" / "Step 1"). */
+  /** Prefijo del paso numerado ("Paso 1" / "Step 1"); solo para lectores de
+   *  pantalla, el número ya se ve en el círculo. */
   stepLabel: string;
   /** Eyebrow del bloque "cómo lo trato yo". */
   howITreatEyebrow: string;
   /** Cargo del doctor bajo la cita. */
   doctorRole: string;
+  /** Comillas de la cita del doctor según el idioma («…» / “…”). */
+  quoteOpen: string;
+  quoteClose: string;
   /** Etiquetas de cédula profesional / de especialidad. */
   cedProf: string;
   cedEsp: string;
@@ -95,6 +99,8 @@ const CONDITIONS_ES: ConditionsUi = {
   stepLabel: "Paso",
   howITreatEyebrow: "Cómo lo trato yo",
   doctorRole: "Ortopedia y Cirugía de Columna",
+  quoteOpen: "«",
+  quoteClose: "»",
   cedProf: "Céd. Prof.",
   cedEsp: "Céd. Esp.",
   imageAltBefore: "Dr. Angel Ancona en quirófano, tratamiento de ",
@@ -137,6 +143,8 @@ const CONDITIONS_EN: ConditionsUi = {
   stepLabel: "Step",
   howITreatEyebrow: "How I treat it",
   doctorRole: "Orthopedics & Spine Surgery",
+  quoteOpen: "“",
+  quoteClose: "”",
   cedProf: "Prof. License",
   cedEsp: "Specialty License",
   imageAltBefore: "Dr. Angel Ancona in the operating room, treating ",

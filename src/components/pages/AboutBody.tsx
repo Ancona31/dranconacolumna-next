@@ -23,8 +23,11 @@ export default function AboutBody({ locale }: { locale: Locale }) {
       {/* Hero de página */}
       <section className="bg-primary-soft">
         <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 md:grid-cols-2 md:py-20">
-          <div className="load-enter">
-            <div className="relative mx-auto aspect-[3/4] w-full max-w-md overflow-hidden rounded-2xl md:max-w-none">
+          {/* min-w-0 en las columnas: con zoom de texto al 200 % una palabra
+              larga no ensancha la rejilla (break-words parte la palabra). */}
+          <div className="load-enter min-w-0">
+            {/* Fondo de respaldo: si la foto falla no queda un hueco. */}
+            <div className="relative bg-primary/10 mx-auto aspect-[3/4] w-full max-w-md overflow-hidden rounded-2xl md:max-w-none">
               <Image
                 src="/images/dr-ancona-perfil.jpg"
                 alt={c.imageAlt}
@@ -37,13 +40,13 @@ export default function AboutBody({ locale }: { locale: Locale }) {
           </div>
 
           <div
-            className="load-enter"
+            className="load-enter min-w-0 break-words"
             style={{ "--load-delay": "120ms" } as React.CSSProperties}
           >
             <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
               {c.hero.eyebrow}
             </p>
-            <h1 className="mt-2 font-heading text-[clamp(2.25rem,1.6rem+2.6vw,3rem)] font-extrabold leading-tight text-primary">
+            <h1 className="break-words mt-2 font-heading text-[clamp(2.25rem,1.6rem+2.6vw,3rem)] font-extrabold leading-tight text-primary">
               {DOCTOR_FULL_NAME}
             </h1>
             <p className="mt-3 font-body text-lg text-ink/80">
@@ -57,7 +60,7 @@ export default function AboutBody({ locale }: { locale: Locale }) {
       {/* Mi manera de trabajar */}
       <section className="bg-background">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <h2 className="font-heading text-3xl font-bold text-primary">
+          <h2 className="break-words font-heading text-3xl font-bold text-primary">
             {c.work.h2}
           </h2>
           <div className="mt-6 space-y-5 font-body text-ink/75">
@@ -71,7 +74,7 @@ export default function AboutBody({ locale }: { locale: Locale }) {
       {/* Formación */}
       <section className="bg-primary-soft">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <h2 className="font-heading text-3xl font-bold text-primary">
+          <h2 className="break-words font-heading text-3xl font-bold text-primary">
             {c.training.h2}
           </h2>
           <ul className="mt-6 space-y-4">
@@ -92,7 +95,7 @@ export default function AboutBody({ locale }: { locale: Locale }) {
       {/* Certificaciones y membresías */}
       <section className="bg-background">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20">
-          <h2 className="font-heading text-3xl font-bold text-primary">
+          <h2 className="break-words font-heading text-3xl font-bold text-primary">
             {c.certs.h2}
           </h2>
           <ul className="mt-6 space-y-4">
@@ -127,7 +130,7 @@ export default function AboutBody({ locale }: { locale: Locale }) {
       {/* CTA final */}
       <section className="bg-primary">
         <div className="mx-auto max-w-3xl px-4 py-14 text-center md:py-20">
-          <h2 className="font-heading text-3xl font-bold text-white">
+          <h2 className="break-words font-heading text-3xl font-bold text-white">
             {c.cta.h2}
           </h2>
           <p className="mx-auto mt-4 max-w-xl font-body text-white/80">

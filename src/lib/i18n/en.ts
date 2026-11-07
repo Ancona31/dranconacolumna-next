@@ -37,6 +37,10 @@ export const en: UiStrings = {
     modelCreditModified: "(modified)",
     modelCreditLicenseLead: "licensed",
     opensInNewTab: "(opens in a new tab)",
+    navHeading: "Navigation",
+    contactHeading: "Contact & locations",
+    locationsLinkLabel: "See locations & hours",
+    contactHref: "/en/contact",
   },
   mobileBar: {
     evaluationCta: "Start my evaluation",

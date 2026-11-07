@@ -1,10 +1,8 @@
-import { Fragment } from "react";
-import { MapPin, Clock, Phone } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import WhatsAppLink from "@/components/analytics/WhatsAppLink";
-import PhoneLink from "@/components/analytics/PhoneLink";
+import SedeCard, { SEDE_ORPHAN_SPAN } from "@/components/sedes/SedeCard";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
-import { SEDES, type Sede } from "@/lib/sedes";
+import { SEDES } from "@/lib/sedes";
 import {
   SITE_URL,
   DOCTOR_FULL_NAME,
@@ -14,13 +12,8 @@ import {
 import type { Locale } from "@/lib/i18n/types";
 import { waMessage } from "@/lib/i18n";
 import { getContactContent } from "@/lib/i18n/pages/contact";
-import { getSedesCopy, type SedesCopy } from "@/lib/i18n/content/sedes";
+import { getSedesCopy } from "@/lib/i18n/content/sedes";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
-import SedeMap from "@/components/ui/SedeMap";
-
-// Con tres sedes, en tablet (2 columnas) la última tarjeta quedaría sola en
-// media fila: ocupa el ancho completo. En lg las tres van en una fila.
-const ORPHAN_SPAN = "md:last:odd:col-span-2 lg:last:odd:col-span-1";
 
 /**
  * Grafo JSON-LD para SEO local: el médico y sus consultorios, construido
@@ -99,93 +92,6 @@ function buildContactJsonLd(locale: Locale) {
   };
 }
 
-function SedeCard({ sede, copy }: { sede: Sede; copy: SedesCopy }) {
-  const sc = copy.byId[sede.id];
-  const whatsappLink = buildWhatsAppLink(copy.whatsappMessage, sede.whatsapp);
-
-  return (
-    <div className="flex flex-1 flex-col rounded-2xl border border-primary/10 bg-background p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="font-heading text-xl font-bold text-primary">
-          {sede.nombre}
-        </h3>
-        <span className="inline-flex items-center rounded-full bg-primary-soft px-3 py-1 font-body text-xs font-semibold text-primary ring-1 ring-primary/15">
-          {sc.horarioCorto}
-        </span>
-      </div>
-
-      <p className="mt-4 flex items-start gap-2 font-body text-sm text-ink/75">
-        <MapPin
-          className="mt-0.5 h-5 w-5 shrink-0 text-accent"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        />
-        <span>
-          {sc.addressLines.map((line, idx) => (
-            <Fragment key={idx}>
-              {idx > 0 && <br />}
-              {line}
-            </Fragment>
-          ))}
-        </span>
-      </p>
-
-      <p className="mt-3 flex items-start gap-2 font-body text-sm text-ink/75">
-        <Clock
-          className="mt-0.5 h-5 w-5 shrink-0 text-accent"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        />
-        <span>
-          {copy.bookingLabel} · {sc.horario}
-        </span>
-      </p>
-
-      <SedeMap sede={sede} titlePrefix={copy.mapTitlePrefix} className="mt-6" />
-
-      <a
-        href={sede.mapsUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-3 inline-flex font-body text-sm font-semibold text-accent hover:underline"
-      >
-        {copy.mapsLink}
-      </a>
-
-      <div className="mt-6 flex flex-1 flex-col justify-end gap-3">
-        <div>
-          <PhoneLink
-            href={`tel:+52${sede.telefono}`}
-            section={sede.section}
-            phoneNumber={sede.telefono}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-transparent px-5 py-3 font-body text-sm font-semibold text-primary transition-[transform,background-color,color] duration-150 ease-out hover:bg-primary hover:text-white active:scale-[0.97]"
-          >
-            <Phone className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-            {copy.callButton}
-          </PhoneLink>
-          <p className="mt-1.5 text-center font-body text-xs text-muted">
-            {copy.forOfficeInfo}
-          </p>
-        </div>
-
-        <div>
-          <WhatsAppLink
-            href={whatsappLink}
-            section={sede.section}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-body text-sm font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
-          >
-            <WhatsAppIcon className="h-4 w-4 shrink-0 text-whatsapp" />
-            {copy.whatsappButton}
-          </WhatsAppLink>
-          <p className="mt-1.5 text-center font-body text-xs text-muted">
-            {copy.clinicWhatsappNote} · {sede.telefonoDisplay}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function ContactBody({ locale }: { locale: Locale }) {
   const c = getContactContent(locale);
   const copy = getSedesCopy(locale);
@@ -209,7 +115,7 @@ export default function ContactBody({ locale }: { locale: Locale }) {
             <p className="font-body text-sm font-semibold uppercase tracking-[0.2em] text-accent">
               {c.hero.eyebrow}
             </p>
-            <h1 className="mt-2 font-heading text-[clamp(2.25rem,1.6rem+2.6vw,3rem)] font-extrabold leading-tight text-primary">
+            <h1 className="break-words mt-2 font-heading text-[clamp(2.25rem,1.6rem+2.6vw,3rem)] font-extrabold leading-tight text-primary">
               {c.hero.h1}
             </h1>
             <p className="mt-5 font-body text-lg text-ink/80">{c.hero.text}</p>
@@ -224,11 +130,13 @@ export default function ContactBody({ locale }: { locale: Locale }) {
             className="load-enter"
             style={{ "--load-delay": "120ms" } as React.CSSProperties}
           >
-            <div className="rounded-2xl border border-primary/10 bg-primary-soft p-6 text-center md:p-8">
+            <div className="rounded-2xl border border-primary/10 bg-primary-soft p-4 text-center sm:p-6 md:p-8">
               <WhatsAppLink
                 href={whatsappPrincipal}
                 section="ubicaciones"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+                // flex-wrap + max-w-full: con zoom de texto al 200 % el ícono baja
+                // de renglón en vez de sacar el botón de la pantalla.
+                className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full bg-primary px-5 py-4 text-center font-body text-base font-semibold text-white transition-[transform,opacity] duration-150 ease-out hover:opacity-90 active:scale-[0.97] sm:px-7"
               >
                 <WhatsAppIcon className="h-5 w-5 shrink-0 text-whatsapp" />
                 {c.cta.button}
@@ -243,13 +151,17 @@ export default function ContactBody({ locale }: { locale: Locale }) {
       <section className="bg-background">
         <div className="mx-auto max-w-5xl px-4 py-14 md:py-20">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {SEDES.map((sede, i) => (
+            {SEDES.map((sede) => (
               <Reveal
                 key={sede.id}
-                delay={i * 80}
-                className={`flex ${ORPHAN_SPAN}`}
+                className={`flex ${SEDE_ORPHAN_SPAN}`}
               >
-                <SedeCard sede={sede} copy={copy} />
+                <SedeCard
+                  sede={sede}
+                  copy={copy}
+                  locale={locale}
+                  variant="contact"
+                />
               </Reveal>
             ))}
           </div>

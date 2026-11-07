@@ -8,6 +8,7 @@ import {
   CERTIFICACION,
   CONTACT_EMAIL,
 } from "@/lib/config";
+import { SEDES } from "@/lib/sedes";
 
 // Atribución exigida por la licencia CC BY-SA 2.1 JP del modelo del esqueleto
 // 3D: fuente, enlace al texto de la licencia e indicación de cambios.
@@ -16,89 +17,147 @@ const BODYPARTS3D_URL =
 const LICENSE_URL = "https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en";
 const LICENSE_NAME = "CC BY-SA 2.1 JP";
 
+// py-1 en enlaces en línea: el área táctil llega a ≥24 px sin mover el texto.
 const creditLink =
-  "underline decoration-white/40 underline-offset-4 transition-colors hover:text-white hover:decoration-white/80";
+  "py-1 underline decoration-white/40 underline-offset-4 transition-colors hover:text-white hover:decoration-white/80";
+
+const columnHeading = "font-heading text-sm font-semibold text-white";
 
 export default function Footer({ strings }: { strings: UiStrings }) {
+  const f = strings.footer;
+  const [emailUser, emailDomain] = CONTACT_EMAIL.split("@");
+
   return (
-    <footer className="bg-primary text-white/90">
+    // Azul más profundo que primary y un filete claro arriba: el footer ya no
+    // se funde con el bloque CTA azul con el que terminan casi todas las
+    // páginas.
+    <footer className="border-t border-white/10 bg-primary-deep text-white/90">
       {/* Zona segura: con muesca en horizontal, el contenido se alinea con el
           header en vez de quedar bajo la muesca. */}
-      <div className="mx-auto max-w-6xl py-12 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
-        <nav className="flex flex-wrap gap-x-6 gap-y-1">
-          {strings.nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="inline-flex min-h-11 items-center font-body text-sm text-white/90 transition-colors hover:text-white"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+      <div className="mx-auto max-w-6xl pb-8 pt-12 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] md:pt-14">
+        {/* Una columna en móvil; en md+ tres: marca y credenciales ·
+            navegación · contacto y sedes. En tablet las dos últimas toman su
+            ancho natural (el correo cabe entero) y la marca cede el resto. */}
+        <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_auto_auto] md:gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1fr)] lg:gap-12">
+          <div className="font-body text-sm text-white/80">
+            <span className="inline-flex rounded-full bg-[var(--color-background)] p-1.5">
+              <Image
+                src="/logo.png"
+                alt={f.logoAlt}
+                width={527}
+                height={512}
+                className="h-12 w-auto"
+              />
+            </span>
+            <p className="mt-4 font-heading text-base font-semibold text-white">
+              {DOCTOR_FULL_NAME}
+            </p>
+            {/* Cada cédula se mantiene entera al partir el renglón. */}
+            <p className="mt-1">
+              <span className="whitespace-nowrap">
+                {f.cedulaProf} {CEDULA_PROFESIONAL}
+              </span>{" "}
+              ·{" "}
+              <span className="whitespace-nowrap">
+                {f.cedulaEsp} {CEDULA_ESPECIALIDAD}
+              </span>
+            </p>
+            <p className="mt-1 max-w-sm">{CERTIFICACION}</p>
+          </div>
 
-        <div className="mt-8 space-y-1 border-t border-white/15 pt-8 font-body text-sm text-white/80">
-          <span className="mb-3 inline-flex rounded-full bg-[var(--color-background)] p-1.5">
-            <Image
-              src="/logo.png"
-              alt={strings.footer.logoAlt}
-              width={527}
-              height={512}
-              className="h-12 w-auto"
-            />
-          </span>
-          <p className="font-semibold text-white">{DOCTOR_FULL_NAME}</p>
-          <p>
-            {strings.footer.cedulaProf} {CEDULA_PROFESIONAL} ·{" "}
-            {strings.footer.cedulaEsp} {CEDULA_ESPECIALIDAD}
-          </p>
-          <p>{CERTIFICACION}</p>
-          <p>
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="underline underline-offset-4 transition-colors hover:text-white"
+          <nav aria-labelledby="footer-nav-heading">
+            <h2 id="footer-nav-heading" className={columnHeading}>
+              {f.navHeading}
+            </h2>
+            <ul className="mt-2 flex flex-col">
+              {strings.nav.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="inline-flex min-h-11 items-center font-body text-sm text-white/90 transition-colors hover:text-white md:min-h-9"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="font-body text-sm">
+            <h2 className={columnHeading}>{f.contactHeading}</h2>
+            {/* Con zoom al 200 % el correo parte tras la @ (<wbr>) y, si aún
+                no cabe, donde haga falta (overflow-wrap:anywhere) en vez de
+                ensanchar la página. */}
+            <p className="mt-3">
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="inline-block py-1 text-white/90 underline underline-offset-4 transition-colors [overflow-wrap:anywhere] hover:text-white"
+              >
+                {emailUser}@
+                <wbr />
+                {emailDomain}
+              </a>
+            </p>
+            <ul className="mt-4 space-y-3">
+              {SEDES.map((sede) => (
+                <li key={sede.id} className="leading-snug">
+                  <span className="block font-semibold text-white">
+                    {sede.nombre}
+                  </span>
+                  <span className="block text-white/70">{sede.ciudad}</span>
+                </li>
+              ))}
+            </ul>
+            <Link
+              href={f.contactHref}
+              className="mt-3 inline-flex min-h-11 items-center gap-1 font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white/80 md:min-h-9"
             >
-              {CONTACT_EMAIL}
-            </a>
-          </p>
+              {f.locationsLinkLabel}
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-2 text-sm">
+        {/* Franja legal: aviso, descargo y crédito del modelo 3D. Todo a la
+            izquierda: a la derecha, al final de la página, se posa el botón
+            flotante de WhatsApp. */}
+        <div className="mt-10 border-t border-white/15 pt-6 font-body text-sm">
           <Link
-            href={strings.footer.privacyHref}
-            className="text-white/90 underline underline-offset-4 transition-colors hover:text-white"
+            href={f.privacyHref}
+            className="inline-flex min-h-6 items-center text-white/90 underline underline-offset-4 transition-colors hover:text-white"
           >
-            {strings.footer.privacyLabel}
+            {f.privacyLabel}
           </Link>
-          <p className="italic text-white/70">{strings.footer.disclaimer}</p>
-          {/* 13 px y blanco al 70 % (6.5:1): legible para el público de 40–70
-              años sin competir con el aviso legal. ↗ visible + aviso sr-only
-              para los enlaces que abren pestaña nueva. */}
-          <p className="text-[13px] leading-5 text-white/70">
-            {strings.footer.modelCreditLead}{" "}
-            <a
-              href={BODYPARTS3D_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={creditLink}
-            >
-              {strings.footer.modelCreditSource}
-              <span aria-hidden="true"> ↗</span>
-              <span className="sr-only"> {strings.footer.opensInNewTab}</span>
-            </a>{" "}
-            {strings.footer.modelCreditModified},{" "}
-            {strings.footer.modelCreditLicenseLead}{" "}
-            <a
-              href={LICENSE_URL}
-              target="_blank"
-              rel="noopener noreferrer license"
-              className={creditLink}
-            >
-              {LICENSE_NAME}
-              <span aria-hidden="true"> ↗</span>
-              <span className="sr-only"> {strings.footer.opensInNewTab}</span>
-            </a>
-          </p>
+          <div className="mt-2 space-y-2 md:max-w-2xl">
+            <p className="italic text-white/70">{f.disclaimer}</p>
+            {/* 13 px y blanco al 70 % (≥6.5:1): legible para el público de
+                40–70 años sin competir con el aviso legal. ↗ visible + aviso
+                sr-only para los enlaces que abren pestaña nueva. */}
+            <p className="text-[13px] leading-6 text-white/70">
+              {f.modelCreditLead}{" "}
+              <a
+                href={BODYPARTS3D_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={creditLink}
+              >
+                {f.modelCreditSource}
+                <span aria-hidden="true"> ↗</span>
+                <span className="sr-only"> {f.opensInNewTab}</span>
+              </a>{" "}
+              {f.modelCreditModified}, {f.modelCreditLicenseLead}{" "}
+              <a
+                href={LICENSE_URL}
+                target="_blank"
+                rel="noopener noreferrer license"
+                className={creditLink}
+              >
+                {LICENSE_NAME}
+                <span aria-hidden="true"> ↗</span>
+                <span className="sr-only"> {f.opensInNewTab}</span>
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
