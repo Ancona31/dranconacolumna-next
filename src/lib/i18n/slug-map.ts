@@ -99,3 +99,13 @@ export function assessmentHref(locale: Locale, zone?: string): string {
   if (!zone) return base;
   return `${base}?${locale === "en" ? "zone" : "zona"}=${zone}`;
 }
+
+/**
+ * Slug ES de un padecimiento a partir de su slug EN, según los pares de arriba
+ * (p. ej. "herniated-disc" → "hernia-de-disco"). undefined si no tiene par.
+ */
+export function esConditionSlug(enSlug: string): string | undefined {
+  const es = EN_TO_ES.get(`/en/conditions/${enSlug}`);
+  const prefix = "/padecimientos/";
+  return es?.startsWith(prefix) ? es.slice(prefix.length) : undefined;
+}

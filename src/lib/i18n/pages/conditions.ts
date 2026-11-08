@@ -71,10 +71,8 @@ export interface ConditionsUi {
   finalWaButton: string;
   /** Recordatorio de la barra sticky de escritorio. */
   stickyReminder: string;
-  /** Silueta del hero: prefijo del pie ("Zona"/"Zone") y aria alrededor de la zona. */
+  /** Figura del hero: prefijo del pie ("Zona"/"Zone"). */
   zoneCaptionPrefix: string;
-  zoneAriaBefore: string;
-  zoneAriaAfter: string;
   /** Idioma para el JSON-LD MedicalWebPage. */
   jsonLdLang: string;
 }
@@ -118,8 +116,6 @@ const CONDITIONS_ES: ConditionsUi = {
   finalWaButton: "Escribir por WhatsApp",
   stickyReminder: "Mide cuánto te está limitando — 2 min",
   zoneCaptionPrefix: "Zona",
-  zoneAriaBefore: "Silueta del cuerpo con la zona ",
-  zoneAriaAfter: " marcada",
   jsonLdLang: "es-MX",
 };
 
@@ -162,8 +158,6 @@ const CONDITIONS_EN: ConditionsUi = {
   finalWaButton: "Message me on WhatsApp",
   stickyReminder: "See how much it's limiting you — 2 min",
   zoneCaptionPrefix: "Zone",
-  zoneAriaBefore: "Body silhouette with the ",
-  zoneAriaAfter: " area highlighted",
   jsonLdLang: "en-US",
 };
 

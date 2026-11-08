@@ -19,7 +19,8 @@ import {
 import type { Padecimiento } from "@/lib/padecimientos";
 import { waMessage } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/types";
-import { assessmentHref } from "@/lib/i18n/slug-map";
+import { assessmentHref, esConditionSlug } from "@/lib/i18n/slug-map";
+import { conditionPoster } from "@/lib/skeleton3d/scenarios";
 import { getConditionsUi, type ConditionsUi } from "@/lib/i18n/pages/conditions";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
@@ -88,16 +89,17 @@ export default function ConditionTemplate({
   const zonaMinuscula = p.zonaChip ? p.zonaChip.toLowerCase() : "zona";
   const fotoComoLoTrato = COMO_LO_TRATO_FOTO[p.grupo];
 
-  // En EN la silueta muestra la zona traducida (el chip del padecimiento); en
-  // ES la silueta conserva su etiqueta interna (BODY_ZONES), sin override.
+  // En EN el pie de la figura muestra la zona traducida (el chip del
+  // padecimiento); en ES conserva su etiqueta interna (BODY_ZONES).
   const zoneCaption =
     locale === "en" && p.zonaChip
       ? `${ui.zoneCaptionPrefix}: ${p.zonaChip}`
       : undefined;
-  const zoneAria =
-    locale === "en" && p.zonaChip
-      ? `${ui.zoneAriaBefore}${zonaMinuscula}${ui.zoneAriaAfter}`
-      : undefined;
+  // Imagen del hero: la del escenario 3D del padecimiento. Las imágenes van
+  // por slug ES, así que en EN se traduce el slug con el slug-map.
+  const heroPoster = conditionPoster(
+    locale === "es" ? p.slug : esConditionSlug(p.slug)
+  );
 
   return (
     <>
@@ -106,7 +108,7 @@ export default function ConditionTemplate({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(p, ui)) }}
       />
 
-      {/* Hero: contenido + silueta de zona (una columna si no hay testZone) */}
+      {/* Hero: contenido + radiografía de la zona (una columna si no hay testZone) */}
       <section className="bg-primary-soft">
         <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
           <div
@@ -179,8 +181,8 @@ export default function ConditionTemplate({
               >
                 <HeroZoneFigure
                   testZone={p.testZone}
+                  posterSrc={heroPoster}
                   caption={zoneCaption}
-                  ariaLabel={zoneAria}
                 />
               </div>
             )}

@@ -300,111 +300,121 @@ html[data-cta-bar] .wa-float {
   animation: eval-screen-in 200ms var(--ease-out);
 }
 
-/* Mapa corporal (BodyFigureSVG). En la home el nodo de dolor recorre las
-   zonas: el relevo se cruza con transiciones para que ninguna cambie de
-   color de golpe. `r` no es animable por CSS, así que el nodo activo crece
-   con transform sobre su propia caja en vez de sobre el origen del viewBox. */
-.body-figure__halo,
-.body-figure__core {
-  transform-box: fill-box;
-  transform-origin: center;
+/* Selector de zonas (ZonePicker) sobre la radiografía en tinta. Reposo: punto
+   azul de marca con un anillo suave. Hover (solo con puntero que lo tenga),
+   foco de teclado, dedo apoyado o zona encendida desde React (data-active):
+   el nodo pasa al rojo de dolor y late como en el 3D (~1.1 s). El latido es
+   transform/opacity (compositor) y con prefers-reduced-motion no se muestra. */
+.zone-node {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.zone-node__ring,
+.zone-node__dot,
+.zone-node__pulse {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.zone-node__ring,
+.zone-node__pulse {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.zone-node__ring {
+  background-color: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-accent) 38%, transparent);
   transition:
-    fill 500ms ease,
-    opacity 500ms ease,
-    transform 500ms ease;
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    scale 150ms var(--ease-out);
 }
 
-.body-figure__pulse {
-  transition: opacity 500ms ease;
+.zone-node__dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  background-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-background);
+  transition:
+    background-color 150ms ease,
+    scale 150ms var(--ease-out);
 }
 
-/* Latidos (antes SMIL sobre `r`, que repintaba en cada frame). Ahora escalan
-   sobre su propia caja: 11→15 en reposo y 15→21 en dolor, con la opacidad de
-   los valores originales. .is-idle congela el latido oculto en su fase y
-   .is-paused (en el <svg>) congela toda la figura fuera de pantalla. */
-@keyframes body-figure-beat-rest {
-  0%,
-  100% {
+.zone-node__pulse {
+  background-color: var(--color-pain);
+  opacity: 0;
+}
+
+@keyframes zone-node-pulse {
+  from {
     transform: scale(1);
-    opacity: 0.2;
+    opacity: 0.35;
   }
-  50% {
-    transform: scale(1.3636);
-    opacity: 0.06;
-  }
-}
-
-@keyframes body-figure-beat-pain {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.3;
-  }
-  50% {
-    transform: scale(1.4);
-    opacity: 0.06;
+  to {
+    transform: scale(2);
+    opacity: 0;
   }
 }
 
-.body-figure__beat {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+.zone-node:is(:focus-visible, :active, [data-active]) .zone-node__ring {
+  background-color: color-mix(in srgb, var(--color-pain) 18%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-pain) 45%, transparent);
+  scale: 1.12;
 }
 
-.body-figure__beat--rest {
-  animation-name: body-figure-beat-rest;
-  animation-duration: 3.2s;
+.zone-node:is(:focus-visible, :active, [data-active]) .zone-node__dot {
+  background-color: var(--color-pain);
+  scale: 1.2;
 }
 
-.body-figure__beat--pain {
-  animation-name: body-figure-beat-pain;
-  animation-duration: 2.6s;
+.zone-node:is(:focus-visible, :active, [data-active]) .zone-node__pulse {
+  animation: zone-node-pulse 1.1s ease-out infinite;
 }
 
-.body-figure__beat.is-idle,
-.is-paused .body-figure__beat {
-  animation-play-state: paused;
+@media (hover: hover) {
+  .zone-node:hover .zone-node__ring {
+    background-color: color-mix(in srgb, var(--color-pain) 18%, transparent);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--color-pain) 45%, transparent);
+    scale: 1.12;
+  }
+
+  .zone-node:hover .zone-node__dot {
+    background-color: var(--color-pain);
+    scale: 1.2;
+  }
+
+  .zone-node:hover .zone-node__pulse {
+    animation: zone-node-pulse 1.1s ease-out infinite;
+  }
 }
 
-/* Chip de zona (modo selected): entra y sale con fade + un desplazamiento leve
-   desde su lado (--chip-dx: -4px izquierda, 4px derecha). `both` fija el estado
-   final; con prefers-reduced-motion queda solo el fade. */
-@keyframes body-figure-chip-in {
+/* Chip con el nombre de la zona: entra con fade + un desplazamiento leve
+   desde el nodo (--chip-dx / --chip-dy). Con prefers-reduced-motion queda
+   solo el fade. */
+@keyframes zone-chip-in {
   from {
     opacity: 0;
-    transform: translateX(var(--chip-dx, 0));
+    transform: translate(var(--chip-dx, 0), var(--chip-dy, 0));
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: none;
   }
 }
 
-@keyframes body-figure-chip-out {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(var(--chip-dx, 0));
-  }
+.zone-chip {
+  animation: zone-chip-in 160ms var(--ease-out) both;
 }
 
-.body-figure__chip.is-enter {
-  animation: body-figure-chip-in 180ms var(--ease-out) both;
-}
-
-.body-figure__chip.is-exit {
-  animation: body-figure-chip-out 150ms var(--ease-out) both;
-}
-
-/* Con reduced-motion los latidos se ocultan: los halos estáticos que van
-   debajo permanecen y la figura se ve completa y quieta. */
 @media (prefers-reduced-motion: reduce) {
-  .body-figure__beat {
+  .zone-node__pulse {
     display: none;
   }
 }
@@ -461,7 +471,7 @@ html[data-cta-bar] .wa-float {
 
   .load-enter,
   .eval-screen,
-  .body-figure__chip.is-enter {
+  .zone-chip {
     animation: rm-fade-in 150ms ease both !important;
   }
 

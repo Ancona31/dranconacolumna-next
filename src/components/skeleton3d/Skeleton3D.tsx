@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { prefetchSkeletonAssets } from "./assets";
 import { resolveQuality, webglApiAvailable } from "./quality";
 import type { Skeleton3DProps } from "./types";
 import type { SkeletonEngine } from "./engine";
+import { EDGE_FADE_STYLE } from "@/lib/skeleton3d/edgeFade";
 
 /**
  * Esqueleto 3D en rayos X "en tinta" sobre fondo claro (plan §3.2). Decorativo: el canvas va con
@@ -20,7 +21,7 @@ import type { SkeletonEngine } from "./engine";
  * El componente ocupa el 100 % de su contenedor y es transparente: va
  * directo sobre el fondo de la página (sin escenario oscuro). El tamaño lo
  * pone quien lo usa; el borde del lienzo y de la imagen se desvanece
- * (EDGE_MASK) para que un encuadre cercano no deje ver el rectángulo.
+ * (EDGE_FADE_STYLE) para que un encuadre cercano no deje ver el rectángulo.
  */
 
 type Status = "idle" | "loading" | "ready" | "static";
@@ -175,7 +176,7 @@ export default function Skeleton3D({
         ref={stageRef}
         className="rm-fade absolute inset-0 transition-opacity ease-out"
         style={{
-          ...EDGE_STYLE,
+          ...EDGE_FADE_STYLE,
           opacity: ready ? 1 : 0,
           transitionDuration: `${ready ? IN_MS : OUT_MS}ms`,
           transitionDelay: `${ready ? IN_DELAY_MS : 0}ms`,
@@ -185,21 +186,6 @@ export default function Skeleton3D({
   );
 }
 
-/**
- * Bordes desvanecidos: sobre el fondo claro no hay caja que contenga al
- * esqueleto, así que un hueso cortado a cuchillo en el borde dejaría ver el
- * rectángulo (encuadres cercanos, imágenes que traen hueso o piel hasta el
- * borde). Solo es alfa: funciona igual sobre cualquier fondo. Es lineal en
- * los 4 lados (no radial) para no apagar el cráneo ni los pies.
- */
-const EDGE_MASK =
-  "linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)";
-const EDGE_STYLE: CSSProperties = {
-  maskImage: EDGE_MASK,
-  WebkitMaskImage: EDGE_MASK,
-  maskComposite: "intersect",
-  WebkitMaskComposite: "source-in",
-};
 // <img> nativo (como el hero): next/image recodificaría los AVIF hechos a mano.
 // La caja de la imagen es la del dibujo (no `object-contain`), así la máscara
 // cae en los bordes reales de la imagen con cualquier proporción del escenario.
@@ -294,7 +280,7 @@ function PosterLayer({
           decoding="async"
           draggable={false}
           className={POSTER_CLASS}
-          style={EDGE_STYLE}
+          style={EDGE_FADE_STYLE}
         />
       )}
       {layers.cur && (
@@ -312,7 +298,7 @@ function PosterLayer({
           decoding="async"
           draggable={false}
           className={POSTER_CLASS}
-          style={EDGE_STYLE}
+          style={EDGE_FADE_STYLE}
           onLoad={(e) => onCurLoad(e.currentTarget, layers.cur as string)}
           onError={() => markFailed(layers.cur as string)}
         />

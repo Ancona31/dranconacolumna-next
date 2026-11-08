@@ -1,20 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import BodyFigureSVG, {
-  BODY_ZONES,
-  type BodyZoneId,
-} from "@/components/home/BodyFigureSVG";
+import { useState, type CSSProperties } from "react";
+import { BODY_ZONES, type BodyZoneId } from "@/components/home/BodyFigureSVG";
 import type { Locale } from "@/lib/i18n/types";
 import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
 import { getZoneLabel } from "@/lib/i18n/zone-labels";
-
-// viewBox de BodyFigureSVG tras F2.a: ancho 300, con la figura centrada por un
-// desplazamiento de +40 en X; alto sin cambios. Los botones táctiles se
-// posicionan sumando ese offset al cx del nodo.
-const VIEW_W = 300;
-const VIEW_H = 540;
-const FIGURE_OFFSET_X = 40;
+import {
+  ZONE_POSITIONS,
+  ZONES_IMAGE,
+  zonesSrcSet,
+} from "@/lib/skeleton3d/zones2d";
 
 type ZonePickerProps = {
   /**
@@ -28,16 +23,65 @@ type ZonePickerProps = {
 
 /**
  * Lado del botón táctil sobre la figura: 48 px, o menos si la figura es
- * angosta. 12 % del ancho cabe entre los dos nodos más cercanos (Espalda baja
- * y Cadera, a 37.8 de 300 unidades = 12.6 %), así que a 320 px los botones ya
- * no se enciman (antes ganaba el último del DOM). La lista de texto de abajo
- * es la vía cómoda para tocar a esos tamaños.
+ * angosta. Sobre la radiografía los dos nodos más cercanos (Cuello y Espalda
+ * alta) quedan a ~16 % del ancho, así que con 12 % los botones no se enciman
+ * ni a 320 px. La lista de texto de abajo es la vía cómoda para tocar a esos
+ * tamaños.
  */
 const HIT_SIZE = "min(3rem, 12%)";
+
+/**
+ * Ancho mostrado de la imagen: 85 % de la columna (max-w-md = 448 px, con
+ * 16 px de padding por lado en la sección). Desde 480 px de viewport la
+ * columna ya está en su máximo.
+ */
+const IMG_SIZES = "(min-width: 480px) 381px, calc(85vw - 28px)";
+
+/**
+ * Lado del chip con el nombre de la zona. Hacia donde hay aire y no hay otro
+ * nodo a la misma altura: el brazo izquierdo de la imagen lo lleva hacia
+ * fuera; Muñeca va debajo (a su derecha, a la misma altura, está Cadera); el
+ * resto, a la derecha (del lado de la imagen sin nodos).
+ */
+const CHIP_SIDE: Record<BodyZoneId, "left" | "right" | "below"> = {
+  cuello: "right",
+  "espalda-alta": "right",
+  "espalda-baja": "right",
+  hombro: "left",
+  codo: "left",
+  muneca: "below",
+  cadera: "right",
+  rodilla: "right",
+  tobillo: "right",
+};
+
+const CHIP_POSITION: Record<(typeof CHIP_SIDE)[BodyZoneId], string> = {
+  left: "right-full top-1/2 mr-0.5 -translate-y-1/2",
+  right: "left-full top-1/2 ml-0.5 -translate-y-1/2",
+  below: "top-full left-1/2 -translate-x-1/2",
+};
+
+/** Desplazamiento de entrada del chip: llega desde el lado del nodo. */
+const CHIP_FROM: Record<(typeof CHIP_SIDE)[BodyZoneId], CSSProperties> = {
+  left: { "--chip-dx": "4px" } as CSSProperties,
+  right: { "--chip-dx": "-4px" } as CSSProperties,
+  below: { "--chip-dy": "-4px" } as CSSProperties,
+};
 
 /** Clic normal (sin teclas ni botón medio): ese lo resuelve el JS en sitio. */
 function isPlainClick(e: React.MouseEvent) {
   return !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0);
+}
+
+/** Punto de zona: anillo suave + punto de marca; el latido solo se ve activo. */
+function NodeMark() {
+  return (
+    <>
+      <span aria-hidden="true" className="zone-node__pulse" />
+      <span aria-hidden="true" className="zone-node__ring" />
+      <span aria-hidden="true" className="zone-node__dot" />
+    </>
+  );
 }
 
 export default function ZonePicker({
@@ -45,15 +89,13 @@ export default function ZonePicker({
   onSelect,
   locale = "es",
 }: ZonePickerProps) {
+  // Zona encendida por hover, foco o dedo apoyado. Al montar no hay ninguna:
+  // el chip solo aparece con una interacción real (nada de chip fantasma).
   const [hovered, setHovered] = useState<BodyZoneId | null>(null);
   const ui = getEvaluationUi(locale).zonePicker;
 
-  // Al montar no hay zona resaltada: el chip solo aparece con hover/focus real
-  // del usuario (antes se defolteaba a la primera zona → chip fantasma "cadera").
-  const highlighted = hovered ?? undefined;
-
-  // Etiquetas por locale para el chip de la silueta y los aria-label. En ES
-  // resuelven a la etiqueta interna de BODY_ZONES (render byte-idéntico).
+  // Etiquetas por locale para el chip y los aria-label. En ES resuelven a la
+  // etiqueta interna de BODY_ZONES.
   const zoneLabels = Object.fromEntries(
     BODY_ZONES.map((z) => [z.id, getZoneLabel(z.id, locale)])
   ) as Record<BodyZoneId, string>;
@@ -71,8 +113,8 @@ export default function ZonePicker({
         e.preventDefault();
         onSelect(id);
       },
-      // Señal al apoyar el dedo (antes del cambio de pantalla): se enciende
-      // el nodo y su chip con el nombre de la zona.
+      // Señal al apoyar el dedo (antes del cambio de pantalla): el nodo se
+      // pone rojo y aparece el chip con el nombre de la zona.
       onPointerDown: () => setHovered(id),
       // Si el dedo se va (scroll), no queda una zona encendida de más.
       onPointerCancel: () => setHovered(null),
@@ -86,50 +128,85 @@ export default function ZonePicker({
       </h1>
       <p className="mt-2 font-body text-ink/70">{ui.subtitle}</p>
 
-      {/* Ancho escalado ×300/220 respecto a F2 para que la figura conserve su
-          tamaño aparente pese al viewBox más ancho; el margen extra es el aire
-          lateral de los chips. */}
-      <div className="relative mx-auto mt-8 w-[85%] max-w-[409px]">
-        <BodyFigureSVG
-          highlightedZone={highlighted}
-          mode="selected"
-          zoneLabels={zoneLabels}
-          ariaLabel={ui.figureAria}
-          className="h-auto w-full text-primary"
-        />
+      {/* Radiografía en tinta directo sobre el fondo, sin caja (como la
+          sección 3D). Misma proporción 1:1.8 y mismo ancho que la silueta
+          anterior: la pantalla no cambia de alto. Los nodos se posicionan en
+          % sobre la caja de la imagen. */}
+      <div
+        role="group"
+        aria-label={ui.figureAria}
+        className="relative mx-auto mt-8 w-[85%] max-w-[409px]"
+      >
+        <picture>
+          <source
+            type="image/avif"
+            srcSet={zonesSrcSet("avif")}
+            sizes={IMG_SIZES}
+          />
+          {/* <img> nativo: next/image recodificaría el AVIF/WebP hecho a mano.
+              Decorativo (las zonas llevan su propio nombre) y eager: es lo
+              principal de la pantalla. */}
+          <img
+            src={`${ZONES_IMAGE.base}-450.webp`}
+            srcSet={zonesSrcSet("webp")}
+            sizes={IMG_SIZES}
+            width={ZONES_IMAGE.width}
+            height={ZONES_IMAGE.height}
+            alt=""
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            draggable={false}
+            className="pointer-events-none block h-auto w-full select-none"
+          />
+        </picture>
 
-        {/* Overlay de zonas táctiles */}
+        {/* Zonas táctiles sobre la imagen */}
         {BODY_ZONES.map((zone) => {
           const available = availableZones.includes(zone.id);
-          const style = {
-            left: `${((zone.cx + FIGURE_OFFSET_X) / VIEW_W) * 100}%`,
-            top: `${(zone.cy / VIEW_H) * 100}%`,
-            width: HIT_SIZE,
-          };
-          const className =
-            "absolute aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full transition-colors duration-100 ease-out active:bg-accent/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent";
+          const [left, top] = ZONE_POSITIONS[zone.id];
+          const active = available && hovered === zone.id;
+          const style = { left: `${left}%`, top: `${top}%`, width: HIT_SIZE };
+          const className = `zone-node absolute aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent${active ? " z-10" : ""}`;
           if (!available) {
             return (
               <span
                 key={zone.id}
                 aria-hidden="true"
-                className={className}
+                className={`${className} opacity-40`}
                 style={style}
-              />
+              >
+                <NodeMark />
+              </span>
             );
           }
+          const side = CHIP_SIDE[zone.id];
           return (
             <a
               key={zone.id}
               {...zoneLinkProps(zone.id)}
               aria-label={ui.zoneAria(zoneLabels[zone.id])}
+              data-active={active ? "" : undefined}
               onMouseEnter={() => setHovered(zone.id)}
               onMouseLeave={() => setHovered(null)}
               onFocus={() => setHovered(zone.id)}
               onBlur={() => setHovered(null)}
               className={className}
               style={style}
-            />
+            >
+              <NodeMark />
+              {/* Chip con el nombre: visual (el enlace ya lleva su
+                  aria-label) y sin capturar el puntero. */}
+              {active && (
+                <span
+                  aria-hidden="true"
+                  className={`zone-chip pointer-events-none absolute whitespace-nowrap rounded-full bg-primary px-2.5 py-1 font-body text-xs font-semibold text-background ${CHIP_POSITION[side]}`}
+                  style={CHIP_FROM[side]}
+                >
+                  {zoneLabels[zone.id]}
+                </span>
+              )}
+            </a>
           );
         })}
       </div>

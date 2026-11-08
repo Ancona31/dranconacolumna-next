@@ -1,70 +1,68 @@
 "use client";
 
-import {
-  BODY_PATH,
-  BODY_ZONES,
-  type BodyZoneId,
-} from "@/components/home/BodyFigureSVG";
+import { BODY_ZONES, type BodyZoneId } from "@/components/home/BodyFigureSVG";
+import { REST_POSTER } from "@/lib/skeleton3d/scenarios";
+import { EDGE_FADE_STYLE } from "@/lib/skeleton3d/edgeFade";
 
 type HeroZoneFigureProps = {
   testZone: BodyZoneId;
   /**
-   * Pie de la silueta. Por defecto usa la etiqueta interna en español de
+   * Imagen fija del padecimiento (la misma del escenario 3D de la home,
+   * resuelta por su slug ES). Si no carga, se cambia a la de reposo.
+   */
+  posterSrc: string;
+  /**
+   * Pie de la figura. Por defecto usa la etiqueta interna en español de
    * BODY_ZONES; las páginas EN pasan aquí la zona ya traducida.
    */
   caption?: string;
-  /** aria-label de la silueta. Por defecto, el español interno. */
-  ariaLabel?: string;
 };
 
-const ACCENT = "var(--color-accent)";
-const INK = "var(--color-primary)";
+/** Cambia a la imagen de reposo si la del padecimiento no existe (404). */
+function fallBackToRest(img: HTMLImageElement) {
+  if (!img.src.endsWith(REST_POSTER)) img.src = REST_POSTER;
+}
 
 /**
- * Silueta de marca del hero: reutiliza el BODY_PATH y las zonas de
- * BodyFigureSVG (mismo patrón de la mini-silueta del PDF) y marca la zona del
- * test en accent con halo. Es un componente cliente porque las constantes que
- * importa viven en un módulo "use client"; no tiene interacción propia.
+ * Figura del hero: la radiografía en tinta del padecimiento (misma imagen
+ * que su escenario en la sección 3D), directo sobre el fondo del hero, sin
+ * caja, con los bordes desvanecidos como el 3D. Decorativa: el pie nombra la
+ * zona. Es cliente solo por el respaldo onError.
  */
 export default function HeroZoneFigure({
   testZone,
+  posterSrc,
   caption,
-  ariaLabel,
 }: HeroZoneFigureProps) {
   const zona = BODY_ZONES.find((z) => z.id === testZone);
   if (!zona) return null;
 
-  const figureAria =
-    ariaLabel ?? `Silueta del cuerpo con la zona ${zona.label} marcada`;
   const figureCaption = caption ?? `Zona: ${zona.label}`;
 
   return (
-    <div className="rounded-2xl bg-primary-soft p-6">
-      <svg
-        viewBox="0 0 220 540"
-        className="mx-auto h-72 w-auto md:h-80"
-        role="img"
-        aria-label={figureAria}
-      >
-        <path d={BODY_PATH} fill={ACCENT} opacity="0.16" />
-        <path
-          d={BODY_PATH}
-          fill="none"
-          stroke={INK}
-          strokeOpacity="0.42"
-          strokeWidth="1.2"
-          strokeLinejoin="round"
-        />
-        <circle cx={zona.cx} cy={zona.cy} r="20" fill={ACCENT} opacity="0.22" />
-        <circle
-          cx={zona.cx}
-          cy={zona.cy}
-          r="9"
-          fill={ACCENT}
-          stroke="var(--color-background)"
-          strokeWidth="2.5"
-        />
-      </svg>
+    <div>
+      {/* <img> nativo: next/image recodificaría los AVIF hechos a mano.
+          width/height (4:5) reservan el alto antes de cargar: sin salto. En
+          PC está en el primer viewport, así que carga ya y con prioridad. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={posterSrc}
+        alt=""
+        width={720}
+        height={900}
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+        draggable={false}
+        className="pointer-events-none mx-auto block h-[336px] w-auto max-w-full select-none object-contain md:h-[352px] lg:h-[400px]"
+        style={EDGE_FADE_STYLE}
+        // Una imagen que falló antes de hidratar no dispara onError: se
+        // revisa al montar.
+        ref={(img) => {
+          if (img?.complete && img.naturalWidth === 0) fallBackToRest(img);
+        }}
+        onError={(e) => fallBackToRest(e.currentTarget)}
+      />
       <p className="mt-2 text-center font-body text-xs font-semibold uppercase tracking-[0.15em] text-primary/70">
         {figureCaption}
       </p>

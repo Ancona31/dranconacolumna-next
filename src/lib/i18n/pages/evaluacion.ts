@@ -27,7 +27,7 @@ export interface EvaluationUi {
   zonePicker: {
     h1: string;
     subtitle: string;
-    /** aria-label de la silueta (BodyFigureSVG). */
+    /** aria-label del grupo de zonas sobre la figura del cuerpo. */
     figureAria: string;
     /** aria-label del botón de una zona. */
     zoneAria: (label: string) => string;

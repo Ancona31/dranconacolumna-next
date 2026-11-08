@@ -39,7 +39,7 @@ import {
 import { getEngineCopy } from "@/lib/evaluacion/i18n";
 import type { Locale } from "@/lib/i18n/types";
 import { getEvaluationUi } from "@/lib/i18n/pages/evaluacion";
-import { BODY_PATH, BODY_ZONES } from "@/components/home/BodyFigureSVG";
+import { ZONE_POSITIONS, ZONES_IMAGE } from "@/lib/skeleton3d/zones2d";
 import PdfDownload from "@/components/evaluacion/PdfDownload";
 import ShareButton from "@/components/share/ShareButton";
 import { trackEvent } from "@/lib/analytics";
@@ -147,7 +147,8 @@ function Gauge({
   );
 }
 
-// Mini-silueta de marca con la zona evaluada marcada en el color del nivel.
+// Mini-figura: la radiografía del selector de zonas, en chico, con la zona
+// evaluada marcada en el rojo de dolor (mismas coordenadas que el selector).
 function MiniSilhouette({
   result,
   locale,
@@ -155,23 +156,35 @@ function MiniSilhouette({
   result: EvaluationResult;
   locale: Locale;
 }) {
-  const pt = BODY_ZONES.find((z) => z.id === result.test.zoneId);
-  const strong = NIVEL_BADGE_COLORS[result.level].strong;
+  const pos = ZONE_POSITIONS[result.test.zoneId];
   return (
-    <svg
-      viewBox="0 0 220 540"
-      className="h-16 w-auto shrink-0"
+    <div
       role="img"
       aria-label={getEvaluationUi(locale).result.zoneAria(result.zoneLabel)}
+      className="relative h-16 shrink-0"
     >
-      <path d={BODY_PATH} fill="var(--color-accent)" fillOpacity={0.12} />
-      {pt && (
-        <>
-          <circle cx={pt.cx} cy={pt.cy} r={17} fill={strong} fillOpacity={0.2} />
-          <circle cx={pt.cx} cy={pt.cy} r={8.5} fill={strong} />
-        </>
+      <picture>
+        {/* <img> nativo (AVIF/WebP hechos a mano). 64 px de alto: con la de
+            450 px de ancho sobra hasta en 3x. */}
+        <source type="image/avif" srcSet={`${ZONES_IMAGE.base}-450.avif`} />
+        <img
+          src={`${ZONES_IMAGE.base}-450.webp`}
+          width={ZONES_IMAGE.width}
+          height={ZONES_IMAGE.height}
+          alt=""
+          decoding="async"
+          draggable={false}
+          className="pointer-events-none block h-16 w-auto select-none"
+        />
+      </picture>
+      {pos && (
+        <span
+          aria-hidden="true"
+          className="absolute size-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-pain ring-2 ring-pain/25"
+          style={{ left: `${pos[0]}%`, top: `${pos[1]}%` }}
+        />
       )}
-    </svg>
+    </div>
   );
 }
 

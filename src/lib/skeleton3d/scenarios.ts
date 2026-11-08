@@ -312,6 +312,15 @@ export const CONDITION_SCENARIOS = Object.fromEntries(
   ]),
 ) as Readonly<Record<ConditionSlug, ScenarioDef>>;
 
+/**
+ * Imagen fija de un padecimiento por su slug ES (las páginas EN traducen su
+ * slug antes de llamar). Sin escenario propio, la de reposo.
+ */
+export function conditionPoster(esSlug: string | undefined): string {
+  const scenario = esSlug ? CONDITION_SCENARIOS[esSlug as ConditionSlug] : undefined;
+  return scenario?.poster ?? REST_POSTER;
+}
+
 // ── Recorrido guiado de reposo (plan §3.2) ──────────────────────────────
 // Cervicales → hombro → mano → lumbar → rodilla → tobillo (derechos) →
 // tobillo y rodilla izquierdos → vista general. Resalte "calm" (azul tinta),
