@@ -27,8 +27,8 @@ export const TAGLINE_LINES = {
 
 export const DOCTOR_FULL_NAME = "Dr. Angel M. Ancona Pérez";
 
-// CONFIRMAR con el dueño antes de producción.
-export const WHATSAPP_PHONE = "529994974956";
+// Celular del doctor (WhatsApp), con lada de México.
+export const WHATSAPP_PHONE = "529992972613";
 
 export const CONTACT_EMAIL = "drangelmanconaperez@gmail.com";
 
