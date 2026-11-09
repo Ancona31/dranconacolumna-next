@@ -51,11 +51,6 @@ const SEDES_ES: SedesCopy = {
   forOfficeInfo: "Para información de la sede",
   mapTitlePrefix: "Mapa de",
   byId: {
-    merida: {
-      addressLines: ["Esquina C. 34 × C. 13, Los Reyes", "Mérida, Yucatán · C.P. 97156"],
-      horario: "Lunes, miércoles y viernes, 9:00 a 11:00 h",
-      horarioCorto: "Mañanas · Lun, Mié y Vie",
-    },
     uman: {
       addressLines: ["C. 20 × 23 y 25, Centro", "Umán, Yucatán · C.P. 97390"],
       horario: "Lunes a viernes, 17:00 a 20:00 h",
@@ -84,11 +79,6 @@ const SEDES_EN: SedesCopy = {
   forOfficeInfo: "For office information",
   mapTitlePrefix: "Map of",
   byId: {
-    merida: {
-      addressLines: ["Corner of Calle 34 and Calle 13, Los Reyes, Mérida, Yucatán 97156"],
-      horario: "Monday, Wednesday and Friday, 9:00–11:00 AM",
-      horarioCorto: "Mornings · Mon, Wed & Fri",
-    },
     uman: {
       addressLines: ["Calle 20 between Calles 23 and 25, Centro, Umán, Yucatán 97390"],
       horario: "Monday–Friday, 5:00–8:00 PM",

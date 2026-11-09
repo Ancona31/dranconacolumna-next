@@ -15,13 +15,6 @@ import type { SedesCopy } from "@/lib/i18n/content/sedes";
 const BUTTON_OUTLINE = buttonClasses({ variant: "outline", fullWidth: true });
 const BUTTON_WHATSAPP = buttonClasses({ variant: "whatsapp", fullWidth: true });
 
-/**
- * Con tres sedes, en tablet (2 columnas) la última tarjeta quedaría sola en
- * media fila: ocupa el ancho completo. En lg las tres van en una fila. Va en
- * el contenedor de cada tarjeta (el Reveal de la rejilla).
- */
-export const SEDE_ORPHAN_SPAN = "md:last:odd:col-span-2 lg:last:odd:col-span-1";
-
 const NOTE = "mt-1.5 text-center font-body text-xs text-muted";
 const TEXT_LINK =
   "inline-flex min-h-11 items-center justify-center gap-1.5 font-body text-sm font-semibold text-accent hover:underline";

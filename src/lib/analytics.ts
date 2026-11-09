@@ -32,7 +32,6 @@ export type WhatsAppSection =
   | "header"
   | "flotante"
   | "barra_movil"
-  | "sede_medclinik"
   | "sede_celus"
   | "sede_prostasur"
   | "sobre_mi";

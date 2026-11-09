@@ -2,13 +2,14 @@
  * Sedes donde el doctor atiende con cita previa. Fuente única de verdad para
  * la página de contacto y para el schema.org (MedicalClinic) de SEO local.
  * Cada campo alimenta tanto la UI como el JSON-LD, sin duplicar datos.
+ * El orden del arreglo es el orden en pantalla: Prostasur, luego Celus.
  */
 
 const LUNES_A_VIERNES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 export type Sede = {
   /** Identificador estable, usado en anclas y llaves. */
-  id: "merida" | "uman" | "prostasur";
+  id: "prostasur" | "uman";
   nombre: string;
   /** Calle y colonia, sin ciudad. */
   direccion: string;
@@ -19,12 +20,12 @@ export type Sede = {
   /** Estado, para schema.org addressRegion. */
   region: string;
   cp: string;
-  /** Teléfono en crudo, solo dígitos ("9994957916"). */
+  /** Teléfono en crudo, solo dígitos ("9995143165"). */
   telefono: string;
-  /** Teléfono formateado para mostrar ("999 495 79 16"). */
+  /** Teléfono formateado para mostrar ("999 514 31 65"). */
   telefonoDisplay: string;
   /**
-   * WhatsApp de la sede en formato wa.me (52 + 10 dígitos, "529994957916").
+   * WhatsApp de la sede en formato wa.me (52 + 10 dígitos, "529995143165").
    * Es el MISMO número que `telefono`; distinto del WhatsApp personal del
    * doctor (config). Alimenta el CTA "Agendar por WhatsApp" de cada tarjeta.
    */
@@ -44,31 +45,31 @@ export type Sede = {
   closes: string;
   mapsUrl: string;
   /** Sección de analítica de los CTA (WhatsApp y teléfono) de esta sede. */
-  section: "sede_medclinik" | "sede_celus" | "sede_prostasur";
+  section: "sede_prostasur" | "sede_celus";
 };
 
 export const SEDES: Sede[] = [
   {
-    id: "merida",
-    nombre: "Medclinik Mérida",
-    direccion: "Esquina C. 34 × C. 13, Los Reyes",
+    id: "prostasur",
+    nombre: "Prostasur",
+    direccion: "C. 32 #198 × 17 y 21, García Ginerés",
     ciudad: "Mérida, Yucatán",
     localidad: "Mérida",
     region: "Yucatán",
-    cp: "97156",
-    telefono: "9994957916",
-    telefonoDisplay: "999 495 79 16",
-    whatsapp: "529994957916",
-    lat: 20.97978962216484,
-    lng: -89.57207645354667,
-    dias: ["Monday", "Wednesday", "Friday"],
-    horario: "Lunes, miércoles y viernes, 9:00 a 11:00 h",
-    horarioCorto: "Mañanas · Lun, Mié y Vie",
+    cp: "97070",
+    telefono: "9995143165",
+    telefonoDisplay: "999 514 31 65",
+    whatsapp: "529995143165",
+    lat: 20.9904344,
+    lng: -89.6384806,
+    dias: ["Tuesday", "Thursday"],
+    horario: "Martes y jueves, 9:00 a 12:00 h",
+    horarioCorto: "Mañanas · Mar y Jue",
     opens: "09:00",
-    closes: "11:00",
-    mapsUrl:
-      "https://www.google.com/maps/search/?api=1&query=20.97978962216484,-89.57207645354667",
-    section: "sede_medclinik",
+    closes: "12:00",
+    // Ficha de Google Maps del lugar (cid), no solo el pin de coordenadas.
+    mapsUrl: "https://www.google.com/maps?cid=18369633801198173940",
+    section: "sede_prostasur",
   },
   {
     id: "uman",
@@ -91,27 +92,5 @@ export const SEDES: Sede[] = [
     mapsUrl:
       "https://www.google.com/maps/search/?api=1&query=20.87988952572975,-89.7481702443132",
     section: "sede_celus",
-  },
-  {
-    id: "prostasur",
-    nombre: "Prostasur",
-    direccion: "C. 32 #198 × 17 y 21, García Ginerés",
-    ciudad: "Mérida, Yucatán",
-    localidad: "Mérida",
-    region: "Yucatán",
-    cp: "97070",
-    telefono: "9995143165",
-    telefonoDisplay: "999 514 31 65",
-    whatsapp: "529995143165",
-    lat: 20.9904344,
-    lng: -89.6384806,
-    dias: ["Tuesday", "Thursday"],
-    horario: "Martes y jueves, 9:00 a 12:00 h",
-    horarioCorto: "Mañanas · Mar y Jue",
-    opens: "09:00",
-    closes: "12:00",
-    // Ficha de Google Maps del lugar (cid), no solo el pin de coordenadas.
-    mapsUrl: "https://www.google.com/maps?cid=18369633801198173940",
-    section: "sede_prostasur",
   },
 ];

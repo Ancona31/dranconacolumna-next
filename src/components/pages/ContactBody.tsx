@@ -1,6 +1,6 @@
 import Reveal from "@/components/ui/Reveal";
 import WhatsAppLink from "@/components/analytics/WhatsAppLink";
-import SedeCard, { SEDE_ORPHAN_SPAN } from "@/components/sedes/SedeCard";
+import SedeCard from "@/components/sedes/SedeCard";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { SEDES } from "@/lib/sedes";
 import {
@@ -155,12 +155,9 @@ export default function ContactBody({ locale }: { locale: Locale }) {
       {/* Grid de sedes */}
       <section className="bg-background">
         <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
             {SEDES.map((sede) => (
-              <Reveal
-                key={sede.id}
-                className={`flex ${SEDE_ORPHAN_SPAN}`}
-              >
+              <Reveal key={sede.id} className="flex">
                 <SedeCard
                   sede={sede}
                   copy={copy}

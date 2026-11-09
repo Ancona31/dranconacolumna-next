@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Reveal from "@/components/ui/Reveal";
-import SedeCard, { SEDE_ORPHAN_SPAN } from "@/components/sedes/SedeCard";
+import SedeCard from "@/components/sedes/SedeCard";
 import { SEDES } from "@/lib/sedes";
 import type { Locale } from "@/lib/i18n/types";
 import { getHomeContent } from "@/lib/i18n/pages/home";
@@ -18,12 +18,9 @@ export default function Locations({ locale }: { locale: Locale }) {
           {c.h2}
         </h2>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
           {SEDES.map((sede) => (
-            <Reveal
-              key={sede.id}
-              className={`flex ${SEDE_ORPHAN_SPAN}`}
-            >
+            <Reveal key={sede.id} className="flex">
               <SedeCard
                 sede={sede}
                 copy={copy}
